@@ -1,0 +1,43 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import BookCard from "../../components/BookCard.astro";
+import QuoteCard from "../../components/QuoteCard.astro";
+import HistoryGrid from "../../components/HistoryGrid.astro";
+import { getBookForDate, formatDate, formatDateISO } from "../../data/books";
+
+export function getStaticPaths() {
+  // Generate pages for the past 90 days
+  const paths = [];
+  for (let i = 0; i < 90; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const dateStr = formatDateISO(date);
+    paths.push({ params: { date: dateStr } });
+  }
+  return paths;
+}
+
+const { date: dateParam } = Astro.params;
+const [year, month, day] = dateParam!.split("-").map(Number);
+const date = new Date(year, month - 1, day);
+const book = getBookForDate(date);
+const dateStr = formatDate(date);
+---
+
+<Layout title={`${book.title} · ${dateStr} · 每日一书`} description={`${dateStr}推荐《${book.title}》—— ${book.quotes[0].text}`}>
+  <div class="date-bar">
+    <div class="date-info">
+      <div class="date-main">{dateStr}</div>
+      <div class="date-reading-day">
+        {formatDateISO(date) === formatDateISO(new Date()) ? "今日推荐" : "往期推荐"}
+      </div>
+    </div>
+    <div class="date-nav">
+      <a href="/" class="date-arrow" title="回到今天" style="font-size: 12px; font-weight: 600; text-decoration: none;">今</a>
+    </div>
+  </div>
+
+  <BookCard book={book} dateStr={dateStr} dayInfo="" />
+  <QuoteCard book={book} />
+  <HistoryGrid days={6} />
+</Layout>

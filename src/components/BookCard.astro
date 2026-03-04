@@ -1,0 +1,92 @@
+---
+import type { Book } from "../data/books";
+
+interface Props {
+  book: Book;
+  dateStr: string;
+  dayInfo: string;
+}
+
+const { book, dateStr, dayInfo } = Astro.props;
+---
+
+<div class="hero-card">
+  <div class="hero-content">
+    <div class="book-cover-section">
+      <div class="book-cover">
+        <div class="book-spine"></div>
+        <div class="book-cover-placeholder" style={`background: ${book.coverBg};`}>
+          <div class="cover-title" set:html={book.coverTitle.replace(/\n/g, "<br>")} />
+          <div class="cover-divider"></div>
+          <div class="cover-author">{book.coverAuthor}</div>
+        </div>
+      </div>
+    </div>
+    <div class="book-info-section">
+      <div class="book-category">{book.category}</div>
+      <h1 class="book-title">{book.title}</h1>
+      <p class="book-author"><span>{book.author}</span></p>
+      <p class="book-desc">{book.desc}</p>
+      <div class="book-meta">
+        <div class="meta-item">
+          <span class="meta-label">出版年份</span>
+          <span class="meta-value">{book.year}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">页数</span>
+          <span class="meta-value">{book.pages}页</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">评分</span>
+          <span class="meta-value">⭐ {book.rating}</span>
+        </div>
+      </div>
+      <div class="book-actions">
+        <button class="btn-primary" id="markReadBtn">📚 标记已读</button>
+        <button class="btn-secondary" id="collectBtn">♡ 收藏</button>
+        <a href="/rss.xml" class="btn-rss" target="_blank">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
+          RSS
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ bookTitle: book.title }}>
+  // Mark as read
+  document.getElementById('markReadBtn')?.addEventListener('click', () => {
+    const readBooks = JSON.parse(localStorage.getItem('dailybook_read') || '[]');
+    if (!readBooks.includes(bookTitle)) {
+      readBooks.push(bookTitle);
+      localStorage.setItem('dailybook_read', JSON.stringify(readBooks));
+      window.showToast(`《${bookTitle}》已标记为已读 📚`);
+    } else {
+      window.showToast('这本书已经标记过了');
+    }
+  });
+
+  // Collect
+  const collectBtn = document.getElementById('collectBtn');
+  const collections = JSON.parse(localStorage.getItem('dailybook_collections') || '[]');
+  if (collections.includes(bookTitle)) {
+    collectBtn.innerHTML = '♥ 已收藏';
+    collectBtn.style.color = 'var(--accent)';
+  }
+  collectBtn?.addEventListener('click', () => {
+    const cols = JSON.parse(localStorage.getItem('dailybook_collections') || '[]');
+    const idx = cols.indexOf(bookTitle);
+    if (idx > -1) {
+      cols.splice(idx, 1);
+      collectBtn.innerHTML = '♡ 收藏';
+      collectBtn.style.color = '';
+      window.showToast('已取消收藏');
+    } else {
+      cols.push(bookTitle);
+      collectBtn.innerHTML = '♥ 已收藏';
+      collectBtn.style.color = 'var(--accent)';
+      window.showToast('已加入收藏 ♥');
+    }
+    localStorage.setItem('dailybook_collections', JSON.stringify(cols));
+  });
+</script>

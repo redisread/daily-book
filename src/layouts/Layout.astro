@@ -1,0 +1,85 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = "每日一书 · Daily Book", description = "每天推荐一本好书，附带精选金句，让阅读成为习惯。" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title="每日一书 RSS" href="/rss.xml" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <!-- Background -->
+    <div class="ambient-bg">
+      <div class="ambient-orb"></div>
+      <div class="ambient-orb"></div>
+      <div class="ambient-orb"></div>
+    </div>
+    <div class="grain"></div>
+
+    <div class="app-container">
+      <!-- Header -->
+      <header class="header">
+        <a href="/" class="logo">
+          <div class="logo-icon">📖</div>
+          <div>
+            <div class="logo-text">每日一书</div>
+            <div class="logo-sub">Daily Book</div>
+          </div>
+        </a>
+        <nav class="header-nav">
+          <a href="/" class="nav-btn active" data-nav="home">今日推荐</a>
+          <a href="/archive" class="nav-btn" data-nav="archive">往期回顾</a>
+          <a href="/rss.xml" class="nav-btn" target="_blank" title="RSS 订阅">RSS</a>
+        </nav>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <span>每日一书 &copy; {new Date().getFullYear()}</span>
+        <a href="/rss.xml" target="_blank">RSS 订阅</a>
+      </footer>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      // Highlight active nav
+      const path = window.location.pathname;
+      document.querySelectorAll('.nav-btn').forEach((btn) => {
+        btn.classList.remove('active');
+        const href = btn.getAttribute('href');
+        if (href === '/' && (path === '/' || path.startsWith('/book/'))) {
+          btn.classList.add('active');
+        } else if (href && href !== '/' && path.startsWith(href)) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Toast utility
+      (window as any).showToast = function(msg: string) {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      };
+    </script>
+  </body>
+</html>

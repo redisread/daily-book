@@ -1,0 +1,28 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BookCard from "../components/BookCard.astro";
+import QuoteCard from "../components/QuoteCard.astro";
+import HistoryGrid from "../components/HistoryGrid.astro";
+import { getTodayBook, formatDate } from "../data/books";
+
+const today = new Date();
+const book = getTodayBook();
+const dateStr = formatDate(today);
+const dayOfYear = Math.floor(
+  (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
+);
+---
+
+<Layout title={`今日推荐：${book.title} · 每日一书`} description={`今日推荐《${book.title}》—— ${book.quotes[0].text}`}>
+  <!-- Date Bar -->
+  <div class="date-bar">
+    <div class="date-info">
+      <div class="date-main">{dateStr}</div>
+      <div class="date-reading-day">今年第 {dayOfYear} 天</div>
+    </div>
+  </div>
+
+  <BookCard book={book} dateStr={dateStr} dayInfo={`今年第 ${dayOfYear} 天`} />
+  <QuoteCard book={book} />
+  <HistoryGrid days={6} />
+</Layout>

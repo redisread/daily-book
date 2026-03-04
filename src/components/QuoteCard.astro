@@ -1,0 +1,78 @@
+---
+import type { Book } from "../data/books";
+
+interface Props {
+  book: Book;
+}
+
+const { book } = Astro.props;
+const mainQuote = book.quotes[0];
+const moreQuotes = book.quotes.slice(1, 5);
+---
+
+<!-- Featured Quote -->
+<div class="quote-section">
+  <div class="quote-card">
+    <div class="quote-mark">&ldquo;</div>
+    <p class="quote-text" id="mainQuoteText">{mainQuote.text}</p>
+    <div class="quote-source" id="mainQuoteSource">
+      ——{book.author}《{book.title}》{mainQuote.page}
+    </div>
+    <div class="quote-actions">
+      <button class="quote-action-btn" id="likeBtn" title="喜欢">♡</button>
+      <button class="quote-action-btn" id="copyBtn" title="复制">⎘</button>
+    </div>
+  </div>
+</div>
+
+<!-- More Quotes -->
+{moreQuotes.length > 0 && (
+  <div class="more-quotes">
+    <div class="section-header">
+      <h2 class="section-title">更多金句</h2>
+    </div>
+    <div class="quotes-grid">
+      {moreQuotes.map((q) => (
+        <div class="mini-quote-card" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`}>
+          <p class="mini-quote-text">{q.text}</p>
+          <span class="mini-quote-page">{q.page}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+<script>
+  // Copy quote
+  document.getElementById('copyBtn')?.addEventListener('click', () => {
+    const quote = document.getElementById('mainQuoteText')?.textContent || '';
+    const source = document.getElementById('mainQuoteSource')?.textContent || '';
+    navigator.clipboard.writeText(`${quote}\n${source}\n\n—— 来自「每日一书」`).then(() => {
+      (window as any).showToast?.('金句已复制到剪贴板 ✓');
+    });
+  });
+
+  // Like
+  const likeBtn = document.getElementById('likeBtn');
+  let liked = false;
+  likeBtn?.addEventListener('click', () => {
+    liked = !liked;
+    likeBtn.innerHTML = liked ? '♥' : '♡';
+    likeBtn.style.color = liked ? '#e74c3c' : '';
+    likeBtn.style.background = liked ? 'rgba(231,76,60,0.1)' : '';
+    (window as any).showToast?.(liked ? '已喜欢这句话 ♥' : '已取消喜欢');
+  });
+
+  // Click mini quote to swap main
+  document.querySelectorAll('.mini-quote-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const text = card.getAttribute('data-quote');
+      const source = card.getAttribute('data-source');
+      const mainText = document.getElementById('mainQuoteText');
+      const mainSource = document.getElementById('mainQuoteSource');
+      if (mainText && text) mainText.textContent = text;
+      if (mainSource && source) mainSource.textContent = source;
+      document.querySelector('.quote-section')?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>

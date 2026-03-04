@@ -1,0 +1,29 @@
+---
+import { getRecentBooks, formatDateShort, formatDateISO } from "../data/books";
+
+interface Props {
+  days?: number;
+  skipToday?: boolean;
+}
+
+const { days = 4, skipToday = true } = Astro.props;
+const allRecent = getRecentBooks(days + (skipToday ? 1 : 0));
+const recent = skipToday ? allRecent.slice(1) : allRecent;
+---
+
+<div class="history-section">
+  <div class="section-header">
+    <h2 class="section-title">往期推荐</h2>
+    <a href="/archive" class="section-more">查看全部 →</a>
+  </div>
+  <div class="history-grid">
+    {recent.map(({ date, book }) => (
+      <a href={`/book/${formatDateISO(date)}`} class="history-card">
+        <div class="history-date">{formatDateShort(date)}</div>
+        <div class="history-title">{book.title}</div>
+        <div class="history-author">{book.author}</div>
+        <div class="history-quote">&ldquo;{book.quotes[0].text.substring(0, 40)}&hellip;&rdquo;</div>
+      </a>
+    ))}
+  </div>
+</div>
