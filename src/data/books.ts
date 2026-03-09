@@ -399,6 +399,26 @@ export const books: Book[] = [
       { text: "当一个人有所追寻时，他只会看到他所追寻之物。他之所以无所发现、无所获得，是因为他只专注于他所追寻之物。", page: "第四章" },
     ],
   },
+  {
+    id: "animal-farm",
+    title: "动物农场",
+    author: "乔治·奥威尔",
+    category: "政治寓言",
+    year: "1945",
+    pages: "141",
+    rating: "9.0",
+    desc: "一个农场里的动物们发动革命，推翻了人类主人的统治，建立起动物自治的社会。然而，猪们逐渐篡夺了权力，变得比人类更加专制。这是奥威尔对极权主义的辛辣讽刺，也是人类政治历史的寓言式写照。",
+    coverBg: "linear-gradient(145deg, #3a2a1a, #6a4a2a, #3a2a1a)",
+    coverTitle: "动物农场",
+    coverAuthor: "奥威尔",
+    quotes: [
+      { text: "所有动物都是平等的，但有些动物比其他动物更加平等。", page: "第十章" },
+      { text: "四条腿好，两条腿坏。", page: "第三章" },
+      { text: "外面的动物从猪看到人，从人看到猪，又从猪看到人，已经分不清哪是人哪是猪了。", page: "第十章" },
+      { text: "苦难和匮乏是生活不可改变的一部分。", page: "第七章" },
+      { text: "猪们用两条腿走路了，手里拿着鞭子。", page: "第十章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
