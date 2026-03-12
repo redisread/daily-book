@@ -439,6 +439,26 @@ export const books: Book[] = [
       { text: "死亡并不恐怖，恐怖的是从未真正活过。", page: "第三卷" },
     ],
   },
+  {
+    id: "the-road-less-traveled",
+    title: "少有人走的路",
+    author: "M·斯科特·派克",
+    category: "心理学",
+    year: "1978",
+    pages: "230",
+    rating: "8.8",
+    desc: "这是一本关于心智成熟的经典著作。作者提出「自律」是解决人生问题的关键，而自律始于「推迟满足感」。书中还探讨了爱的本质、成长与信仰的关系，以及如何面对生活中的痛苦与挑战。",
+    coverBg: "linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)",
+    coverTitle: "少有人走的路",
+    coverAuthor: "派克",
+    quotes: [
+      { text: "人生苦难重重。这是个伟大的真理，是世界上最伟大的真理之一。", page: "第一章" },
+      { text: "自律是解决人生问题最主要的工具，也是消除人生痛苦最重要的方法。", page: "第一章" },
+      { text: "爱，是为了促进自己和他人心智成熟，而具有的一种自我完善的意愿。", page: "第二章" },
+      { text: "坠入情网，意味着自我界限的某一部分突然崩溃，使我们的自我与他人的自我合而为一。", page: "第二章" },
+      { text: "所谓信仰，就是让我们敢于面对不确定的未来，相信自己能够应对一切。", page: "第四章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
