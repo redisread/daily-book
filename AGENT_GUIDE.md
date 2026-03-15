@@ -182,7 +182,26 @@ npx astro build
 npx astro preview --port 4321
 ```
 
-部署到 Cloudflare Pages 时，构建命令为 `npm run build`，输出目录为 `dist`。
+### Cloudflare Pages 部署配置
+
+这是一个**静态站点**，部署时必须使用以下配置：
+
+| 配置项 | 值 | 说明 |
+|--------|-----|------|
+| 构建命令 | `npm run build` | 执行 Astro 构建 |
+| 输出目录 | `dist` | 静态文件输出目录 |
+| **部署命令** | **留空** | Pages 会自动部署静态文件 |
+
+**⚠️ 重要警告**：
+- **不要**设置 `npx wrangler deploy` 或任何部署命令
+- `wrangler deploy` 仅适用于 Workers 项目，不适用于静态 Pages 站点
+- 错误的部署命令会导致构建成功但部署失败
+
+### 部署流程
+
+1. 代码推送到 GitHub 后，Cloudflare Pages 自动触发构建
+2. 构建成功后，Pages 自动将 `dist` 目录部署到 CDN
+3. 无需额外的部署命令
 
 ---
 
