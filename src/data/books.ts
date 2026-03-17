@@ -619,6 +619,26 @@ export const books: Book[] = [
       { text: "未来的人工智能系统将不仅仅是工具，而是人类认知能力的延伸和放大器。", page: "第二十章" },
     ],
   },
+  {
+    id: "atomic-habits",
+    title: "原子习惯",
+    author: "詹姆斯·克利尔",
+    category: "个人成长",
+    year: "2018",
+    pages: "320",
+    rating: "8.9",
+    desc: "微小的改变，非凡的结果。作者提出「1%法则」：每天进步1%，一年后你会比原来好37倍。书中详细阐述了习惯形成的四大定律，帮助读者建立好习惯、戒除坏习惯，实现持续的自我提升。",
+    coverBg: "linear-gradient(145deg, #1a5a3a, #2a8a5a, #1a5a3a)",
+    coverTitle: "原子习惯",
+    coverAuthor: "克利尔",
+    quotes: [
+      { text: "你不是要读一本书，而是要成为读书的人。你不是要跑一次步，而是要成为跑步的人。", page: "第一章" },
+      { text: "目标不是赢一场比赛，而是成为一个赢家。身份认同才是持久改变的关键。", page: "第二章" },
+      { text: "让好习惯显而易见、有吸引力、简便易行、令人愉悦。", page: "第四章" },
+      { text: "成功不是达到某个目标，而是遵循正确的系统。", page: "第三章" },
+      { text: "真正的行为改变是身份的改变。你采取的每个行动都是对你希望成为的那种人的投票。", page: "第六章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
