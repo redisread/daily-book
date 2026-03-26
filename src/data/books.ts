@@ -719,6 +719,26 @@ export const books: Book[] = [
       { text: "艺术是唯一的途径，能让我们从时间的束缚中解脱出来。", page: "第七卷" },
     ],
   },
+  {
+    id: "the-metamorphosis",
+    title: "变形记",
+    author: "弗兰茨·卡夫卡",
+    category: "现代主义",
+    year: "1915",
+    pages: "128",
+    rating: "9.2",
+    desc: "推销员格里高尔一觉醒来发现自己变成了一只巨大的甲虫。这个荒诞的开端揭示了现代社会中人的异化、孤独与存在的荒谬。卡夫卡用冷静克制的笔触，描绘了一个关于家庭关系、社会压力和人性本质的寓言。",
+    coverBg: "linear-gradient(145deg, #2a2a2a, #4a4a4a, #2a2a2a)",
+    coverTitle: "变形记",
+    coverAuthor: "卡夫卡",
+    quotes: [
+      { text: "一天早晨，格里高尔·萨姆沙从不安的睡梦中醒来，发现自己躺在床上变成了一只巨大的甲虫。", page: "第一章" },
+      { text: "他觉得自己必须离开这里，他的这个意见也许比妹妹的还要坚决呢。", page: "第三章" },
+      { text: "只要可能，他还是想回到自己房间里去的。", page: "第三章" },
+      { text: "他怀着深情和爱意回忆家庭，并坚定地认为他必须离开。", page: "第三章" },
+      { text: "他消灭自己的决心比妹妹还强烈呢，因为妹妹只是站在那儿，目瞪口呆地看着他。", page: "第三章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
