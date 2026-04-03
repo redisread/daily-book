@@ -799,6 +799,26 @@ export const books: Book[] = [
       { text: "对于一个高尚的人来说，侮辱是比挨打还难受的。", page: "第二卷" },
     ],
   },
+  {
+    id: "the-consolation-of-philosophy",
+    title: "哲学的慰藉",
+    author: "波爱修斯",
+    category: "哲学经典",
+    year: "524",
+    pages: "224",
+    rating: "9.1",
+    desc: "罗马哲学家波爱修斯在狱中等待处决时写下此书。通过与哲学女神的对话，探讨了命运、自由意志、善恶本质等永恒命题。这部中世纪经典为无数身处困境的人提供了精神慰藉和智慧指引。",
+    coverBg: "linear-gradient(145deg, #5a1a8a, #7a2ab0, #5a1a8a)",
+    coverTitle: "哲学的慰藉",
+    coverAuthor: "波爱修斯",
+    quotes: [
+      { text: "命运无常，但智慧永恒。真正的幸福不依赖于外在境遇，而在于内心的平静与理性。", page: "第三卷" },
+      { text: "恶人看似强大，实则虚弱。他们被欲望奴役，失去了真正的自由。", page: "第四卷" },
+      { text: "最高的善就是至善本身，它包含了所有其他的善。", page: "第三卷" },
+      { text: "时间流逝，但永恒不变。真正的智慧在于超越时间的束缚。", page: "第五卷" },
+      { text: "哲学不是逃避现实的工具，而是面对现实的勇气。", page: "第一卷" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
