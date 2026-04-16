@@ -1081,6 +1081,26 @@ export const books: Book[] = [
       { text: "人类常常声称自己是地球上最聪明的物种，这本身就是一个相当可疑的说法。", page: "第三章" },
     ],
   },
+  {
+    id: "noise",
+    title: "噪声",
+    author: "丹尼尔·卡尼曼、奥利维耶·西博尼、卡斯·桑斯坦",
+    category: "行为决策",
+    year: "2021",
+    pages: "386",
+    rating: "8.6",
+    desc: "卡尼曼继《思考，快与慢》后的又一力作，揭示了人类判断中隐藏的「噪声」——那些导致同样问题得到不同答案的随机误差。从司法判决到医疗诊断，噪声无处不在，而减少噪声能显著提升决策质量。",
+    coverBg: "linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)",
+    coverTitle: "噪声",
+    coverAuthor: "卡尼曼",
+    quotes: [
+      { text: "哪里有判断，哪里就有噪声，而且通常比你想象的更多。", page: "导言" },
+      { text: "偏差是平均的错误，噪声是分散的错误。", page: "第一章" },
+      { text: "系统噪声等于你并不希望存在的个体差异的平方和。", page: "第六章" },
+      { text: "判断就像射击，偏差是准星不准，噪声是手抖。", page: "第三章" },
+      { text: "减少噪声不是要把人变成机器，而是要让决策更加一致和公正。", page: "第十六章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
