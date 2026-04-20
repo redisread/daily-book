@@ -1161,6 +1161,26 @@ export const books: Book[] = [
       { text: "最好的决策是用逻辑和常识判断，而不是情绪。", page: "第二部分" },
     ],
   },
+  {
+    id: "rework",
+    title: "重来",
+    author: "贾森·弗里德、戴维·海涅迈尔·汉森",
+    category: "商业创业",
+    year: "2010",
+    pages: "288",
+    rating: "8.6",
+    desc: "Basecamp创始人挑战传统商业思维的宣言。书中提出「创业不需要商业计划」「不需要投资人」「不需要办公室」等反常识观点，主张用更精简、更务实的方式创建和经营企业，让工作回归本质。",
+    coverBg: "linear-gradient(145deg, #2a5a8a, #4a7ab0, #2a5a8a)",
+    coverTitle: "重来",
+    coverAuthor: "弗里德/汉森",
+    quotes: [
+      { text: "失败不是成功的必要条件。你从成功中学到的东西，远比从失败中学到的多。", page: "第一章" },
+      { text: "除非你正在制造火箭，否则你的商业计划毫无意义。", page: "第二章" },
+      { text: "工作狂不是英雄。他们不会拯救这一天，他们只是在浪费时间。", page: "第三章" },
+      { text: "你不需要更多的资源，你需要的是更少的干扰。", page: "第五章" },
+      { text: "最好的竞争策略就是不去竞争。找到没人涉足的角落，在那里成为唯一的选择。", page: "第七章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
