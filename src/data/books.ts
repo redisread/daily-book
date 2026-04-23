@@ -1221,6 +1221,26 @@ export const books: Book[] = [
       { text: " validated learning（经证实的认知）是精益创业的核心——我们要用科学的方法验证每一个假设。", page: "第三章" },
     ],
   },
+  {
+    id: "how-to-read-a-book",
+    title: "如何阅读一本书",
+    author: "莫提默·J·艾德勒、查尔斯·范多伦",
+    category: "阅读方法",
+    year: "1940",
+    pages: "426",
+    rating: "8.9",
+    desc: "一本关于阅读艺术的经典指南，系统阐述了阅读的四个层次：基础阅读、检视阅读、分析阅读和主题阅读。作者强调主动阅读的重要性，教导读者如何与作者对话，如何从书中获取真正的知识，是提升阅读能力的必读书目。",
+    coverBg: "linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)",
+    coverTitle: "如何阅读\n一本书",
+    coverAuthor: "艾德勒/范多伦",
+    quotes: [
+      { text: "阅读是一门艺术，就像滑雪、打网球或演奏乐器一样，需要学习和练习。", page: "第一章" },
+      { text: "一个读者要追求的，是尽可能地被作者启发，而不是被作者牵着鼻子走。", page: "第五章" },
+      { text: "阅读的速度并非越快越好，而是要根据内容的难易程度和重要性来调整。", page: "第三章" },
+      { text: "好的阅读者不会被动地接受信息，而是主动地与作者进行对话和辩论。", page: "第七章" },
+      { text: "阅读的最终目的，是让一本书真正属于你——让它成为你知识体系的一部分。", page: "第二十章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
