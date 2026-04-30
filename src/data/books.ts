@@ -1361,6 +1361,26 @@ export const books: Book[] = [
       { text: "人之所以不幸，是因为不知道自己是幸福的。", page: "第四章" },
     ],
   },
+  {
+    id: "the-psychology-of-money",
+    title: "金钱心理学",
+    author: "摩根·豪泽尔",
+    category: "投资理财",
+    year: "2020",
+    pages: "252",
+    rating: "8.8",
+    desc: "豪泽尔用18个短篇故事探讨了财富、贪婪与幸福的永恒主题。书中指出，理财的成功与否往往不取决于智商或学历，而是与行为习惯和心理因素密切相关。作者强调，在金钱的世界里，理性决策比知识更重要，而时间是最强大的财富杠杆。",
+    coverBg: "linear-gradient(145deg, #1a4a3a, #2a7a5a, #1a4a3a)",
+    coverTitle: "金钱心理学",
+    coverAuthor: "豪泽尔",
+    quotes: [
+      { text: "理财的成功与否和你的智商关系不大，但和你的行为习惯关系很大。", page: "第一章" },
+      { text: "金钱最大的价值在于它能让你掌控自己的时间。", page: "第七章" },
+      { text: "复利的第一条原则是：除非万不得已，否则永远不要打断它。", page: "第四章" },
+      { text: "财富是你看不见的那些东西——是你没有买的豪车、没有戴的名表、没有去的豪华度假。", page: "第九章" },
+      { text: "在金钱方面，最危险的事情是相信过去的成功经验会永远适用。", page: "第十五章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
