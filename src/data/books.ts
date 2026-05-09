@@ -1541,6 +1541,26 @@ export const books: Book[] = [
       { text: "禅的修行不在寺庙，而在日常生活的每一个当下。洗碗时就专心洗碗，喝茶时就专心喝茶。", page: "第十章" },
     ],
   },
+  {
+    id: "the-great-gatsby",
+    title: "了不起的盖茨比",
+    author: "F·斯科特·菲茨杰拉德",
+    category: "经典文学",
+    year: "1925",
+    pages: "180",
+    rating: "9.0",
+    desc: "20世纪美国文学的经典之作，讲述了神秘富豪盖茨比对初恋黛西的执着追求。小说以爵士时代为背景，通过尼克·卡拉威的视角，展现了美国梦的幻灭、阶级固化的残酷以及金钱与爱情的复杂关系。",
+    coverBg: "linear-gradient(145deg, #1a3a5a, #2a5a8a, #1a3a5a)",
+    coverTitle: "了不起的\n盖茨比",
+    coverAuthor: "菲茨杰拉德",
+    quotes: [
+      { text: "每当你想要批评别人的时候，要记住，这世上并非所有人都有你拥有的那些优势。", page: "第一章" },
+      { text: "于是我们奋力向前划，逆流向上的小舟，不停地倒退，进入过去。", page: "第九章" },
+      { text: "盖茨比信仰那盏绿灯，那盏年复一年在我们眼前渐渐远去的极乐未来的绿灯。", page: "第九章" },
+      { text: "他绝望地伸出手，仿佛想抓住一缕空气，将这座因她而可爱的城市存留一个 fragment。", page: "第八章" },
+      { text: "人的基本美德是勇气，而勇气源于希望。", page: "第六章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
