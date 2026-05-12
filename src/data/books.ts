@@ -1601,6 +1601,26 @@ export const books: Book[] = [
       { text: "人工智能可能是人类发明的最后一个工具，也可能是最后一个发明。", page: "结语" },
     ],
   },
+  {
+    id: "the-art-of-thinking",
+    title: "思考的艺术",
+    author: "罗尔夫·多贝里",
+    category: "认知科学",
+    year: "2011",
+    pages: "256",
+    rating: "8.8",
+    desc: "多贝里在本书中揭示了52种常见的思维错误，从沉没成本谬误到确认偏误，从权威偏见到从众心理。作者用生动的案例和清晰的逻辑，帮助读者识别并克服这些认知陷阱，培养更理性的思考方式。",
+    coverBg: "linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)",
+    coverTitle: "思考的艺术",
+    coverAuthor: "多贝里",
+    quotes: [
+      { text: "沉没成本谬误让我们为已经失去的东西继续投入，仿佛这样就能挽回损失。", page: "第一章" },
+      { text: "确认偏误使我们只看到支持自己观点的证据，而忽略那些相反的证据。", page: "第三章" },
+      { text: "权威偏见让我们盲目相信专家，即使他们的观点明显错误。", page: "第五章" },
+      { text: "从众心理使我们放弃独立思考，仅仅因为「大家都这么做」。", page: "第七章" },
+      { text: "理性的思考不是天生的能力，而是需要不断练习和修正的技能。", page: "结语" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
