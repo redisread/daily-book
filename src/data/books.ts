@@ -1661,6 +1661,26 @@ export const books: Book[] = [
       { text: "在舒适区边缘扩展自己的行动范围，是进步最快的区域，既不会太无聊，也不会太焦虑。", page: "第四章" },
     ],
   },
+  {
+    id: "fortress-besieged",
+    title: "围城",
+    author: "钱钟书",
+    category: "讽刺小说",
+    year: "1947",
+    pages: "368",
+    rating: "9.0",
+    desc: "钱钟书唯一的长篇小说，以抗战初期的知识分子方鸿渐为主角，讲述他从海外归来后在爱情、婚姻和事业上的种种遭遇。书名取自法国谚语「婚姻就像围城，城外的人想进去，城里的人想出来」，深刻讽刺了知识分子的虚荣、懦弱与困境。",
+    coverBg: "linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)",
+    coverTitle: "围城",
+    coverAuthor: "钱钟书",
+    quotes: [
+      { text: "婚姻是一座围城，城外的人想进去，城里的人想出来。", page: "第五章" },
+      { text: "天下只有两种人。譬如一串葡萄到手，一种人挑最好的先吃，另一种人把最好的留在最后吃。", page: "第三章" },
+      { text: "忠厚老实人的恶毒，像饭里的砂砾或者出骨鱼片里未净的刺，会给人一种不期待的伤痛。", page: "第二章" },
+      { text: "对于丑人，细看是一种残忍。", page: "第四章" },
+      { text: "人生的刺，就在这里，留恋着不肯快走的，偏是你所不留恋的东西。", page: "第九章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
