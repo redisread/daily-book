@@ -1721,6 +1721,26 @@ export const books: Book[] = [
       { text: "鱼啊，我爱你，非常尊敬你。不过今天无论如何要把你杀死。", page: "第三章" },
     ],
   },
+  {
+    id: "the-myth-of-sisyphus",
+    title: "西西弗神话",
+    author: "阿尔贝·加缪",
+    category: "存在主义",
+    year: "1942",
+    pages: "192",
+    rating: "9.1",
+    desc: "加缪在这本哲学随笔中探讨了「荒诞」这一核心概念——当人类对意义的渴求遭遇世界的沉默，荒诞便产生了。但加缪拒绝自杀和虚无主义，主张像推石上山的西西弗一样，在承认荒诞的同时继续生活，在反抗中获得自由与尊严。",
+    coverBg: "linear-gradient(145deg, #2a2a2a, #4a4a4a, #2a2a2a)",
+    coverTitle: "西西弗神话",
+    coverAuthor: "加缪",
+    quotes: [
+      { text: "真正严肃的哲学问题只有一个，那就是自杀。判断人生值不值得活，等于回答哲学的根本问题。", page: "第一章" },
+      { text: "登上顶峰的斗争本身足以充实人的心灵。应当想像西西弗是幸福的。", page: "结语" },
+      { text: "荒诞诞生于人类的呼唤与世界非理性的沉默之间的对峙。", page: "第一章" },
+      { text: "反抗赋予生命以价值。它贯穿人类存在的始终，将一种崇高的意义赋予生命。", page: "第二章" },
+      { text: "重要的不是治愈，而是带着伤痛活下去。", page: "第三章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
