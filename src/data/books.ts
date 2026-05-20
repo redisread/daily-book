@@ -1741,6 +1741,26 @@ export const books: Book[] = [
       { text: "重要的不是治愈，而是带着伤痛活下去。", page: "第三章" },
     ],
   },
+  {
+    id: "the-mythical-man-month",
+    title: "人月神话",
+    author: "弗雷德里克·布鲁克斯",
+    category: "软件工程",
+    year: "1975",
+    pages: "336",
+    rating: "9.1",
+    desc: "IBM 360系统项目经理布鲁克斯的经验总结，揭示了软件工程中最核心的悖论：向进度落后的项目中增加人手，只会使进度更加落后。书中提出了「没有银弹」「第二系统效应」等经典概念，是软件工程领域的圣经级著作。",
+    coverBg: "linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)",
+    coverTitle: "人月神话",
+    coverAuthor: "布鲁克斯",
+    quotes: [
+      { text: "向进度落后的项目中增加人手，只会使进度更加落后。", page: "第二章" },
+      { text: "没有银弹——在十年内，没有任何一种技术或管理方法能使软件生产率提高一个数量级。", page: "第十六章" },
+      { text: "第二系统效应：工程师倾向于在第二个系统中过度设计，试图纠正第一个系统的所有遗憾。", page: "第五章" },
+      { text: "优秀的程序员和糟糕的程序员之间的生产率差异可达十倍，而他们的薪资差异却远小于此。", page: "第三章" },
+      { text: "软件项目的核心困难在于概念结构的复杂性，而非表达这些概念的语法。", page: "第一章" },
+    ],
+  },
 ];
 
 export function getBookForDate(date: Date): Book {
