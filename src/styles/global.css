@@ -336,6 +336,282 @@ a { color: inherit; text-decoration: none; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
 
+/* ========== Cover Lightbox ========== */
+.cover-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.cover-lightbox.active {
+  opacity: 1;
+  visibility: visible;
+}
+.lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+}
+.lightbox-content {
+  position: relative;
+  z-index: 1;
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox-close:hover {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: var(--border-accent);
+}
+.book-cover.enlarged {
+  width: 280px;
+  height: 400px;
+  transform: none !important;
+  cursor: default;
+}
+.book-cover.enlarged .cover-title { font-size: 36px; }
+.book-cover.enlarged .cover-author { font-size: 14px; }
+
+/* Click cursor on book cover */
+.book-cover {
+  cursor: zoom-in;
+}
+
+@media (max-width: 768px) {
+  .book-cover.enlarged {
+    width: 240px;
+    height: 340px;
+  }
+  .book-cover.enlarged .cover-title { font-size: 30px; }
+}
+
+/* ========== Mobile Bottom Navigation ========== */
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card-solid);
+  border-top: 1px solid var(--border);
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  display: none;
+}
+.mobile-nav-list {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.mobile-nav-item {
+  flex: 1;
+  text-align: center;
+}
+.mobile-nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  color: var(--text-muted);
+  font-size: 11px;
+  transition: var(--transition);
+  text-decoration: none;
+}
+.mobile-nav-link:hover,
+.mobile-nav-link.active {
+  color: var(--accent);
+}
+.mobile-nav-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: block;
+  }
+  .app-container {
+    padding-bottom: 80px;
+  }
+  /* Hide header nav on mobile */
+  .header-nav {
+    display: none;
+  }
+  .footer {
+    padding-bottom: 100px;
+  }
+}
+
+/* ========== Quote Swipe ========== */
+.quote-swipe-container {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.quote-swipe-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+.quote-card {
+  flex: 0 0 100%;
+  min-width: 100%;
+}
+.quote-swipe-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.quote-swipe-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.quote-swipe-dot.active {
+  background: var(--accent);
+}
+.quote-swipe-hint {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  opacity: 0.7;
+}
+
+@media (min-width: 769px) {
+  .quote-swipe-hint,
+  .quote-swipe-dots {
+    display: none;
+  }
+}
+
+/* ========== Share Image Modal ========== */
+.share-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.share-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+.share-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+}
+.share-modal-content {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  max-width: 400px;
+  width: 90%;
+}
+.share-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.share-modal-close:hover {
+  color: var(--text-primary);
+}
+.share-preview {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 12px;
+  padding: 32px 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  border: 1px solid var(--border-accent);
+}
+.share-preview-quote {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #fff;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+.share-preview-source {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.share-actions {
+  display: flex;
+  gap: 12px;
+}
+.share-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  font-family: inherit;
+}
+.share-btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  color: #0a0a0f;
+}
+.share-btn-secondary {
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.share-btn:hover {
+  transform: translateY(-2px);
+}
+
 /* ========== Archive Page ========== */
 .archive-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
