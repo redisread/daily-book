@@ -1,12 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { books, getAllCategories, searchAndFilter } from "../data/books";
+import { books, getAllCategories } from "../data/books";
 
 const categories = getAllCategories();
-const query = Astro.url.searchParams.get("q") || "";
-const category = Astro.url.searchParams.get("category") || "";
-
-const filteredBooks = searchAndFilter(query, category);
 ---
 
 <Layout title="搜索书籍 · 每日一书" description="搜索书名、作者或按类别筛选书籍">
@@ -17,16 +13,15 @@ const filteredBooks = searchAndFilter(query, category);
 
   <!-- Search Form -->
   <div class="search-container">
-    <form class="search-form" method="get" action="/search">
+    <div class="search-form">
       <div class="search-input-wrapper">
         <input
           type="text"
-          name="q"
+          id="searchInput"
           class="search-input"
           placeholder="搜索书名或作者..."
-          value={query}
         />
-        <button type="submit" class="search-btn">
+        <button type="button" class="search-btn" id="searchBtn">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
@@ -34,77 +29,135 @@ const filteredBooks = searchAndFilter(query, category);
         </button>
       </div>
 
-      <div class="category-filters">
-        <button
-          type="submit"
-          name="category"
-          value=""
-          class={`category-btn ${!category ? "active" : ""}`}
-        >
-          全部
-        </button>
+      <div class="category-filters" id="categoryFilters">
+        <button type="button" class="category-btn active" data-category="">全部</button>
         {categories.map((cat) => (
-          <button
-            type="submit"
-            name="category"
-            value={cat}
-            class={`category-btn ${category === cat ? "active" : ""}`}
-          >
+          <button type="button" class="category-btn" data-category={cat}>
             {cat}
           </button>
         ))}
       </div>
-
-      {query && <input type="hidden" name="q" value={query} />}
-    </form>
+    </div>
   </div>
 
   <!-- Results -->
   <div class="results-container">
     <div class="results-header">
-      <span class="results-count">
-        找到 {filteredBooks.length} 本书
-        {query && <span class="search-term">搜索: "{query}"</span>}
-        {category && <span class="filter-term">类别: {category}</span>}
-      </span>
+      <span class="results-count" id="resultsCount">加载中...</span>
     </div>
 
-    {filteredBooks.length === 0 ? (
+    <div id="resultsContainer">
       <div class="empty-state">
         <div class="empty-icon">📚</div>
-        <p>未找到相关书籍</p>
-        <p class="empty-hint">尝试其他关键词或类别</p>
+        <p>输入关键词开始搜索</p>
+        <p class="empty-hint">支持书名和作者搜索</p>
       </div>
-    ) : (
-      <div class="books-grid">
-        {filteredBooks.map((book) => (
-          <a href={`/book/${book.id}`} class="book-card">
-            <div class="book-cover" style={`background: ${book.coverBg}`}>
-              <div class="book-cover-title">{book.coverTitle}</div>
-              <div class="book-cover-author">{book.coverAuthor}</div>
-            </div>
-            <div class="book-info">
-              <h3 class="book-title">{book.title}</h3>
-              <p class="book-author">{book.author}</p>
-              <span class="book-category">{book.category}</span>
-              <p class="book-desc">{book.desc.substring(0, 80)}...</p>
-            </div>
-          </a>
-        ))}
-      </div>
-    )}
+    </div>
   </div>
 </Layout>
 
-<style>
-  :root {
-    --surface-color: var(--bg-card);
-    --border-color: var(--border);
-    --accent-color: var(--accent);
-    --accent-color-hover: var(--accent-light);
-    --accent-color-alpha: var(--accent-dim);
+<script define:vars={{ booksData: books }}>
+  const books = booksData;
+  let currentQuery = '';
+  let currentCategory = '';
+
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const resultsContainer = document.getElementById('resultsContainer');
+  const resultsCount = document.getElementById('resultsCount');
+  const categoryButtons = document.querySelectorAll('.category-btn');
+
+  // Search function
+  function searchBooks(query, category) {
+    const lowerQuery = query.toLowerCase().trim();
+    let result = [...books];
+
+    if (lowerQuery) {
+      result = result.filter(
+        (book) =>
+          book.title.toLowerCase().includes(lowerQuery) ||
+          book.author.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    if (category && category !== '全部') {
+      result = result.filter((book) => book.category === category);
+    }
+
+    return result;
   }
 
+  // Render results
+  function renderResults(books) {
+    if (books.length === 0) {
+      resultsContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📚</div>
+          <p>未找到相关书籍</p>
+          <p class="empty-hint">尝试其他关键词或类别</p>
+        </div>
+      `;
+      resultsCount.textContent = `找到 0 本书`;
+      return;
+    }
+
+    const html = books.map((book) => `
+      <a href="/book/${book.id}" class="book-card">
+        <div class="book-cover" style="background: ${book.coverBg}">
+          <div class="book-cover-title">${book.coverTitle}</div>
+          <div class="book-cover-author">${book.coverAuthor}</div>
+        </div>
+        <div class="book-info">
+          <h3 class="book-title">${book.title}</h3>
+          <p class="book-author">${book.author}</p>
+          <span class="book-category">${book.category}</span>
+          <p class="book-desc">${book.desc.substring(0, 80)}...</p>
+        </div>
+      </a>
+    `).join('');
+
+    resultsContainer.innerHTML = `<div class="books-grid">${html}</div>`;
+    resultsCount.innerHTML = `找到 ${books.length} 本书
+      ${currentQuery ? `<span class="search-term">搜索: "${currentQuery}"</span>` : ''}
+      ${currentCategory ? `<span class="filter-term">类别: ${currentCategory}</span>` : ''}`;
+  }
+
+  // Perform search
+  function performSearch() {
+    currentQuery = searchInput.value;
+    const results = searchBooks(currentQuery, currentCategory);
+    renderResults(results);
+  }
+
+  // Event listeners
+  searchInput?.addEventListener('input', (e) => {
+    currentQuery = e.target.value;
+    performSearch();
+  });
+
+  searchBtn?.addEventListener('click', performSearch);
+
+  searchInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      performSearch();
+    }
+  });
+
+  // Category filter
+  categoryButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      categoryButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCategory = btn.dataset.category || '';
+      performSearch();
+    });
+  });
+
+  // Initial render - show all books
+  renderResults(books);
+</script>
+
+<style>
   .page-title {
     font-size: 28px;
     font-weight: 700;
