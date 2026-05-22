@@ -1,0 +1,342 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { books, getAllCategories, searchAndFilter } from "../data/books";
+
+const categories = getAllCategories();
+const query = Astro.url.searchParams.get("q") || "";
+const category = Astro.url.searchParams.get("category") || "";
+
+const filteredBooks = searchAndFilter(query, category);
+---
+
+<Layout title="搜索书籍 · 每日一书" description="搜索书名、作者或按类别筛选书籍">
+  <div style="padding: 32px 0 16px;">
+    <h1 class="page-title">搜索书籍</h1>
+    <p class="page-desc">搜索书名、作者或按类别筛选，发现你喜欢的书籍。</p>
+  </div>
+
+  <!-- Search Form -->
+  <div class="search-container">
+    <form class="search-form" method="get" action="/search">
+      <div class="search-input-wrapper">
+        <input
+          type="text"
+          name="q"
+          class="search-input"
+          placeholder="搜索书名或作者..."
+          value={query}
+        />
+        <button type="submit" class="search-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="category-filters">
+        <button
+          type="submit"
+          name="category"
+          value=""
+          class={`category-btn ${!category ? "active" : ""}`}
+        >
+          全部
+        </button>
+        {categories.map((cat) => (
+          <button
+            type="submit"
+            name="category"
+            value={cat}
+            class={`category-btn ${category === cat ? "active" : ""}`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {query && <input type="hidden" name="q" value={query} />}
+    </form>
+  </div>
+
+  <!-- Results -->
+  <div class="results-container">
+    <div class="results-header">
+      <span class="results-count">
+        找到 {filteredBooks.length} 本书
+        {query && <span class="search-term">搜索: "{query}"</span>}
+        {category && <span class="filter-term">类别: {category}</span>}
+      </span>
+    </div>
+
+    {filteredBooks.length === 0 ? (
+      <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <p>未找到相关书籍</p>
+        <p class="empty-hint">尝试其他关键词或类别</p>
+      </div>
+    ) : (
+      <div class="books-grid">
+        {filteredBooks.map((book) => (
+          <a href={`/book/${book.id}`} class="book-card">
+            <div class="book-cover" style={`background: ${book.coverBg}`}>
+              <div class="book-cover-title">{book.coverTitle}</div>
+              <div class="book-cover-author">{book.coverAuthor}</div>
+            </div>
+            <div class="book-info">
+              <h3 class="book-title">{book.title}</h3>
+              <p class="book-author">{book.author}</p>
+              <span class="book-category">{book.category}</span>
+              <p class="book-desc">{book.desc.substring(0, 80)}...</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</Layout>
+
+<style>
+  :root {
+    --surface-color: var(--bg-card);
+    --border-color: var(--border);
+    --accent-color: var(--accent);
+    --accent-color-hover: var(--accent-light);
+    --accent-color-alpha: var(--accent-dim);
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+
+  .page-desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .search-container {
+    margin-bottom: 32px;
+  }
+
+  .search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .search-input-wrapper {
+    display: flex;
+    gap: 12px;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 14px 18px;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+
+  .search-btn {
+    padding: 14px 20px;
+    background: var(--accent);
+    color: #08080c;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .search-btn:hover {
+    background: var(--accent-light);
+    transform: translateY(-1px);
+  }
+
+  .category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .category-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .category-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .category-btn.active {
+    background: var(--accent);
+    color: #08080c;
+    border-color: var(--accent);
+  }
+
+  .results-container {
+    min-height: 200px;
+  }
+
+  .results-header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .results-count {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .search-term,
+  .filter-term {
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+  }
+
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .empty-state p {
+    color: var(--text-secondary);
+    margin: 8px 0;
+  }
+
+  .empty-hint {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .book-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    border-color: var(--accent);
+  }
+
+  .book-cover {
+    aspect-ratio: 3/4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .book-cover-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    margin-bottom: 8px;
+    white-space: pre-line;
+  }
+
+  .book-cover-author {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .book-info {
+    padding: 16px;
+    flex: 1;
+  }
+
+  .book-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+  }
+
+  .book-author {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0 0 8px 0;
+  }
+
+  .book-category {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 12px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  .book-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .books-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .category-filters {
+      gap: 6px;
+    }
+
+    .category-btn {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+  }
+</style>

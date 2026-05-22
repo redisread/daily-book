@@ -679,3 +679,51 @@ export function formatDateShort(date: Date): string {
 export function formatDateISO(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
+
+// Get all unique categories
+export function getAllCategories(): string[] {
+  const categories = new Set<string>();
+  books.forEach((book) => categories.add(book.category));
+  return Array.from(categories).sort();
+}
+
+// Search books by title or author
+export function searchBooks(query: string): Book[] {
+  const lowerQuery = query.toLowerCase().trim();
+  if (!lowerQuery) return books;
+
+  return books.filter(
+    (book) =>
+      book.title.toLowerCase().includes(lowerQuery) ||
+      book.author.toLowerCase().includes(lowerQuery)
+  );
+}
+
+// Filter books by category
+export function filterByCategory(category: string): Book[] {
+  if (!category || category === "全部") return books;
+  return books.filter((book) => book.category === category);
+}
+
+// Combined search and filter
+export function searchAndFilter(
+  query: string,
+  category: string
+): Book[] {
+  let result = books;
+
+  if (query) {
+    const lowerQuery = query.toLowerCase().trim();
+    result = result.filter(
+      (book) =>
+        book.title.toLowerCase().includes(lowerQuery) ||
+        book.author.toLowerCase().includes(lowerQuery)
+    );
+  }
+
+  if (category && category !== "全部") {
+    result = result.filter((book) => book.category === category);
+  }
+
+  return result;
+}
