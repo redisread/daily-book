@@ -3,11 +3,9 @@ import type { Book } from "../data/books";
 
 interface Props {
   book: Book;
-  dateStr: string;
-  dayInfo: string;
 }
 
-const { book, dateStr, dayInfo } = Astro.props;
+const { book } = Astro.props;
 ---
 
 <div class="hero-card">

@@ -24,6 +24,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Security audit
+        # critical 漏洞阻断；high 仅作 astro 上游参考（当前 3 high 全来自 astro/vite/esbuild，不可在不降级 astro 的前提下修复）
+        run: npm audit --audit-level=critical
+
       - name: Build
         run: npm run build
 

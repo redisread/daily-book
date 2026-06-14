@@ -116,7 +116,7 @@ const { title = "每日一书 · Daily Book", description = "每天推荐一本�
       });
 
       // Toast utility
-      (window as any).showToast = function(msg: string) {
+      window.showToast = function(msg: string) {
         const toast = document.getElementById('toast');
         if (!toast) return;
         toast.textContent = msg;
