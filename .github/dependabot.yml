@@ -1,0 +1,38 @@
+version: 2
+updates:
+  # npm 依赖（daily-book 用 npm 管理前端依赖）
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      astro:
+        patterns:
+          - astro
+          - '@astrojs/*'
+      eslint:
+        patterns:
+          - eslint
+          - '@eslint/*'
+          - typescript-eslint
+          - eslint-plugin-*
+    ignore:
+      # astro 走 ^6 锁定大版本，避免 Dependabot 提 major 升级
+      - dependency-name: astro
+        update-types: ['version-update:semver-major']
+
+  # GitHub Actions 版本（deploy.yml 里的 actions/checkout 等）
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
