@@ -13,12 +13,27 @@ const { book, dateStr, dayInfo } = Astro.props;
 <div class="hero-card">
   <div class="hero-content">
     <div class="book-cover-section">
-      <div class="book-cover">
+      <div class="book-cover" id="bookCover">
         <div class="book-spine"></div>
         <div class="book-cover-placeholder" style={`background: ${book.coverBg};`}>
           <div class="cover-title" set:html={book.coverTitle.replace(/\n/g, "<br>")} />
           <div class="cover-divider"></div>
           <div class="cover-author">{book.coverAuthor}</div>
+        </div>
+      </div>
+      <!-- Cover Lightbox -->
+      <div class="cover-lightbox" id="coverLightbox">
+        <div class="lightbox-backdrop"></div>
+        <div class="lightbox-content">
+          <div class="book-cover enlarged" id="enlargedCover">
+            <div class="book-spine"></div>
+            <div class="book-cover-placeholder" style={`background: ${book.coverBg};`}>
+              <div class="cover-title" set:html={book.coverTitle.replace(/\n/g, "<br>")} />
+              <div class="cover-divider"></div>
+              <div class="cover-author">{book.coverAuthor}</div>
+            </div>
+          </div>
+          <button class="lightbox-close" id="lightboxClose" aria-label="关闭">✕</button>
         </div>
       </div>
     </div>
@@ -88,5 +103,33 @@ const { book, dateStr, dayInfo } = Astro.props;
       window.showToast('已加入收藏 ♥');
     }
     localStorage.setItem('dailybook_collections', JSON.stringify(cols));
+  });
+
+  // Cover Lightbox
+  const cover = document.getElementById('bookCover');
+  const lightbox = document.getElementById('coverLightbox');
+  const closeBtn = document.getElementById('lightboxClose');
+
+  function openLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  cover?.addEventListener('click', openLightbox);
+  closeBtn?.addEventListener('click', closeLightbox);
+  lightbox?.querySelector('.lightbox-backdrop')?.addEventListener('click', closeLightbox);
+
+  // Close on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox?.classList.contains('active')) {
+      closeLightbox();
+    }
   });
 </script>
