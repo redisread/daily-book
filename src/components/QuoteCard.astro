@@ -7,7 +7,6 @@ interface Props {
 
 const { book } = Astro.props;
 const quotes = book.quotes;
-const mainQuote = quotes[0];
 const moreQuotes = quotes.slice(1, 5);
 ---
 
@@ -88,11 +87,12 @@ const moreQuotes = quotes.slice(1, 5);
     let currentX = 0;
     let isDragging = false;
 
-    function goToSlide(index) {
+    function goToSlide(index: number) {
+      if (!cards) return;
       if (index < 0) index = cards.length - 1;
       if (index >= cards.length) index = 0;
       currentIndex = index;
-      track.style.transform = `translateX(-${index * 100}%)`;
+      if (track) track.style.transform = `translateX(-${index * 100}%)`;
       dots?.forEach((d, i) => d.classList.toggle('active', i === index));
     }
 
@@ -154,13 +154,14 @@ const moreQuotes = quotes.slice(1, 5);
 
   // Like buttons
   document.querySelectorAll('.like-btn').forEach((btn) => {
+    const likeBtn = btn as HTMLElement;
     let liked = false;
-    btn.addEventListener('click', () => {
+    likeBtn.addEventListener('click', () => {
       liked = !liked;
-      btn.innerHTML = liked ? '♥' : '♡';
-      btn.style.color = liked ? '#e74c3c' : '';
-      btn.style.background = liked ? 'rgba(231,76,60,0.1)' : '';
-      (window as any).showToast?.(liked ? '已喜欢这句话 ♥' : '已取消喜欢');
+      likeBtn.innerHTML = liked ? '♥' : '♡';
+      likeBtn.style.color = liked ? '#e74c3c' : '';
+      likeBtn.style.background = liked ? 'rgba(231,76,60,0.1)' : '';
+      window.showToast?.(liked ? '已喜欢这句话 ♥' : '已取消喜欢');
     });
   });
 
@@ -170,7 +171,7 @@ const moreQuotes = quotes.slice(1, 5);
       const quote = btn.getAttribute('data-quote') || '';
       const source = btn.getAttribute('data-source') || '';
       navigator.clipboard.writeText(`${quote}\n${source}\n\n—— 来自「每日一书」`).then(() => {
-        (window as any).showToast?.('金句已复制到剪贴板 ✓');
+        window.showToast?.('金句已复制到剪贴板 ✓');
       });
     });
   });
@@ -272,13 +273,13 @@ const moreQuotes = quotes.slice(1, 5);
     link.href = canvas.toDataURL('image/png');
     link.click();
 
-    (window as any).showToast?.('图片已生成并下载 ✓');
+    window.showToast?.('图片已生成并下载 ✓');
   });
 
   // Copy text
   copyTextBtn?.addEventListener('click', () => {
     navigator.clipboard.writeText(`${currentShareQuote}\n${currentShareSource}\n\n—— 来自「每日一书」`).then(() => {
-      (window as any).showToast?.('文字已复制到剪贴板 ✓');
+      window.showToast?.('文字已复制到剪贴板 ✓');
     });
   });
 
@@ -286,7 +287,6 @@ const moreQuotes = quotes.slice(1, 5);
   document.querySelectorAll('.mini-quote-card').forEach((card) => {
     card.addEventListener('click', () => {
       const text = card.getAttribute('data-quote');
-      const source = card.getAttribute('data-source');
       // Find and show this quote in the swipe container
       const cards = document.querySelectorAll('.quote-card');
       cards.forEach((c, index) => {
