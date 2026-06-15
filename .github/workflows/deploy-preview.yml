@@ -1,4 +1,4 @@
-name: PR Preview Deployment
+name: Deploy Preview
 
 on:
   pull_request:
@@ -10,14 +10,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy-preview:
+  quality:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -34,8 +31,43 @@ jobs:
       - name: Lint
         run: npm run lint
 
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Security audit
         run: npm audit --audit-level=critical
+
+  deploy-preview:
+    needs: [quality, security]
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build
         run: npm run build
@@ -55,33 +87,32 @@ jobs:
             const prNumber = context.issue.number;
             const previewUrl = `https://daily-book-preview.redisread.workers.dev`;
 
-            const body = `## 🔍 PR Preview Deployed
+            const body = `## 🔍 Preview Deployed
 
             | | |
             |---|---|
-            | Preview URL | [${previewUrl}](${previewUrl}) |
-            | PR | #${prNumber} |
-            | Commit | ${context.sha.substring(0, 7)} |
+            | 🌐 Preview URL | [${previewUrl}](${previewUrl}) |
+            | 📦 PR | #${prNumber} |
+            | 🔖 Commit | ${context.sha.substring(0, 7)} |
 
-            > Preview updated on every push. Review the live site before merging.`;
+            > Review the live preview before merging to production.`;
 
-            // Find and update existing preview comment, or create new one
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
             });
 
-            const previewComment = comments.find(c =>
-              c.body.includes('PR Preview Deployed') &&
+            const botComment = comments.find(c =>
+              c.body.includes('Preview Deployed') &&
               c.user.login === 'github-actions[bot]'
             );
 
-            if (previewComment) {
+            if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                comment_id: previewComment.id,
+                comment_id: botComment.id,
                 body,
               });
             } else {
