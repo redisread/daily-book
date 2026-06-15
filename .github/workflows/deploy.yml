@@ -1,17 +1,19 @@
-name: Deploy to Cloudflare Workers
+name: Deploy to Production
 
 on:
   push:
     branches: [main]
 
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 jobs:
-  deploy:
+  quality:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -28,12 +30,69 @@ jobs:
       - name: Lint
         run: npm run lint
 
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Security audit
-        # critical 漏洞阻断；high 仅作 astro 上游参考（当前 3 high 全来自 astro/vite/esbuild，不可在不降级 astro 的前提下修复）
+        # critical 漏洞阻断；high 仅作 astro 上游参考
         run: npm audit --audit-level=critical
+
+  deploy:
+    needs: [quality, security]
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build
         run: npm run build
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Build output directory 'dist' not found"
+            exit 1
+          fi
+          echo "Build size: $(du -sh dist | cut -f1)"
+
+      - name: Check bundle size
+        run: |
+          BUNDLE_SIZE=$(du -sm dist | cut -f1)
+          WARN_SIZE=5
+          FAIL_SIZE=10
+          echo "Bundle size: ${BUNDLE_SIZE}MB"
+          if [ "$BUNDLE_SIZE" -ge "$FAIL_SIZE" ]; then
+            echo "❌ Bundle size exceeds failure threshold!"
+            exit 1
+          elif [ "$BUNDLE_SIZE" -ge "$WARN_SIZE" ]; then
+            echo "⚠️ Bundle size exceeds warning threshold"
+          else
+            echo "✅ Bundle size OK"
+          fi
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
