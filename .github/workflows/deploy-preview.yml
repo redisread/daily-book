@@ -74,28 +74,31 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy preview
-        id: deploy
+      - name: Upload Worker Version
+        id: upload
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --env preview
+          command: versions upload
 
       - name: Comment preview URL
         uses: actions/github-script@v9
         with:
           script: |
             const prNumber = context.issue.number;
-            const previewUrl = `https://daily-book-preview.redisread.workers.dev`;
+            const versionId = process.env.VERSION_ID || 'latest';
+            // Workers Versions preview URL 格式: https://<version-id>--<worker-name>.<account-subdomain>.workers.dev
+            const previewUrl = `https://${versionId}--daily-book.redisread.workers.dev`;
 
-            const body = `## 🔍 Preview Deployed
+            const body = `## 🔍 Preview Deployed (Workers Versions)
 
             | | |
             |---|---|
             | 🌐 Preview URL | [${previewUrl}](${previewUrl}) |
             | 📦 PR | #${prNumber} |
             | 🔖 Commit | ${context.sha.substring(0, 7)} |
+            | 📋 Version ID | ${versionId} |
 
             > Review the live preview before merging to production.`;
 
