@@ -35,10 +35,12 @@ a { color: inherit; text-decoration: none; }
 .ambient-bg {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   z-index: 0; pointer-events: none;
+  contain: layout style paint;
 }
 .ambient-orb {
   position: absolute; border-radius: 50%;
   filter: blur(100px); animation: float 25s ease-in-out infinite;
+  will-change: transform;
 }
 .ambient-orb:nth-child(1) {
   width: 700px; height: 700px;
@@ -622,4 +624,15 @@ a { color: inherit; text-decoration: none; }
 }
 .page-desc {
   font-size: 14px; color: var(--text-secondary); margin-bottom: 32px;
+}
+
+/* ========== Reduced Motion ========== */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-orb { animation: none; }
+  .book-cover, .book-cover * { animation: none !important; transition: none !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
