@@ -56,24 +56,27 @@ const fullTitle = title === "每日一书 · Daily Book" ? title : `${title} · 
     <div class="grain"></div>
 
     <div class="app-container">
+      <!-- Skip to content for keyboard users -->
+      <a href="#main-content" class="skip-link">跳到主内容</a>
+
       <!-- Header -->
       <header class="header">
-        <a href="/" class="logo">
-          <div class="logo-icon">📖</div>
+        <a href="/" class="logo" aria-label="每日一书 首页">
+          <div class="logo-icon" aria-hidden="true">📖</div>
           <div>
             <div class="logo-text">每日一书</div>
             <div class="logo-sub">Daily Book</div>
           </div>
         </a>
-        <nav class="header-nav">
+        <nav class="header-nav" aria-label="主导航">
           <a href="/" class="nav-btn active" data-nav="home">今日推荐</a>
           <a href="/archive" class="nav-btn" data-nav="archive">往期回顾</a>
           <a href="/search" class="nav-btn" data-nav="search">搜索</a>
-          <a href="/rss.xml" class="nav-btn" target="_blank" title="RSS 订阅">RSS</a>
+          <a href="/rss.xml" class="nav-btn" target="_blank" rel="noopener" title="RSS 订阅">RSS</a>
         </nav>
       </header>
 
-      <main>
+      <main id="main-content">
         <slot />
       </main>
 
@@ -115,7 +118,7 @@ const fullTitle = title === "每日一书 · Daily Book" ? title : `${title} · 
     </nav>
 
     <!-- Toast -->
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <script>
       // Highlight active nav
