@@ -1,8 +1,21 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { books, getAllCategories } from "../data/books";
+import { books, getAllCategories, getBookForDate, formatDateISO } from "../data/books";
 
 const categories = getAllCategories();
+
+// 构建 book.id -> 日期映射（最近 90 天内该书籍首次出现的日期）
+// 因为路由是 /book/[date]，搜索结果需要链接到具体日期页
+const bookDateMap: Record<string, string> = {};
+for (let i = 0; i < 90; i++) {
+  const d = new Date();
+  d.setDate(d.getDate() - i);
+  const dateStr = formatDateISO(d);
+  const book = getBookForDate(d);
+  if (!bookDateMap[book.id]) {
+    bookDateMap[book.id] = dateStr;
+  }
+}
 ---
 
 <Layout title="搜索书籍 · 每日一书" description="搜索书名、作者或按类别筛选书籍">
@@ -56,8 +69,9 @@ const categories = getAllCategories();
   </div>
 </Layout>
 
-<script is:inline define:vars={{ booksData: books }}>
+<script is:inline define:vars={{ booksData: books, bookDateMapData: bookDateMap }}>
   const books = booksData;
+  const bookDateMap = bookDateMapData;
   let currentQuery = '';
   let currentCategory = '';
 
@@ -102,7 +116,7 @@ const categories = getAllCategories();
     }
 
     const html = books.map((book) => `
-      <a href="/book/${book.id}" class="book-card">
+      <a href="/book/${bookDateMap[book.id] || book.id}" class="book-card">
         <div class="book-cover" style="background: ${book.coverBg}">
           <div class="book-cover-title">${book.coverTitle}</div>
           <div class="book-cover-author">${book.coverAuthor}</div>
