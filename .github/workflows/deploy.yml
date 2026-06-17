@@ -3,6 +3,13 @@ name: Deploy to Production
 on:
   push:
     branches: [main]
+  schedule:
+    # 每天 00:00 中国时间 (UTC 16:00)
+    - cron: '0 16 * * *'
+  workflow_dispatch: # 手动触发
+
+env:
+  TZ: Asia/Shanghai # 确保日期计算使用中国时区
 
 concurrency:
   group: deploy-production

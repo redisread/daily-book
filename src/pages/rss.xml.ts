@@ -4,6 +4,8 @@ import { getRecentBooks, formatDateISO } from "../data/books";
 
 export function GET(context: APIContext) {
   const recent = getRecentBooks(30);
+  const buildTime = new Date();
+  const buildTimeStr = buildTime.toUTCString();
 
   return rss({
     title: "每日一书 · Daily Book",
@@ -13,20 +15,10 @@ export function GET(context: APIContext) {
       title: `📖 ${book.title} —— ${book.author}`,
       pubDate: date,
       link: `/book/${formatDateISO(date)}`,
-      description: `
-        <h2>📖 ${book.title}</h2>
-        <p><strong>作者：</strong>${book.author} | <strong>分类：</strong>${book.category} | <strong>评分：</strong>${book.rating}</p>
-        <p>${book.desc}</p>
-        <hr>
-        <h3>📝 今日金句</h3>
-        <blockquote><p>${book.quotes[0].text}</p><footer>——${book.author}《${book.title}》${book.quotes[0].page}</footer></blockquote>
-        ${book.quotes.length > 1 ? `
-        <h3>更多金句</h3>
-        <ul>${book.quotes.slice(1, 4).map((q) => `<li>${q.text} <em>(${q.page})</em></li>`).join("")}</ul>
-        ` : ""}
-      `.trim(),
+      // 纯文本摘要：书名 + 作者 + 分类 + 1 条精选金句，控制在 300 字以内
+      description: `${book.author}《${book.title}》（${book.category}）\n\n今日精选金句：${book.quotes[0].text}`,
       categories: [book.category],
     })),
-    customData: `<language>zh-cn</language>`,
+    customData: `<language>zh-cn</language><lastBuildDate>${buildTimeStr}</lastBuildDate><ttl>1440</ttl>`,
   });
 }
