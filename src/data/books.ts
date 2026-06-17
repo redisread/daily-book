@@ -1763,16 +1763,41 @@ export const books: Book[] = [
   },
 ];
 
-export function getBookForDate(date: Date): Book {
-  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-  let hash = 0;
-  for (let i = 0; i < dateStr.length; i++) {
-    const char = dateStr.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
+// 固定种子的 Fisher-Yates 洗牌，生成确定性排列
+// 确保同一天永远返回同一本书，且连续日期不重复
+function seededShuffle(arr: Book[], seed: number): Book[] {
+  const result = [...arr];
+  let s = seed >>> 0;
+  for (let i = result.length - 1; i > 0; i--) {
+    // LCG，>>> 0 保证结果为无符号 32 位非负整数
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+    const j = s % (i + 1);
+    const tmp = result[i];
+    result[i] = result[j];
+    result[j] = tmp;
   }
-  const index = ((hash % books.length) + books.length) % books.length;
-  return books[index];
+  return result;
+}
+
+// 基准日期：2024-01-01（确保 dayNumber 始终为正整数）
+const EPOCH_DATE = new Date(2024, 0, 1);
+
+// 缓存洗牌结果（按 books.length 分组，避免重复计算）
+const shuffleCache = new Map<number, Book[]>();
+
+function getShuffledBooks(): Book[] {
+  const key = books.length;
+  if (!shuffleCache.has(key)) {
+    shuffleCache.set(key, seededShuffle(books, 42));
+  }
+  return shuffleCache.get(key)!;
+}
+
+export function getBookForDate(date: Date): Book {
+  const dayNumber = Math.floor((date.getTime() - EPOCH_DATE.getTime()) / (1000 * 60 * 60 * 24));
+  const shuffled = getShuffledBooks();
+  const index = ((dayNumber % shuffled.length) + shuffled.length) % shuffled.length;
+  return shuffled[index];
 }
 
 export function getTodayBook(): Book {
