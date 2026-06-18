@@ -14,7 +14,7 @@ const { book } = Astro.props;
       <div class="book-cover" id="bookCover">
         <div class="book-spine"></div>
         <div class="book-cover-placeholder" style={`background: ${book.coverBg};`}>
-          <div class="cover-title" set:html={book.coverTitle.replace(/\n/g, "<br>")} />
+          <div class="cover-title" set:text={book.coverTitle} />
           <div class="cover-divider"></div>
           <div class="cover-author">{book.coverAuthor}</div>
         </div>
@@ -26,7 +26,7 @@ const { book } = Astro.props;
           <div class="book-cover enlarged" id="enlargedCover">
             <div class="book-spine"></div>
             <div class="book-cover-placeholder" style={`background: ${book.coverBg};`}>
-              <div class="cover-title" set:html={book.coverTitle.replace(/\n/g, "<br>")} />
+              <div class="cover-title" set:text={book.coverTitle} />
               <div class="cover-divider"></div>
               <div class="cover-author">{book.coverAuthor}</div>
             </div>
