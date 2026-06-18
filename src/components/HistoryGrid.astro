@@ -1,5 +1,5 @@
 ---
-import { getRecentBooks, formatDateShort, formatDateISO } from "../data/books";
+import { getPublishedBooks, formatDateShort, formatDateISO } from "../data/books";
 
 interface Props {
   days?: number;
@@ -7,7 +7,7 @@ interface Props {
 }
 
 const { days = 4, skipToday = true } = Astro.props;
-const allRecent = getRecentBooks(days + (skipToday ? 1 : 0));
+const allRecent = getPublishedBooks(days + (skipToday ? 1 : 0));
 const recent = skipToday ? allRecent.slice(1) : allRecent;
 ---
 

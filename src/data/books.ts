@@ -18,6 +18,62 @@ export interface Book {
   quotes: Quote[];
 }
 
+import { publishedHistory } from "./publishedHistory";
+
+// 用 id 反查书籍
+function getBookById(id: string): Book | undefined {
+  return books.find((b) => b.id === id);
+}
+
+// 解析 YYYY-MM-DD 字符串为本地时区 Date（避免 UTC 偏移导致日期错位）
+function parseDateString(s: string): Date {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+// 获取按发布历史倒序排列的书籍（最新在前）
+// publishedHistory 为空时 fallback 到日期哈希逻辑（getRecentBooks）
+export function getPublishedBooks(count: number): { date: Date; book: Book }[] {
+  if (publishedHistory.length === 0) {
+    return getRecentBooks(count);
+  }
+  const result: { date: Date; book: Book }[] = [];
+  for (const entry of publishedHistory.slice(0, count)) {
+    const book = getBookById(entry.bookId);
+    if (book) {
+      result.push({ date: parseDateString(entry.date), book });
+    }
+  }
+  return result;
+}
+
+// 获取最新发布的一本书（用于首页"今日推荐"）
+// publishedHistory 为空时 fallback 到 getTodayBook
+export function getLatestPublishedBook(): { date: Date; book: Book } {
+  if (publishedHistory.length === 0) {
+    return { date: new Date(), book: getTodayBook() };
+  }
+  for (const entry of publishedHistory) {
+    const book = getBookById(entry.bookId);
+    if (book) {
+      return { date: parseDateString(entry.date), book };
+    }
+  }
+  // publishedHistory 全部 bookId 失效时也兜底
+  return { date: new Date(), book: getTodayBook() };
+}
+
+// 兼容旧逻辑：保留 getRecentBooks 作为日期哈希兜底
+export function getRecentBooks(days: number): { date: Date; book: Book }[] {
+  const result: { date: Date; book: Book }[] = [];
+  for (let i = 0; i < days; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    result.push({ date, book: getBookForDate(date) });
+  }
+  return result;
+}
+
 export const books: Book[] = [
   {
     id: "hundred-years-of-solitude",
@@ -1802,16 +1858,6 @@ export function getBookForDate(date: Date): Book {
 
 export function getTodayBook(): Book {
   return getBookForDate(new Date());
-}
-
-export function getRecentBooks(days: number): { date: Date; book: Book }[] {
-  const result: { date: Date; book: Book }[] = [];
-  for (let i = 0; i < days; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    result.push({ date, book: getBookForDate(date) });
-  }
-  return result;
 }
 
 export function formatDate(date: Date): string {

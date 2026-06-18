@@ -3,13 +3,12 @@ import Layout from "../layouts/Layout.astro";
 import BookCard from "../components/BookCard.astro";
 import QuoteCard from "../components/QuoteCard.astro";
 import HistoryGrid from "../components/HistoryGrid.astro";
-import { getTodayBook, formatDate } from "../data/books";
+import { getLatestPublishedBook, formatDate } from "../data/books";
 
-const today = new Date();
-const book = getTodayBook();
-const dateStr = formatDate(today);
+const { date: bookDate, book } = getLatestPublishedBook();
+const dateStr = formatDate(bookDate);
 const dayOfYear = Math.floor(
-  (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
+  (bookDate.getTime() - new Date(bookDate.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
 );
 ---
 

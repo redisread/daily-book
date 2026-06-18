@@ -1,14 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getRecentBooks, formatDate, formatDateISO } from "../data/books";
+import { getPublishedBooks, formatDate, formatDateISO } from "../data/books";
 
-const recent = getRecentBooks(30);
+const recent = getPublishedBooks(30);
 ---
 
-<Layout title="往期回顾 · 每日一书" description="查看过去30天的每日推荐书籍">
+<Layout title="往期回顾 · 每日一书" description="查看过去发布的每日推荐书籍">
   <div style="padding: 32px 0 16px;">
     <h1 class="page-title">往期回顾</h1>
-    <p class="page-desc">过去 30 天的每日推荐，每一本都值得细细品读。</p>
+    <p class="page-desc">每日推荐回顾，每一本都值得细细品读。</p>
   </div>
 
   <div class="archive-grid">

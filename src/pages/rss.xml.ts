@@ -1,9 +1,9 @@
 import rss from "@astrojs/rss";
 import type { APIContext } from "astro";
-import { getRecentBooks, formatDateISO } from "../data/books";
+import { getPublishedBooks, formatDateISO } from "../data/books";
 
 export function GET(context: APIContext) {
-  const recent = getRecentBooks(30);
+  const recent = getPublishedBooks(30);
   const buildTime = new Date();
   const buildTimeStr = buildTime.toUTCString();
 
