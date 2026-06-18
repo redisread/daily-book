@@ -22,9 +22,25 @@ const [year, month, day] = dateParam!.split("-").map(Number);
 const date = new Date(year, month - 1, day);
 const book = getBookForDate(date);
 const dateStr = formatDate(date);
+
+// Book schema JSON-LD（结构化数据，利于搜索引擎富媒体展示）
+const bookSchema = {
+  "@context": "https://schema.org",
+  "@type": "Book",
+  name: book.title,
+  author: { "@type": "Person", name: book.author },
+  datePublished: book.year,
+  numberOfPages: Number(book.pages) || undefined,
+  bookFormat: "https://schema.org/Hardcover",
+  description: book.desc,
+  inLanguage: "zh-CN",
+  aggregateRating: book.rating
+    ? { "@type": "AggregateRating", ratingValue: book.rating, bestRating: "10" }
+    : undefined,
+};
 ---
 
-<Layout title={`${book.title} · ${dateStr} · 每日一书`} description={`${dateStr}推荐《${book.title}》—— ${book.quotes[0].text}`}>
+<Layout title={`${book.title} · ${dateStr} · 每日一书`} description={`${dateStr}推荐《${book.title}》—— ${book.quotes[0].text}`} jsonLd={bookSchema}>
   <div class="date-bar">
     <div class="date-info">
       <div class="date-main">{dateStr}</div>

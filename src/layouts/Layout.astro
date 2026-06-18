@@ -5,18 +5,41 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
   title = "每日一书 · Daily Book",
   description = "每天推荐一本好书，附带精选金句，让阅读成为习惯。",
-  image = "/favicon.svg",
+  image = "/og-image.png",
+  jsonLd,
 } = Astro.props;
 
 const site = Astro.site ?? new URL("https://daily-book.pages.dev");
 const canonical = new URL(Astro.url.pathname, site);
 const ogImage = new URL(image, site);
 const fullTitle = title === "每日一书 · Daily Book" ? title : `${title} · 每日一书`;
+
+// Default WebSite JSON-LD（每页都有），如调用方传 jsonLd 则追加
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "每日一书",
+  alternateName: "Daily Book",
+  url: site.href,
+  description: "每天推荐一本好书，附带精选金句",
+  inLanguage: "zh-CN",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: { "@type": "EntryPoint", urlTemplate: `${site.href}search?q={query}` },
+    "query-input": "required name=query",
+  },
+};
+const allSchemas: Record<string, unknown>[] = [websiteSchema];
+if (jsonLd) {
+  if (Array.isArray(jsonLd)) allSchemas.push(...jsonLd);
+  else allSchemas.push(jsonLd);
+}
 ---
 
 <!doctype html>
@@ -37,12 +60,20 @@ const fullTitle = title === "每日一书 · Daily Book" ? title : `${title} · 
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImage.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={fullTitle} />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage.href} />
+
+    <!-- JSON-LD Structured Data -->
+    {allSchemas.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
 
     <title>{title}</title>
   </head>
