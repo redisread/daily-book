@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { books, getBookDateMap, formatDateISO } from '../data/books';
+import { books, getBookDateMap } from '../data/books';
 
 export const prerender = true;
 

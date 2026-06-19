@@ -7,12 +7,12 @@ export function initLightbox() {
   if (!cover || !lightbox) return;
 
   function openLightbox() {
-    lightbox.classList.add('active');
+    lightbox!.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
 
   function closeLightbox() {
-    lightbox.classList.remove('active');
+    lightbox!.classList.remove('active');
     document.body.style.overflow = '';
   }
 
