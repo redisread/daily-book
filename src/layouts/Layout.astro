@@ -15,7 +15,7 @@ const {
   jsonLd,
 } = Astro.props;
 
-const site = Astro.site ?? new URL("https://daily-book.pages.dev");
+const site = Astro.site ?? new URL("https://daily-book.redisread.workers.dev");
 const canonical = new URL(Astro.url.pathname, site);
 const ogImage = new URL(image, site);
 const fullTitle = title === "每日一书 · Daily Book" ? title : `${title} · 每日一书`;
@@ -76,7 +76,7 @@ if (jsonLd) {
 
     <!-- JSON-LD Structured Data -->
     {allSchemas.map((schema) => (
-      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
     ))}
 
     <title>{title}</title>

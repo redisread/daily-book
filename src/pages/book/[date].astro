@@ -3,18 +3,10 @@ import Layout from "../../layouts/Layout.astro";
 import BookCard from "../../components/BookCard.astro";
 import QuoteCard from "../../components/QuoteCard.astro";
 import HistoryGrid from "../../components/HistoryGrid.astro";
-import { getBookForDate, formatDate, formatDateISO } from "../../data/books";
+import { getBookForDate, getPublishedDates, formatDate, formatDateISO } from "../../data/books";
 
 export function getStaticPaths() {
-  // Generate pages for the past 90 days
-  const paths = [];
-  for (let i = 0; i < 90; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const dateStr = formatDateISO(date);
-    paths.push({ params: { date: dateStr } });
-  }
-  return paths;
+  return getPublishedDates().map((date) => ({ params: { date } }));
 }
 
 const { date: dateParam } = Astro.params;
@@ -30,7 +22,7 @@ const bookSchema = {
   name: book.title,
   author: { "@type": "Person", name: book.author },
   datePublished: book.year,
-  numberOfPages: Number(book.pages) || undefined,
+  numberOfPages: book.pages || undefined,
   bookFormat: "https://schema.org/Hardcover",
   description: book.desc,
   inLanguage: "zh-CN",

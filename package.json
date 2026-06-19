@@ -10,20 +10,26 @@
     "typecheck": "astro check",
     "lint": "eslint src",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.17",
     "@astrojs/sitemap": "^3.7.3",
-    "astro": "^6.4.6"
+    "astro": "^6.4.6",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.0",
+    "@types/js-yaml": "^4.0.9",
     "eslint": "^10.5.0",
     "eslint-plugin-astro": "^1.7.0",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.0"
+    "typescript-eslint": "^8.61.0",
+    "vitest": "^4.1.9"
   }
 }
