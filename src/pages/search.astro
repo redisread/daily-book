@@ -1,17 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { books, getAllCategories, getPublishedBooks, formatDateISO } from "../data/books";
+import { books, getAllCategories, getBookDateMap } from "../data/books";
 
 const categories = getAllCategories();
-
-// 构建 book.id -> 发布日期映射，搜索链接指向该书的发布日期
-const published = getPublishedBooks(books.length + 1);
-const dateMap = new Map<string, string>();
-for (const { date, book } of published) {
-  if (!dateMap.has(book.id)) {
-    dateMap.set(book.id, formatDateISO(date));
-  }
-}
+const bookDateMap = getBookDateMap();
 
 const searchBooks = books.map((book) => ({
   id: book.id,
@@ -22,7 +14,7 @@ const searchBooks = books.map((book) => ({
   coverTitle: book.coverTitle,
   coverAuthor: book.coverAuthor,
   desc: book.desc,
-  date: dateMap.get(book.id) || book.id,
+  date: bookDateMap.get(book.id) || book.id,
 }));
 ---
 
@@ -143,4 +135,3 @@ const searchBooks = books.map((book) => ({
     });
   });
 </script>
-

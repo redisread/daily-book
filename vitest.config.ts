@@ -1,9 +1,5 @@
 import { defineConfig } from 'vitest/config';
 import { readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Plugin to handle ?raw imports for YAML files in tests
 function yamlRawPlugin() {
