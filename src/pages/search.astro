@@ -96,7 +96,7 @@ const searchBooks = books.map((book) => ({
   let currentCategory = '';
 
   function updateFilter() {
-    const query = searchInput.value.toLowerCase().trim();
+    const query = (searchInput as HTMLInputElement).value.toLowerCase().trim();
     let visible = 0;
 
     cards.forEach((card) => {
@@ -106,18 +106,18 @@ const searchBooks = books.map((book) => ({
       const matchesQuery = !query || title.toLowerCase().includes(query) || author.toLowerCase().includes(query);
       const matchesCategory = !currentCategory || category === currentCategory;
       const show = matchesQuery && matchesCategory;
-      card.hidden = !show;
+      (card as HTMLElement).hidden = !show;
       if (show) visible++;
     });
 
     const queryText = query ? `搜索: "${query}"` : '';
     const categoryText = currentCategory ? `类别: ${currentCategory}` : '';
-    resultsCount.innerHTML = `找到 ${visible} 本书` +
+    resultsCount!.innerHTML = `找到 ${visible} 本书` +
       (queryText ? ` <span class="search-term">${queryText}</span>` : '') +
       (categoryText ? ` <span class="filter-term">${categoryText}</span>` : '');
 
-    emptyState.hidden = visible > 0;
-    booksGrid.hidden = visible === 0;
+    emptyState!.hidden = visible > 0;
+    booksGrid!.hidden = visible === 0;
   }
 
   searchInput?.addEventListener('input', updateFilter);
