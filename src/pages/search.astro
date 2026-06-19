@@ -1,17 +1,29 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getAllCategories } from "../data/books";
+import { books, getAllCategories, getBookDateMap } from "../data/books";
 
 const categories = getAllCategories();
+const bookDateMap = getBookDateMap();
+
+const searchBooks = books.map((book) => ({
+  id: book.id,
+  title: book.title,
+  author: book.author,
+  category: book.category,
+  coverBg: book.coverBg,
+  coverTitle: book.coverTitle,
+  coverAuthor: book.coverAuthor,
+  desc: book.desc,
+  date: bookDateMap.get(book.id) || book.id,
+}));
 ---
 
 <Layout title="搜索书籍 · 每日一书" description="搜索书名、作者或按类别筛选书籍">
-  <div style="padding: 32px 0 16px;">
+  <div class="search-page" style="padding: 32px 0 16px;">
     <h1 class="page-title">搜索书籍</h1>
     <p class="page-desc">搜索书名、作者或按类别筛选，发现你喜欢的书籍。</p>
   </div>
 
-  <!-- Search Form -->
   <div class="search-container">
     <div class="search-form">
       <div class="search-input-wrapper">
@@ -20,8 +32,9 @@ const categories = getAllCategories();
           id="searchInput"
           class="search-input"
           placeholder="搜索书名或作者..."
+          autocomplete="off"
         />
-        <button type="button" class="search-btn" id="searchBtn">
+        <button type="button" class="search-btn" id="searchBtn" aria-label="搜索">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
@@ -29,7 +42,7 @@ const categories = getAllCategories();
         </button>
       </div>
 
-      <div class="category-filters" id="categoryFilters">
+      <div class="category-filters" id="categoryFilters" role="group" aria-label="类别筛选">
         <button type="button" class="category-btn active" data-category="">全部</button>
         {categories.map((cat) => (
           <button type="button" class="category-btn" data-category={cat}>
@@ -40,391 +53,85 @@ const categories = getAllCategories();
     </div>
   </div>
 
-  <!-- Results -->
   <div class="results-container">
     <div class="results-header">
-      <span class="results-count" id="resultsCount">加载中...</span>
+      <span class="results-count" id="resultsCount">共 {searchBooks.length} 本书</span>
     </div>
 
     <div id="resultsContainer">
-      <div class="skeleton-grid" aria-hidden="true">
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
+      <div class="books-grid" id="booksGrid">
+        {searchBooks.map((book) => (
+          <a href={`/book/${book.date}`} class="book-card" data-title={book.title} data-author={book.author} data-category={book.category}>
+            <div class="book-cover" style={`background: ${book.coverBg}`}>
+              <div class="book-cover-title">{book.coverTitle}</div>
+              <div class="book-cover-author">{book.coverAuthor}</div>
+            </div>
+            <div class="book-info">
+              <h3 class="book-title">{book.title}</h3>
+              <p class="book-author">{book.author}</p>
+              <span class="book-category">{book.category}</span>
+              <p class="book-desc">{book.desc.substring(0, 80)}...</p>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div class="empty-state" id="emptyState" hidden>
+        <div class="empty-icon">📚</div>
+        <p>未找到相关书籍</p>
+        <p class="empty-hint">尝试其他关键词或类别</p>
       </div>
     </div>
   </div>
 </Layout>
 
-<script is:inline>
-  let books = [];
-  let currentQuery = '';
-  let currentCategory = '';
-
+<script>
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
-  const resultsContainer = document.getElementById('resultsContainer');
-  const resultsCount = document.getElementById('resultsCount');
   const categoryButtons = document.querySelectorAll('.category-btn');
+  const cards = document.querySelectorAll('.book-card');
+  const resultsCount = document.getElementById('resultsCount');
+  const emptyState = document.getElementById('emptyState');
+  const booksGrid = document.getElementById('booksGrid');
 
-  // 动态加载书籍数据
-  async function loadBooks() {
-    try {
-      const response = await fetch('/books.json');
-      books = await response.json();
-      renderResults(books);
-    } catch {
-      resultsContainer.innerHTML = '<div class="empty-state"><p>加载失败，请刷新重试</p></div>';
-    }
+  let currentCategory = '';
+
+  function updateFilter() {
+    const query = searchInput.value.toLowerCase().trim();
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const title = card.getAttribute('data-title') || '';
+      const author = card.getAttribute('data-author') || '';
+      const category = card.getAttribute('data-category') || '';
+      const matchesQuery = !query || title.toLowerCase().includes(query) || author.toLowerCase().includes(query);
+      const matchesCategory = !currentCategory || category === currentCategory;
+      const show = matchesQuery && matchesCategory;
+      card.hidden = !show;
+      if (show) visible++;
+    });
+
+    const queryText = query ? `搜索: "${query}"` : '';
+    const categoryText = currentCategory ? `类别: ${currentCategory}` : '';
+    resultsCount.innerHTML = `找到 ${visible} 本书` +
+      (queryText ? ` <span class="search-term">${queryText}</span>` : '') +
+      (categoryText ? ` <span class="filter-term">${categoryText}</span>` : '');
+
+    emptyState.hidden = visible > 0;
+    booksGrid.hidden = visible === 0;
   }
 
-  // Search function
-  function searchBooks(query, category) {
-    const lowerQuery = query.toLowerCase().trim();
-    let result = [...books];
-
-    if (lowerQuery) {
-      result = result.filter(
-        (book) =>
-          book.title.toLowerCase().includes(lowerQuery) ||
-          book.author.toLowerCase().includes(lowerQuery)
-      );
-    }
-
-    if (category && category !== '全部') {
-      result = result.filter((book) => book.category === category);
-    }
-
-    return result;
-  }
-
-  // Render results
-  function renderResults(books) {
-    if (books.length === 0) {
-      resultsContainer.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">📚</div>
-          <p>未找到相关书籍</p>
-          <p class="empty-hint">尝试其他关键词或类别</p>
-        </div>
-      `;
-      resultsCount.textContent = `找到 0 本书`;
-      return;
-    }
-
-    const html = books.map((book) => `
-      <a href="/book/${book.date}" class="book-card">
-        <div class="book-cover" style="background: ${book.coverBg}">
-          <div class="book-cover-title">${book.coverTitle}</div>
-          <div class="book-cover-author">${book.coverAuthor}</div>
-        </div>
-        <div class="book-info">
-          <h3 class="book-title">${book.title}</h3>
-          <p class="book-author">${book.author}</p>
-          <span class="book-category">${book.category}</span>
-          <p class="book-desc">${book.desc.substring(0, 80)}...</p>
-        </div>
-      </a>
-    `).join('');
-
-    resultsContainer.innerHTML = `<div class="books-grid">${html}</div>`;
-    resultsCount.innerHTML = `找到 ${books.length} 本书
-      ${currentQuery ? `<span class="search-term">搜索: "${currentQuery}"</span>` : ''}
-      ${currentCategory ? `<span class="filter-term">类别: ${currentCategory}</span>` : ''}`;
-  }
-
-  // Perform search
-  function performSearch() {
-    currentQuery = searchInput.value;
-    const results = searchBooks(currentQuery, currentCategory);
-    renderResults(results);
-  }
-
-  // Event listeners
-  searchInput?.addEventListener('input', (e) => {
-    currentQuery = e.target.value;
-    performSearch();
-  });
-
-  searchBtn?.addEventListener('click', performSearch);
-
+  searchInput?.addEventListener('input', updateFilter);
+  searchBtn?.addEventListener('click', updateFilter);
   searchInput?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      performSearch();
-    }
+    if (e.key === 'Enter') updateFilter();
   });
 
-  // Category filter
   categoryButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       categoryButtons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-      currentCategory = btn.dataset.category || '';
-      performSearch();
+      currentCategory = btn.getAttribute('data-category') || '';
+      updateFilter();
     });
   });
-
-  // Initial load
-  loadBooks();
 </script>
-
-<style>
-  .page-title {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-  }
-
-  .page-desc {
-    font-size: 15px;
-    color: var(--text-secondary);
-    margin: 0;
-  }
-
-  .search-container {
-    margin-bottom: 32px;
-  }
-
-  .search-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .search-input-wrapper {
-    display: flex;
-    gap: 12px;
-  }
-
-  .search-input {
-    flex: 1;
-    padding: 14px 18px;
-    font-size: 16px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: var(--bg-card);
-    color: var(--text-primary);
-    transition: all 0.2s ease;
-  }
-
-  .search-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-dim);
-  }
-
-  .search-btn {
-    padding: 14px 20px;
-    background: var(--accent);
-    color: #08080c;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-  }
-
-  .search-btn:hover {
-    background: var(--accent-light);
-    transform: translateY(-1px);
-  }
-
-  .category-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .category-btn {
-    padding: 8px 16px;
-    font-size: 14px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .category-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .category-btn.active {
-    background: var(--accent);
-    color: #08080c;
-    border-color: var(--accent);
-  }
-
-  .results-container {
-    min-height: 200px;
-  }
-
-  .results-header {
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .results-count {
-    font-size: 14px;
-    color: var(--text-secondary);
-  }
-
-  .search-term,
-  .filter-term {
-    margin-left: 8px;
-    padding: 2px 8px;
-    background: var(--accent-dim);
-    color: var(--accent);
-    border-radius: 4px;
-    font-size: 12px;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 48px 24px;
-  }
-
-  .empty-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-  }
-
-  .empty-state p {
-    color: var(--text-secondary);
-    margin: 8px 0;
-  }
-
-  .empty-hint {
-    font-size: 14px;
-    opacity: 0.7;
-  }
-
-  .books-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-  }
-
-  .book-card {
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-card);
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
-    text-decoration: none;
-  }
-
-  .book-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-    border-color: var(--accent);
-  }
-
-  .book-cover {
-    aspect-ratio: 3/4;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    text-align: center;
-  }
-
-  .book-cover-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: white;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    margin-bottom: 8px;
-    white-space: pre-line;
-  }
-
-  .book-cover-author {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.9);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  }
-
-  .book-info {
-    padding: 16px;
-    flex: 1;
-  }
-
-  .book-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 4px 0;
-    line-height: 1.4;
-  }
-
-  .book-author {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin: 0 0 8px 0;
-  }
-
-  .book-category {
-    display: inline-block;
-    padding: 2px 8px;
-    font-size: 12px;
-    background: var(--accent-dim);
-    color: var(--accent);
-    border-radius: 4px;
-    margin-bottom: 8px;
-  }
-
-  .book-desc {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin: 0;
-  }
-
-  @media (max-width: 768px) {
-    .books-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .category-filters {
-      gap: 6px;
-    }
-
-    .category-btn {
-      padding: 6px 12px;
-      font-size: 13px;
-    }
-  }
-
-  /* Skeleton loading */
-  .skeleton-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-    padding: 24px 0;
-  }
-
-  .skeleton-card {
-    height: 180px;
-    background: linear-gradient(90deg, var(--bg-card) 25%, rgba(255,255,255,0.08) 50%, var(--bg-card) 75%);
-    background-size: 200% 100%;
-    border-radius: 12px;
-    animation: skeleton-pulse 1.5s ease-in-out infinite;
-  }
-
-  @keyframes skeleton-pulse {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-</style>

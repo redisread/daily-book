@@ -66,68 +66,10 @@ const { book } = Astro.props;
   </div>
 </div>
 
-<script is:inline define:vars={{ bookTitle: book.title }}>
-  // Mark as read
-  document.getElementById('markReadBtn')?.addEventListener('click', () => {
-    const readBooks = JSON.parse(localStorage.getItem('dailybook_read') || '[]');
-    if (!readBooks.includes(bookTitle)) {
-      readBooks.push(bookTitle);
-      localStorage.setItem('dailybook_read', JSON.stringify(readBooks));
-      window.showToast(`《${bookTitle}》已标记为已读 📚`);
-    } else {
-      window.showToast('这本书已经标记过了');
-    }
-  });
+<script define:vars={{ bookTitle: book.title }}>
+  import { initLightbox } from "../scripts/lightbox";
+  import { initBookActions } from "../scripts/storage";
 
-  // Collect
-  const collectBtn = document.getElementById('collectBtn');
-  const collections = JSON.parse(localStorage.getItem('dailybook_collections') || '[]');
-  if (collections.includes(bookTitle)) {
-    collectBtn.innerHTML = '♥ 已收藏';
-    collectBtn.style.color = 'var(--accent)';
-  }
-  collectBtn?.addEventListener('click', () => {
-    const cols = JSON.parse(localStorage.getItem('dailybook_collections') || '[]');
-    const idx = cols.indexOf(bookTitle);
-    if (idx > -1) {
-      cols.splice(idx, 1);
-      collectBtn.innerHTML = '♡ 收藏';
-      collectBtn.style.color = '';
-      window.showToast('已取消收藏');
-    } else {
-      cols.push(bookTitle);
-      collectBtn.innerHTML = '♥ 已收藏';
-      collectBtn.style.color = 'var(--accent)';
-      window.showToast('已加入收藏 ♥');
-    }
-    localStorage.setItem('dailybook_collections', JSON.stringify(cols));
-  });
-
-  // Cover Lightbox
-  const cover = document.getElementById('bookCover');
-  const lightbox = document.getElementById('coverLightbox');
-  const closeBtn = document.getElementById('lightboxClose');
-
-  function openLightbox() {
-    if (!lightbox) return;
-    lightbox.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeLightbox() {
-    if (!lightbox) return;
-    lightbox.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  cover?.addEventListener('click', openLightbox);
-  closeBtn?.addEventListener('click', closeLightbox);
-  lightbox?.querySelector('.lightbox-backdrop')?.addEventListener('click', closeLightbox);
-
-  // Close on escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && lightbox?.classList.contains('active')) {
-      closeLightbox();
-    }
-  });
+  initLightbox();
+  initBookActions(bookTitle);
 </script>
