@@ -22,10 +22,10 @@ export function initQuoteSwipe() {
   let isDragging = false;
 
   function goToSlide(index: number) {
-    if (index < 0) index = cards.length - 1;
-    if (index >= cards.length) index = 0;
+    if (index < 0) index = cards!.length - 1;
+    if (index >= cards!.length) index = 0;
     currentIndex = index;
-    track.style.transform = `translateX(-${index * 100}%)`;
+    track!.style.transform = `translateX(-${index * 100}%)`;
     dots?.forEach((d, i) => d.classList.toggle('active', i === index));
   }
 
@@ -219,7 +219,7 @@ export function initQuoteActions() {
           const track = container.querySelector('.quote-swipe-track') as HTMLElement;
           const dots = container.querySelectorAll('.quote-swipe-dot');
           if (track) {
-            track.style.transform = `translateX(-${index * 100}%)`;
+            track!.style.transform = `translateX(-${index * 100}%)`;
             dots.forEach((d, i) => d.classList.toggle('active', i === index));
           }
           c.scrollIntoView({ behavior: 'smooth', block: 'center' });
