@@ -10,7 +10,8 @@ const parsed = load(booksYaml);
 
 const validation = BookSchema.array().safeParse(parsed);
 if (!validation.success) {
-  console.error("books.yaml 校验失败:", JSON.stringify(validation.error.format(), null, 2));
+  const issues = validation.error.issues.map(i => ({ path: i.path.join("."), message: i.message, code: i.code }));
+  console.error("books.yaml 校验失败:", JSON.stringify(issues, null, 2));
   throw new Error("书籍数据校验失败，无法启动");
 }
 export const books: Book[] = validation.data;
