@@ -38,12 +38,15 @@ export function toggleCollection(bookTitle: string): boolean {
 }
 
 export function initBookActions(bookTitle: string) {
-  const markReadBtn = document.getElementById('markReadBtn');
-  const collectBtn = document.getElementById('collectBtn');
+  // Use data attributes to find buttons for this specific card
+  const markReadBtn = document.querySelector<HTMLButtonElement>(`[data-action="markRead"][data-title="${CSS.escape(bookTitle)}"]`);
+  const collectBtn = document.querySelector<HTMLButtonElement>(`[data-action="collect"][data-title="${CSS.escape(bookTitle)}"]`);
 
   markReadBtn?.addEventListener('click', () => {
     if (markAsRead(bookTitle)) {
       window.showToast?.(`《${bookTitle}》已标记为已读 📚`);
+      markReadBtn.textContent = '✅ 已读';
+      markReadBtn.disabled = true;
     } else {
       window.showToast?.('这本书已经标记过了');
     }
@@ -52,17 +55,17 @@ export function initBookActions(bookTitle: string) {
   if (collectBtn) {
     if (isCollected(bookTitle)) {
       collectBtn.innerHTML = '♥ 已收藏';
-      (collectBtn as HTMLElement).style.color = 'var(--accent)';
+      collectBtn.style.color = 'var(--accent)';
     }
     collectBtn.addEventListener('click', () => {
       const collected = toggleCollection(bookTitle);
       if (collected) {
         collectBtn.innerHTML = '♥ 已收藏';
-        (collectBtn as HTMLElement).style.color = 'var(--accent)';
+        collectBtn.style.color = 'var(--accent)';
         window.showToast?.('已加入收藏 ♥');
       } else {
         collectBtn.innerHTML = '♡ 收藏';
-        (collectBtn as HTMLElement).style.color = '';
+        collectBtn.style.color = '';
         window.showToast?.('已取消收藏');
       }
     });
