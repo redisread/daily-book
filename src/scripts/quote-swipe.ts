@@ -136,7 +136,7 @@ export function initQuoteActions() {
   imageModalClose?.addEventListener('click', closeImageModal);
   imageModal?.querySelector('.share-modal-backdrop')?.addEventListener('click', closeImageModal);
 
-  // 生成并下载图片
+  // 生成并下载图片（canvas 操作延迟到点击时）
   downloadBtn?.addEventListener('click', async () => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');

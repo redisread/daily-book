@@ -60,8 +60,14 @@ const searchBooks = books.map((book) => ({
 
     <div id="resultsContainer">
       <div class="books-grid" id="booksGrid">
-        {searchBooks.map((book) => (
-          <a href={`/book/${book.date}`} class="book-card" data-title={book.title} data-author={book.author} data-category={book.category}>
+        {searchBooks.map((book, i) => (
+          <a
+            href={`/book/${book.date}`}
+            class={`book-card${i >= 20 ? ' lazy-hidden' : ''}`}
+            data-title={book.title}
+            data-author={book.author}
+            data-category={book.category}
+          >
             <div class="book-cover" style={`background: ${book.coverBg}`}>
               <div class="book-cover-title">{book.coverTitle}</div>
               <div class="book-cover-author">{book.coverAuthor}</div>
@@ -75,6 +81,7 @@ const searchBooks = books.map((book) => ({
           </a>
         ))}
       </div>
+      <div id="loadMoreTrigger" class="load-more-trigger"></div>
       <div class="empty-state" id="emptyState" hidden>
         <div class="empty-icon">📚</div>
         <p>未找到相关书籍</p>
@@ -84,11 +91,49 @@ const searchBooks = books.map((book) => ({
   </div>
 </Layout>
 
+<style>
+  .lazy-hidden {
+    display: none;
+  }
+  .load-more-trigger {
+    height: 1px;
+  }
+</style>
+
 <script>
+  // 懒加载：滚动时逐步显示更多书籍卡片
+  const BATCH = 20;
+
+  const trigger = document.getElementById('loadMoreTrigger');
+  const hiddenCards = () => document.querySelectorAll<HTMLElement>('.lazy-hidden');
+
+  function revealNextBatch() {
+    const toShow = hiddenCards();
+    for (let i = 0; i < BATCH && i < toShow.length; i++) {
+      toShow[i].classList.remove('lazy-hidden');
+    }
+    // 全部显示后，不再观察
+    if (hiddenCards().length === 0 && trigger) {
+      observer.disconnect();
+      trigger.style.display = 'none';
+    }
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) {
+        revealNextBatch();
+      }
+    },
+    { rootMargin: '200px' }
+  );
+
+  if (trigger) observer.observe(trigger);
+
+  // 搜索/筛选逻辑（作用于所有卡片，包括懒加载隐藏的）
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
-  const categoryButtons = document.querySelectorAll('.category-btn');
-  const cards = document.querySelectorAll('.book-card');
+  const categoryButtons = document.querySelectorAll<HTMLButtonElement>('.category-btn');
   const resultsCount = document.getElementById('resultsCount');
   const emptyState = document.getElementById('emptyState');
   const booksGrid = document.getElementById('booksGrid');
@@ -97,8 +142,16 @@ const searchBooks = books.map((book) => ({
 
   function updateFilter() {
     const query = (searchInput as HTMLInputElement).value.toLowerCase().trim();
-    let visible = 0;
+    // 搜索时：显示所有匹配卡片，停止懒加载观察
+    if (query || currentCategory) {
+      observer.disconnect();
+      document.querySelectorAll<HTMLElement>('.lazy-hidden').forEach((el) => {
+        el.classList.remove('lazy-hidden');
+      });
+    }
 
+    let visible = 0;
+    const cards = document.querySelectorAll<HTMLElement>('.book-card');
     cards.forEach((card) => {
       const title = card.getAttribute('data-title') || '';
       const author = card.getAttribute('data-author') || '';
@@ -106,7 +159,7 @@ const searchBooks = books.map((book) => ({
       const matchesQuery = !query || title.toLowerCase().includes(query) || author.toLowerCase().includes(query);
       const matchesCategory = !currentCategory || category === currentCategory;
       const show = matchesQuery && matchesCategory;
-      (card as HTMLElement).hidden = !show;
+      card.hidden = !show;
       if (show) visible++;
     });
 
