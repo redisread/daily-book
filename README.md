@@ -73,6 +73,61 @@ npm run preview
 | `npm run typecheck` | TypeScript 类型检查 |
 | `npm run lint` | ESLint 代码检查 |
 
+## 📖 添加每日一书
+
+所有书籍数据集中在 `src/data/books.yaml`，每本书是一个条目，字段说明：
+
+| 字段 | 说明 | 示例 |
+| :--- | :--- | :--- |
+| `id` | 唯一标识，kebab-case | `百年孤独` → `hundred-years-of-solitude` |
+| `title` | 书名 | `百年孤独` |
+| `author` | 作者 | `加西亚·马尔克斯` |
+| `category` | 分类 | `魔幻现实主义` |
+| `year` | 出版年份 | `1967` |
+| `pages` | 页数 | `360` |
+| `rating` | 评分（1-10） | `9.3` |
+| `desc` | 简介 | `《百年孤独》...` |
+| `coverBg` | 封面背景 CSS | `linear-gradient(145deg, #1a5c2a, #2d8a4e, #1a5c2a)` |
+| `coverTitle` | 封面显示的书名（可简化） | `百年孤独` |
+| `coverAuthor` | 封面显示的作者（可简化） | `马尔克斯` |
+| `publishedDate` | 发布日期 `YYYY-MM-DD`，未发布为 `null` | `2026-06-21` 或 `null` |
+| `quotes` | 金句列表，每条含 `text` 和 `page` | 至少 1 条，最多 10 条 |
+
+### 添加新书
+
+1. 在 `src/data/books.yaml` 末尾添加新条目：
+
+```yaml
+- id: new-book-id
+  title: "书名"
+  author: "作者"
+  category: "分类"
+  year: 2026
+  pages: 300
+  rating: 8.5
+  desc: "简介内容"
+  coverBg: "linear-gradient(145deg, #1a2a3a, #2a4a6a, #1a2a3a)"
+  coverTitle: "书名"
+  coverAuthor: "作者简称"
+  publishedDate: null
+  quotes:
+    - text: "金句内容"
+      page: "第10页"
+```
+
+2. 运行质量检查：
+
+```bash
+npm run typecheck
+npm test
+```
+
+3. 提交并推送，发布 PR。
+
+### 发布书籍
+
+将 `publishedDate: null` 改为实际日期（如 `2026-06-21`），推送后自动部署。
+
 ## 🔄 CI/CD
 
 项目配置了两套 GitHub Actions 工作流：
