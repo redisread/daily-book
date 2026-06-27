@@ -2,7 +2,7 @@
 // 发布新书时，往数组顶部 prepend 一条新记录，然后 push 代码触发部署
 // 注意：bookId 必须对应 books.ts 中的有效 id
 //
-// 当前数据：87 本书的发布历史（2026-03-24 ~ 2026-06-18），
+// 当前数据：89 本书的发布历史（2026-03-24 ~ 2026-06-20），
 // 顺序按 books.ts 的固定洗牌排列（seed=42），与 getBookForDate 一致，保证可复现。
 
 export interface PublishedEntry {
@@ -11,6 +11,8 @@ export interface PublishedEntry {
 }
 
 export const publishedHistory: PublishedEntry[] = [
+  { date: "2026-06-20", bookId: "tokio-2026" },
+  { date: "2026-06-19", bookId: "brief-history-intelligence-2026" },
   { date: "2026-06-18", bookId: "hackers-and-painters" },
   { date: "2026-06-17", bookId: "the-road-less-traveled" },
   { date: "2026-06-16", bookId: "the-little-prince" },
