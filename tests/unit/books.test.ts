@@ -99,7 +99,7 @@ describe('getLatestPublishedBook', () => {
     const { date, book } = getLatestPublishedBook();
     expect(date).toBeInstanceOf(Date);
     expect(book).toBeDefined();
-    expect(book.id).toBe('hackers-and-painters');
+    expect(book.id).toBe('tokio-2026');
   });
 });
 
@@ -107,7 +107,7 @@ describe('getPublishedDates', () => {
   it('should return all published dates', () => {
     const dates = getPublishedDates();
     expect(dates.length).toBeGreaterThan(0);
-    expect(dates[0]).toBe('2026-06-18');
+    expect(dates[0]).toBe('2026-06-20');
     expect(dates[dates.length - 1]).toBe('2026-03-24');
   });
 

@@ -1,16 +1,10 @@
-// 发布历史：手动维护的"每日一书"发布记录
-// 发布新书时，往数组顶部 prepend 一条新记录，然后 push 代码触发部署
-// 注意：bookId 必须对应 books.ts 中的有效 id
-//
-// 当前数据：89 本书的发布历史（2026-03-24 ~ 2026-06-20），
-// 顺序按 books.ts 的固定洗牌排列（seed=42），与 getBookForDate 一致，保证可复现。
+// scripts/migrate-published-date.mjs
+// 将 publishedDate 从 publishedHistory 迁移到 books.yaml 每本书中
+// 并将 publishedDate 字段放在 coverAuthor 之后、quotes 之前
+import { load, dump } from "js-yaml";
+import { readFileSync, writeFileSync } from "fs";
 
-export interface PublishedEntry {
-  date: string; // YYYY-MM-DD
-  bookId: string; // 对应 books 数组中的 id
-}
-
-export const publishedHistory: PublishedEntry[] = [
+const historyEntries = [
   { date: "2026-06-20", bookId: "tokio-2026" },
   { date: "2026-06-19", bookId: "brief-history-intelligence-2026" },
   { date: "2026-06-18", bookId: "hackers-and-painters" },
@@ -101,3 +95,53 @@ export const publishedHistory: PublishedEntry[] = [
   { date: "2026-03-25", bookId: "siddhartha" },
   { date: "2026-03-24", bookId: "the-pragmatic-programmer" },
 ];
+
+const dateMap = new Map(historyEntries.map(e => [e.bookId, e.date]));
+console.log(`Parsed ${historyEntries.length} history entries`);
+
+const yamlPath = new URL("../src/data/books.yaml", import.meta.url);
+const yamlContent = readFileSync(yamlPath, "utf-8");
+
+// Skip existing header comment
+const yamlBody = yamlContent.replace(/^#.*\n/, "");
+const books = load(yamlBody);
+
+for (const book of books) {
+  if (dateMap.has(book.id)) {
+    book.publishedDate = dateMap.get(book.id);
+  } else {
+    book.publishedDate = null;
+  }
+}
+
+// Reorder fields: publishedDate should appear after coverAuthor, before quotes
+// js-yaml dump respects property insertion order, so we rebuild each book object
+const FIELD_ORDER = [
+  "id", "title", "author", "category", "year", "pages", "rating",
+  "desc", "coverBg", "coverTitle", "coverAuthor", "publishedDate", "quotes"
+];
+
+const reordered = books.map(book => {
+  const result = {};
+  for (const key of FIELD_ORDER) {
+    if (book[key] !== undefined) {
+      result[key] = book[key];
+    }
+  }
+  return result;
+});
+
+const yamlOutput = dump(reordered, {
+  indent: 2,
+  lineWidth: -1,
+  noRefs: true,
+  sortKeys: false,
+});
+
+const header = `# 每日一书书籍数据
+# 由 scripts/migrate-published-date.mjs 迁移生成
+# 新增/修改书籍后，运行 npm run validate:books 校验
+# publishedDate 格式为 YYYY-MM-DD，未发布为 null
+`;
+writeFileSync(yamlPath, header + yamlOutput);
+console.log("Written to books.yaml");
