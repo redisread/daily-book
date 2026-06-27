@@ -1,5 +1,4 @@
 import { load } from "js-yaml";
-import { publishedHistory } from "./publishedHistory";
 import { BookSchema } from "../schemas/book";
 import type { Book, Quote } from "../schemas/book";
 import booksYaml from "./books.yaml?raw";
@@ -15,6 +14,17 @@ if (!validation.success) {
   throw new Error("书籍数据校验失败，无法启动");
 }
 export const books: Book[] = validation.data;
+
+export interface PublishedEntry {
+  date: string;
+  bookId: string;
+}
+
+// 从 books.yaml 的 publishedDate 字段推导发布历史（唯一数据源）
+export const publishedHistory: PublishedEntry[] = books
+  .filter((b) => b.publishedDate != null)
+  .sort((a, b) => b.publishedDate!.localeCompare(a.publishedDate!))
+  .map((b) => ({ date: b.publishedDate!, bookId: b.id }));
 
 function getBookById(id: string): Book | undefined {
   return books.find((b) => b.id === id);

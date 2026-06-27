@@ -20,6 +20,7 @@ export const BookSchema = z.object({
   coverBg: z.string().min(1, "封面背景不能为空"),
   coverTitle: z.string().min(1, "封面标题不能为空"),
   coverAuthor: z.string().min(1, "封面作者不能为空"),
+  publishedDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "发布日期格式必须为 YYYY-MM-DD").nullable().optional(),
   quotes: z.array(QuoteSchema).min(1, "至少一条金句").max(10, "最多 10 条金句"),
 });
 
