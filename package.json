@@ -9,6 +9,7 @@
     "astro": "astro",
     "typecheck": "astro check",
     "lint": "eslint src",
+    "yaml-check": "node -e \"require('js-yaml').load(require('fs').readFileSync('src/data/books.yaml','utf8'));console.log('YAML ✓')\"",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test": "vitest run",
