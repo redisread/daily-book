@@ -2208,3 +2208,25 @@
       page: 第七章
     - text: "一个人无法自成孤岛，要么至少，一个人无法自成最理想的孤岛。"
       page: 第十九章
+
+- id: cognitive-awakening
+  title: 认知觉醒
+  author: 周岭
+  category: 自我提升
+  year: 2020
+  pages: 240
+  rating: 8.2
+  desc: "为什么我们做事总是急于求半、避难趋易？因为大脑的天性就是趋利避害、急于求成。周岭从脑科学和认知科学的角度，揭示了人类焦虑、拖延、注意力分散的根源，并提供了可操作的方法论：早冥读写跑——人生五件套，帮你在日常生活中积累复利式的成长。"
+  coverBg: 'linear-gradient(145deg, #2a4a7a, #4a6a9a, #2a4a7a)'
+  coverTitle: 认知觉醒
+  coverAuthor: 周岭
+  publishedDate: '2026-07-04'
+  quotes:
+    - text: "真正的觉醒源自对自我规律的理解，而非简单的意志力对抗。"
+      page: 第三章
+    - text: "焦虑的根源是：想同时做很多事，又想立即看到效果。"
+      page: 第二章
+    - text: "耐心不是靠坚持而是靠具有长远目光支撑的天性。"
+      page: 第六章
+    - text: "越是在快速变化的时代，越需要深度学习的能力。"
+      page: 第十一章
