@@ -57,6 +57,7 @@ jobs:
     # Skip deploy for fork PRs (secrets not available)
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    continue-on-error: true  # Cloudflare API 偶发故障，不阻塞 PR 合并
     environment: preview
     permissions:
       contents: read
@@ -77,8 +78,17 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Upload Worker Version
+      - name: Upload Worker Version (with retry)
         id: upload
+        uses: cloudflare/wrangler-action@v4
+        continue-on-error: true
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: versions upload
+
+      - name: Retry upload on failure
+        if: steps.upload.outcome == 'failure'
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
