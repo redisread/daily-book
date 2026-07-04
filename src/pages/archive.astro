@@ -3,6 +3,20 @@ import Layout from "../layouts/Layout.astro";
 import { getPublishedBooks, formatDate, formatDateISO } from "../data/books";
 
 const recent = getPublishedBooks(30);
+
+// Group by year-month
+interface MonthGroup { label: string; entries: { date: Date; book: typeof recent[0]["book"] }[] }
+const groups: MonthGroup[] = [];
+for (const entry of recent) {
+  const d = entry.date;
+  const label = `${d.getFullYear()}年${d.getMonth() + 1}月`;
+  let g = groups.find(g => g.label === label);
+  if (!g) {
+    g = { label, entries: [] };
+    groups.push(g);
+  }
+  g.entries.push(entry);
+}
 ---
 
 <Layout title="往期回顾 · 每日一书" description="查看过去发布的每日推荐书籍">
@@ -11,14 +25,19 @@ const recent = getPublishedBooks(30);
     <p class="page-desc">每日推荐回顾，每一本都值得细细品读。</p>
   </div>
 
-  <div class="archive-grid">
-    {recent.map(({ date, book }) => (
-      <a href={`/book/${formatDateISO(date)}`} class="history-card">
-        <div class="history-date">{formatDate(date)}</div>
-        <div class="history-title">{book.title}</div>
-        <div class="history-author">{book.author}</div>
-        <div class="history-quote">&ldquo;{book.quotes[0].text.substring(0, 50)}&hellip;&rdquo;</div>
-      </a>
-    ))}
-  </div>
+  {groups.map(group => (
+    <section class="archive-month-group">
+      <h2 class="archive-month-label">{group.label}</h2>
+      <div class="archive-grid">
+        {group.entries.map(({ date, book }) => (
+          <a href={`/book/${formatDateISO(date)}`} class="history-card">
+            <div class="history-date">{formatDate(date)}</div>
+            <div class="history-title">{book.title}</div>
+            <div class="history-author">{book.author}</div>
+            <div class="history-quote">&ldquo;{book.quotes[0].text.substring(0, 50)}&hellip;&rdquo;</div>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
 </Layout>

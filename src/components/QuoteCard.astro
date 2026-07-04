@@ -7,10 +7,27 @@ interface Props {
 
 const { book } = Astro.props;
 const quotes = book.quotes;
-const moreQuotes = quotes.slice(1, 5);
 ---
 
-<!-- Featured Quote with Swipe -->
+<!-- Desktop: vertical quotes list -->
+<div class="quote-list-desktop">
+  {quotes.map((q, index) => (
+    <div class="quote-card stacked" data-index={index}>
+      <div class="quote-mark">&ldquo;</div>
+      <p class="quote-text">{q.text}</p>
+      <div class="quote-source">
+        ——{book.author}《{book.title}》{q.page}
+      </div>
+      <div class="quote-actions">
+        <button class="quote-action-btn like-btn" data-index={index} title="喜欢">♡</button>
+        <button class="quote-action-btn share-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="分享">⎘</button>
+        <button class="quote-action-btn image-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="生成图片">🖼</button>
+      </div>
+    </div>
+  ))}
+</div>
+
+<!-- Mobile: Swipe carousel -->
 <div class="quote-swipe-container" id="quoteSwipeContainer">
   <div class="quote-swipe-track" id="quoteSwipeTrack">
     {quotes.map((q, index) => (
@@ -48,22 +65,6 @@ const moreQuotes = quotes.slice(1, 5);
   </div>
 </div>
 
-<!-- More Quotes -->
-{moreQuotes.length > 0 && (
-  <div class="more-quotes">
-    <div class="section-header">
-      <h2 class="section-title">更多金句</h2>
-    </div>
-    <div class="quotes-grid">
-      {moreQuotes.map((q) => (
-        <div class="mini-quote-card" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`}>
-          <p class="mini-quote-text">{q.text}</p>
-          <span class="mini-quote-page">{q.page}</span>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
 
 <script>
   import { initQuoteSwipe, initQuoteActions } from "../scripts/quote-swipe";
