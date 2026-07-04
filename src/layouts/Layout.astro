@@ -15,7 +15,7 @@ const {
   jsonLd,
 } = Astro.props;
 
-const site = Astro.site ?? new URL("https://daily-book.redisread.workers.dev");
+const site = Astro.site ?? new URL("https://daily-book.jiahongw.com");
 const canonical = new URL(Astro.url.pathname, site);
 const ogImage = new URL(image, site);
 const fullTitle = title === "每日一书 · Daily Book" ? title : `${title} · 每日一书`;

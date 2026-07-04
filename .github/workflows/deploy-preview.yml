@@ -83,14 +83,14 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --name daily-book-pr${{ github.event.pull_request.number }}
+          command: deploy --config wrangler.preview.toml --name daily-book-pr${{ github.event.pull_request.number }}
 
       - name: Comment preview URL
         uses: actions/github-script@v9
         with:
           script: |
             const prNumber = context.issue.number;
-            const previewUrl = `https://daily-book-pr${prNumber}.redisread.workers.dev`;
+            const previewUrl = `https://daily-book-pr${prNumber}.wujiahong2013.workers.dev`;
 
             const body = `## 🔍 Preview Deployed
 
