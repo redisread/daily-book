@@ -1,12 +1,30 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const quotes = [
+  { text: "我们拥有的书籍，就是我们尚未需要的图书馆。", author: "翁贝托·艾柯" },
+  { text: "读一本好书，就是和高尚的人谈话。", author: "歌德" },
+  { text: "读书是在别人思想的帮助下，建立起自己的思想。", author: "巴金" },
+  { text: "书卷多情似故人，晨昏忧乐每相亲。", author: "于谦" },
+  { text: "没有书籍的屋子，就像没有灵魂的躯体。", author: "西塞罗" },
+  { text: "读书补天然之不足，经验又补读书之不足。", author: "培根" },
+  { text: "书籍是造就灵魂的工具。", author: "雨果" },
+  { text: "书犹药也，善读之可以医愚。", author: "刘向" },
+  { text: "书籍是人类进步的阶梯。", author: "高尔基" },
+  { text: "你的问题是不读书，而想得太多。", author: "杨绛" },
+];
+const q = quotes[Math.floor(Math.random() * quotes.length)];
 ---
 
 <Layout title="页面未找到 · 每日一书" description="您访问的页面不存在">
   <div class="not-found">
     <div class="not-found-icon">📖</div>
     <h1 class="not-found-title">页面未找到</h1>
-    <p class="not-found-desc">您访问的页面似乎已经漂流到了别处...</p>
+    <blockquote class="not-found-quote">
+      「{q.text}」
+      <footer>——{q.author}</footer>
+    </blockquote>
+    <p class="not-found-desc">也许您要找的内容已经换了个地方，但这句话或许刚好适合此刻。</p>
     <a href="/" class="not-found-btn">返回首页</a>
   </div>
 </Layout>

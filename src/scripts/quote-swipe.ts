@@ -207,24 +207,4 @@ export function initQuoteActions() {
     });
   });
 
-  // 点击迷你金句跳转到主卡片
-  document.querySelectorAll('.mini-quote-card').forEach((card) => {
-    card.addEventListener('click', () => {
-      const text = card.getAttribute('data-quote');
-      const cards = document.querySelectorAll('.quote-card');
-      const container = document.getElementById('quoteSwipeContainer');
-      cards.forEach((c, index) => {
-        const quoteText = c.querySelector('.quote-text')?.textContent;
-        if (quoteText === text && container) {
-          const track = container.querySelector('.quote-swipe-track') as HTMLElement;
-          const dots = container.querySelectorAll('.quote-swipe-dot');
-          if (track) {
-            track!.style.transform = `translateX(-${index * 100}%)`;
-            dots.forEach((d, i) => d.classList.toggle('active', i === index));
-          }
-          c.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      });
-    });
-  });
 }

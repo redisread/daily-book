@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   books,
+  publishedHistory,
   getBookForDate,
   getPublishedBooks,
   getLatestPublishedBook,
@@ -99,16 +100,18 @@ describe('getLatestPublishedBook', () => {
     const { date, book } = getLatestPublishedBook();
     expect(date).toBeInstanceOf(Date);
     expect(book).toBeDefined();
-    expect(book.id).toBe('tokio-2026');
+    // 最新发布 = publishedHistory 排序后第一个
+    const latest = publishedHistory[0];
+    expect(book.id).toBe(latest.bookId);
   });
 });
 
 describe('getPublishedDates', () => {
   it('should return all published dates', () => {
     const dates = getPublishedDates();
-    expect(dates.length).toBeGreaterThan(0);
-    expect(dates[0]).toBe('2026-06-20');
-    expect(dates[dates.length - 1]).toBe('2026-03-24');
+    expect(dates.length).toBe(publishedHistory.length);
+    expect(dates[0]).toBe(publishedHistory[0].date); // 最新
+    expect(dates[dates.length - 1]).toBe(publishedHistory[publishedHistory.length - 1].date); // 最早
   });
 
   it('should return dates in YYYY-MM-DD format', () => {

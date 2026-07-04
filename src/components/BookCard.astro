@@ -40,19 +40,12 @@ const { book } = Astro.props;
       <h1 class="book-title">{book.title}</h1>
       <p class="book-author"><span>{book.author}</span></p>
       <p class="book-desc">{book.desc}</p>
-      <div class="book-meta">
-        <div class="meta-item">
-          <span class="meta-label">出版年份</span>
-          <span class="meta-value">{book.year}</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">页数</span>
-          <span class="meta-value">{book.pages}页</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">评分</span>
-          <span class="meta-value">⭐ {book.rating}</span>
-        </div>
+      <div class="book-meta-inline">
+        <span>{book.year}</span>
+        <span class="meta-dot">·</span>
+        <span>{book.pages}页</span>
+        <span class="meta-dot">·</span>
+        <span>⭐ {book.rating}</span>
       </div>
       <div class="book-actions">
         <button class="btn-primary" data-action="markRead" data-title={book.title}>📚 标记已读</button>
