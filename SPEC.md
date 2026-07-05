@@ -105,9 +105,19 @@ tests/unit/
 
 ## 边界
 
-- **Always:** 新增书籍必须指定 `publishedDate: null`，由发布时填写实际日期
-- **Ask first:** 修改 `publishedDate` 已有值的书籍
-- **Never:** 不再创建独立的 `publishedHistory.ts` 文件
+- **Always:** 新增书籍的 `publishedDate` 可设为 `null`（待发布）或**北京时间（UTC+8）当前日期**（直接发布）；填写前必须确认该日期未被其他书籍占用。
+- **Ask first:** 修改 `publishedDate` 已有值的书籍；将 `publishedDate` 设为非当前的过去/未来日期（排期由人工统筹）。
+- **Never:** 不再创建独立的 `publishedHistory.ts` 文件；两本书共用同一 `publishedDate`（会导致后书永远无法展示）。
+
+### 北京时间取法
+
+构建环境（Cloudflare Pages）默认 UTC，直接用 `new Date()` 取「今天」可能比北京时间晚一天。取当前日期必须显式指定时区：
+
+```bash
+TZ=Asia/Shanghai date +%Y-%m-%d   # macOS / Linux 通用
+```
+
+agent 不得用 `new Date()` / `Date.now()` 推断「当前」，必须用上述命令或由调用方显式提供日期字符串。
 
 ## 验收条件
 
