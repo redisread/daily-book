@@ -126,6 +126,11 @@ npm test
 
 ### 发布书籍
 
+新书 `publishedDate` 两种取法：
+
+- `publishedDate: null` —— 待发布，稍后由人工定日期。
+- 北京时间当前日期 —— 直接发布。取值用 `TZ=Asia/Shanghai date +%Y-%m-%d`，勿用 `new Date()`（构建环境 UTC 会差一天）。填前 `grep` 确认该日期未被其他书占用。
+
 将 `publishedDate: null` 改为实际日期（如 `2026-06-21`），推送后自动部署。
 
 ## 🔄 CI/CD
