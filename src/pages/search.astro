@@ -10,7 +10,6 @@ const searchBooks = books.map((book) => ({
   title: book.title,
   author: book.author,
   category: book.category,
-  coverBg: book.coverBg,
   coverTitle: book.coverTitle,
   coverAuthor: book.coverAuthor,
   desc: book.desc,
@@ -35,7 +34,7 @@ const searchBooks = books.map((book) => ({
           autocomplete="off"
         />
         <button type="button" class="search-btn" id="searchBtn" aria-label="搜索">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
           </svg>
@@ -68,7 +67,7 @@ const searchBooks = books.map((book) => ({
             data-author={book.author}
             data-category={book.category}
           >
-            <div class="book-cover" style={`background: ${book.coverBg}`}>
+            <div class="book-cover">
               <div class="book-cover-title">{book.coverTitle}</div>
               <div class="book-cover-author">{book.coverAuthor}</div>
             </div>
@@ -83,7 +82,6 @@ const searchBooks = books.map((book) => ({
       </div>
       <div id="loadMoreTrigger" class="load-more-trigger"></div>
       <div class="empty-state" id="emptyState" hidden>
-        <div class="empty-icon">📚</div>
         <p>未找到相关书籍</p>
         <p class="empty-hint">尝试其他关键词或类别</p>
       </div>
