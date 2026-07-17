@@ -110,7 +110,7 @@
 | **文件** | `src/pages/books.json.ts` |
 | **路由** | `/books.json` |
 | **User Story** | 作为前端搜索功能，我可以通过 JSON 接口获取全部书籍数据（含日期映射），以实现客户端搜索过滤。 |
-| **Expected Behaviour** | 输出 JSON 数组，每本书含 id/title/author/category/coverBg/coverTitle/coverAuthor/desc/date |
+| **Expected Behaviour** | 输出 JSON 数组，每本书含 id/title/author/category/coverTitle/coverAuthor/desc/date |
 | **Edge Cases** | 1. 某本书未在 publishedHistory 中找到日期 → date 回退为 book.id |
 | **Validation Rules** | 输出为 UTF-8 JSON，Cache-Control: public, max-age=3600 |
 | **Dependencies** | F14(books), F13(bookDateMap) |
@@ -142,7 +142,7 @@
 | **文件** | `src/components/BookCard.astro` |
 | **Description** | 展示书籍封面、详细信息（分类、书名、作者、简介、出版年、页数、评分）和操作按钮（标记已读、收藏、RSS） |
 | **Expected Behaviour** | 1. 左侧显示书籍封面（CSS 生成，可点击放大） 2. 右侧显示分类/书名/作者/简介/meta/操作按钮 3. 点击封面打开 lightbox 4. "标记已读"按钮使用 localStorage 存储 5. "收藏"按钮使用 localStorage 存储 |
-| **Edge Cases** | 1. coverBg 为空/无效 → 显示默认背景 2. rating 不存在 → meta 不显示评分行 3. pages 不存在 → meta 不显示页数行 |
+| **Edge Cases** | 1. rating 不存在 → meta 不显示评分行 2. pages 不存在 → meta 不显示页数行 |
 | **Validation Rules** | coverTitle/coverAuthor 使用 `set:text`（已修复 XSS），lightbox 中内容相同 |
 | **Dependencies** | F14(book 数据), F16(lightbox.ts), F18(storage.ts) |
 
@@ -213,10 +213,10 @@
 | **Feature ID** | F14 |
 | **Feature Name** | 书籍数据加载与校验 |
 | **文件** | `src/data/books.ts` + `src/data/books.yaml` + `src/schemas/book.ts` |
-| **Description** | 从 books.yaml 加载书籍数据，通过 Zod schema 校验（id/title/author/category/year/pages/rating/desc/coverBg/coverTitle/coverAuthor/quotes），导出供各组件使用 |
+| **Description** | 从 books.yaml 加载书籍数据，通过 Zod schema 校验（id/title/author/category/year/pages/rating/desc/coverTitle/coverAuthor/quotes），导出供各组件使用 |
 | **Expected Behaviour** | 1. 启动时从 YAML 解析并 Zod 校验 2. 校验失败直接抛出异常阻止构建 3. 提供 getPublishedBooks/getLatestPublishedBook/getRecentBooks/getBookForDate/getTodayBook 等查询函数 |
 | **Edge Cases** | 1. YAML 格式错误 → js-yaml 解析失败 2. 校验失败 → throw error 阻止构建 3. 空书籍数组 → 各种查询返回空/undefined |
-| **Validation Rules** | id: kebab-case, title/author/category/desc/coverBg/coverTitle/coverAuthor: min(1), year: integer, pages: positive int, rating: positive, quotes: 1~10 条 |
+| **Validation Rules** | id: kebab-case, title/author/category/desc/coverTitle/coverAuthor: min(1), year: integer, pages: positive int, rating: positive, quotes: 1~10 条 |
 
 ---
 

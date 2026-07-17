@@ -13,7 +13,6 @@ export const GET: APIRoute = () => {
     title: book.title,
     author: book.author,
     category: book.category,
-    coverBg: book.coverBg,
     coverTitle: book.coverTitle,
     coverAuthor: book.coverAuthor,
     desc: book.desc,

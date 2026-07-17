@@ -118,7 +118,7 @@ for (const book of books) {
 // js-yaml dump respects property insertion order, so we rebuild each book object
 const FIELD_ORDER = [
   "id", "title", "author", "category", "year", "pages", "rating",
-  "desc", "coverBg", "coverTitle", "coverAuthor", "publishedDate", "quotes"
+  "desc", "coverTitle", "coverAuthor", "publishedDate", "quotes"
 ];
 
 const reordered = books.map(book => {
