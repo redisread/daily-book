@@ -10,7 +10,6 @@
   pages: 360
   rating: 9.3
   desc: 《百年孤独》是魔幻现实主义文学的代表作，描写了布恩迪亚家族七代人的传奇故事，以及加勒比海沿岸小镇马孔多的百年兴衰，反映了拉丁美洲一个世纪以来风云变幻的历史。
-  coverBg: 'linear-gradient(145deg, #1a5c2a, #2d8a4e, #1a5c2a)'
   coverTitle: 百年孤独
   coverAuthor: 马尔克斯
   publishedDate: '2026-05-20'
@@ -33,7 +32,6 @@
   pages: 97
   rating: 9
   desc: 小王子从自己的星球出发，先后访问了六个星球，最后来到地球。在沙漠中与飞行员相遇，讲述了自己的故事。这是一部写给大人的童话，关于爱、责任与生命的寓言。
-  coverBg: 'linear-gradient(145deg, #1a3a8a, #2952c8, #1a3a8a)'
   coverTitle: 小王子
   coverAuthor: 圣-埃克苏佩里
   publishedDate: '2026-06-16'
@@ -56,7 +54,6 @@
   pages: 440
   rating: 9.1
   desc: 从十万年前有生命迹象开始到21世纪资本、科技交织的人类发展史，将科学和历史编织在一起，从全新的角度阐述地球上智人的发展历史。
-  coverBg: 'linear-gradient(145deg, #b52020, #d43d3d, #b52020)'
   coverTitle: 人类简史
   coverAuthor: 赫拉利
   publishedDate: '2026-03-29'
@@ -79,7 +76,6 @@
   pages: 280
   rating: 9
   desc: 一个英国证券交易所的经纪人，本已有牢靠的职业和地位、美满的家庭，但却迷恋上绘画，像被魔鬼附了体，突然弃家出走，到巴黎去追求绘画的理想。
-  coverBg: 'linear-gradient(145deg, #1a1a40, #2a2a60, #1a1a40)'
   coverTitle: 月亮与六便士
   coverAuthor: 毛姆
   publishedDate: '2026-04-25'
@@ -102,7 +98,6 @@
   pages: 191
   rating: 9.4
   desc: 讲述了农村人福贵悲惨的人生遭遇。福贵本是个阔少爷，可他嗜赌如命，终于赌光了家业。他的亲人一个个离他而去，最后只剩一头老牛与他相依为命。
-  coverBg: 'linear-gradient(145deg, #5a3a20, #8a5a30, #5a3a20)'
   coverTitle: 活着
   coverAuthor: 余华
   publishedDate: '2026-04-06'
@@ -125,7 +120,6 @@
   pages: 535
   rating: 8.8
   desc: 14岁的少女苏菲某天放学回家，收到了神秘的一封信。就这样，在一位神秘导师的指引下，苏菲开始思索从古希腊到康德的哲学问题。
-  coverBg: 'linear-gradient(145deg, #5a1a8a, #7a2ab0, #5a1a8a)'
   coverTitle: 苏菲的世界
   coverAuthor: 贾德
   publishedDate: '2026-05-17'
@@ -148,7 +142,6 @@
   pages: 362
   rating: 8.9
   desc: 12岁的阿富汗富家少爷阿米尔与仆人哈桑情同手足。然而，在一场风筝比赛后，发生了一件悲惨不堪的事，阿米尔为自己的懦弱感到自责和痛苦，逼走了哈桑。
-  coverBg: 'linear-gradient(145deg, #c45a10, #e87a20, #c45a10)'
   coverTitle: 追风筝的人
   coverAuthor: 胡赛尼
   publishedDate: '2026-04-21'
@@ -171,7 +164,6 @@
   pages: 312
   rating: 8.6
   desc: 梭罗独自在瓦尔登湖畔生活了两年两个月，记录了他在自然中的所见所思。这本书是对简朴生活的颂歌，也是对现代文明的深刻反思。
-  coverBg: 'linear-gradient(145deg, #1a4a3a, #2a7a5a, #1a4a3a)'
   coverTitle: 瓦尔登湖
   coverAuthor: 梭罗
   publishedDate: '2026-05-31'
@@ -194,7 +186,6 @@
   pages: 120
   rating: 9
   desc: 默尔索是阿尔及尔的一个小职员，母亲去世后他没有哭泣，之后在海滩上莫名其妙地杀了一个阿拉伯人。法庭审判时，他因为对母亲之死的冷漠态度而被判处死刑。
-  coverBg: 'linear-gradient(145deg, #2a2a2a, #4a4a4a, #2a2a2a)'
   coverTitle: 局外人
   coverAuthor: 加缪
   publishedDate: '2026-04-30'
@@ -217,7 +208,6 @@
   pages: 384
   rating: 8.4
   desc: 渡边彻在飞机上听到《挪威的森林》旋律，回忆起大学时代与直子和绿子之间的感情纠葛。一段关于青春、爱情、孤独与死亡的动人故事。
-  coverBg: 'linear-gradient(145deg, #1a3a2a, #2a5a3a, #1a3a2a)'
   coverTitle: 挪威的森林
   coverAuthor: 村上春树
   publishedDate: '2026-06-14'
@@ -240,7 +230,6 @@
   pages: 302
   rating: 9.3
   desc: 文化大革命如火如荼进行的同时，军方探寻外星文明的绝秘计划取得了突破性进展。半个世纪后，叶文洁的行为彻底改变了人类的命运。
-  coverBg: 'linear-gradient(145deg, #0a1a3a, #1a3a6a, #0a1a3a)'
   coverTitle: 三体
   coverAuthor: 刘慈欣
   publishedDate: '2026-04-12'
@@ -263,7 +252,6 @@
   pages: 401
   rating: 9
   desc: 讲述了一段跨越半个多世纪的爱情故事。弗洛伦蒂诺在年轻时爱上了费尔明娜，被拒绝后他等待了五十一年九个月零四天，终于等到了再续前缘的机会。
-  coverBg: 'linear-gradient(145deg, #8a1a3a, #b52a4a, #8a1a3a)'
   coverTitle: 霍乱时期的爱情
   coverAuthor: 马尔克斯
   publishedDate: '2026-05-21'
@@ -286,7 +274,6 @@
   pages: 328
   rating: 9.4
   desc: 在大洋国，思想是罪行，自由即奴役，战争即和平。温斯顿在真理部工作，负责篡改历史记录。他开始质疑党的统治，并秘密地爱上了朱莉亚。
-  coverBg: 'linear-gradient(145deg, #3a0a0a, #6a1a1a, #3a0a0a)'
   coverTitle: '1984'
   coverAuthor: 奥威尔
   publishedDate: '2026-05-04'
@@ -309,7 +296,6 @@
   pages: 176
   rating: 8.5
   desc: 大庭叶藏从小就对人类的生活充满恐惧和不安，他用搞笑来掩饰内心的痛苦，在酗酒、药物和女人之间沉沦。这是太宰治最后的作品，也是他灵魂的自画像。
-  coverBg: 'linear-gradient(145deg, #1a1a2a, #2a2a4a, #1a1a2a)'
   coverTitle: 人间失格
   coverAuthor: 太宰治
   publishedDate: '2026-04-27'
@@ -332,7 +318,6 @@
   pages: 272
   rating: 8.3
   desc: Basecamp创始人分享的商业智慧，主张打造小而美的公司，拒绝盲目扩张。书中提倡简单、高效的工作方式，强调专注核心业务，保持团队精简，让工作更有意义。
-  coverBg: 'linear-gradient(145deg, #2a5a8a, #4a7ab0, #2a5a8a)'
   coverTitle: 小而美
   coverAuthor: 弗里德/汉森
   publishedDate: '2026-05-19'
@@ -355,7 +340,6 @@
   pages: 448
   rating: 8.7
   desc: 预言了信息时代个人主权的崛起。作者认为技术革命将重塑社会结构，个人将摆脱民族国家的束缚，获得前所未有的自由和力量。这本写于1997年的书准确预测了加密货币、远程工作等趋势。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: 主权个人
   coverAuthor: 戴维森/里斯-莫格
   publishedDate: '2026-06-11'
@@ -378,7 +362,6 @@
   pages: 242
   rating: 9.1
   desc: 汇集了硅谷投资人纳瓦尔·拉维坎特关于财富和幸福的智慧。书中提出了独特的财富观：真正的财富是拥有资产，让钱为你工作。同时强调内心平静和幸福才是人生的终极目标。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 纳瓦尔宝典
   coverAuthor: 纳瓦尔
   publishedDate: '2026-04-10'
@@ -401,7 +384,6 @@
   pages: 256
   rating: 8.6
   desc: 一部融合科学史、哲学思考和个人回忆录的独特作品。作者从19世纪博物学家大卫·斯塔尔·乔丹的故事出发，探讨了分类学、混沌理论和人生意义。书名源于现代分类学的发现：鱼类并非一个真实的生物学类群。
-  coverBg: 'linear-gradient(145deg, #1a5a7a, #2a7a9a, #1a5a7a)'
   coverTitle: 鱼不存在
   coverAuthor: 露露·米勒
   publishedDate: '2026-05-29'
@@ -424,7 +406,6 @@
   pages: 152
   rating: 9
   desc: 古印度贵族青年悉达多，在沙门苦修后仍未找到答案，转而投身世俗体验欲望与财富，最终在一条河边悟道。这是黑塞关于自我追寻与精神觉醒的诗意寓言，探寻「我是谁」的终极命题。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: 悉达多
   coverAuthor: 黑塞
   publishedDate: '2026-03-25'
@@ -447,7 +428,6 @@
   pages: 141
   rating: 9
   desc: 一个农场里的动物们发动革命，推翻了人类主人的统治，建立起动物自治的社会。然而，猪们逐渐篡夺了权力，变得比人类更加专制。这是奥威尔对极权主义的辛辣讽刺，也是人类政治历史的寓言式写照。
-  coverBg: 'linear-gradient(145deg, #3a2a1a, #6a4a2a, #3a2a1a)'
   coverTitle: 动物农场
   coverAuthor: 奥威尔
   publishedDate: '2026-04-05'
@@ -470,7 +450,6 @@
   pages: 256
   rating: 9.2
   desc: 罗马皇帝马可·奥勒留在戎马倥偬中写下的私人笔记，记录了他对人生、道德、理性和宇宙秩序的思考。这部斯多葛派哲学的经典之作，教导人们如何在动荡的世界中保持内心的平静与理性。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: 沉思录
   coverAuthor: 奥勒留
   publishedDate: '2026-05-27'
@@ -493,7 +472,6 @@
   pages: 230
   rating: 8.8
   desc: 这是一本关于心智成熟的经典著作。作者提出「自律」是解决人生问题的关键，而自律始于「推迟满足感」。书中还探讨了爱的本质、成长与信仰的关系，以及如何面对生活中的痛苦与挑战。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 少有人走的路
   coverAuthor: 派克
   publishedDate: '2026-06-17'
@@ -516,7 +494,6 @@
   pages: 288
   rating: 9.1
   desc: 赫胥黎描绘了一个科技高度发达的未来社会，人类被基因工程和条件反射训练分为五个等级，用索麻麻痹自己，在舒适中丧失了自由、情感和思考的能力。
-  coverBg: 'linear-gradient(145deg, #3a1a5a, #5a2a7a, #3a1a5a)'
   coverTitle: 美丽新世界
   coverAuthor: 赫胥黎
   publishedDate: '2026-03-26'
@@ -539,7 +516,6 @@
   pages: 416
   rating: 9.2
   desc: 撒旦化身沃兰德教授造访莫斯科，引发一系列荒诞事件。同时穿插着大师与玛格丽特的爱情故事，以及彼拉多审判耶稣的古代叙事。这部苏联时期的禁书，以其魔幻笔法探讨了善恶、真理与艺术的永恒主题。
-  coverBg: 'linear-gradient(145deg, #3a1a5a, #5a2a7a, #3a1a5a)'
   coverTitle: |-
     大师与
     玛格丽特
@@ -564,7 +540,6 @@
   pages: 128
   rating: 9.3
   desc: 中国现存最早的兵书，被誉为「兵学圣典」。全书十三篇，论述了战争与政治、经济的关系，战略战术原则，以及将领素养等。其思想已超越军事领域，广泛应用于商业、体育和外交等领域。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: 孙子兵法
   coverAuthor: 孙武
   publishedDate: '2026-04-19'
@@ -587,7 +562,6 @@
   pages: 832
   rating: 9.2
   desc: 波伏娃在这部开创性著作中提出「女人不是天生的，而是被塑造的」。她从生物学、精神分析、历史唯物主义等多个角度分析了女性处境的形成，并探讨了女性如何实现自我解放的可能性。
-  coverBg: 'linear-gradient(145deg, #8a1a3a, #b52a4a, #8a1a3a)'
   coverTitle: 第二性
   coverAuthor: 波伏娃
   publishedDate: '2026-05-07'
@@ -610,7 +584,6 @@
   pages: 448
   rating: 9.2
   desc: 讲述了意大利裔美国黑手党柯里昂家族的故事。维托·柯里昂是纽约最有势力的黑帮首领，他有三个儿子：暴躁的桑尼、懦弱的弗雷多和聪明的迈克尔。当维托遭到暗杀后，迈克尔被迫接手家族事业，逐渐蜕变为新一代教父。
-  coverBg: 'linear-gradient(145deg, #3a2a1a, #6a4a2a, #3a2a1a)'
   coverTitle: 教父
   coverAuthor: 普佐
   publishedDate: '2026-06-02'
@@ -633,7 +606,6 @@
   pages: 248
   rating: 8.9
   desc: 马尔克斯用一个独裁者漫长而孤独的一生，展现了权力的本质和人性的荒诞。小说以意识流手法描绘了一个统治六代人的拉丁美洲独裁者，在无尽的权力中逐渐迷失自我，最终走向孤独与死亡。
-  coverBg: 'linear-gradient(145deg, #5a2a1a, #8a4a2a, #5a2a1a)'
   coverTitle: 族长的秋天
   coverAuthor: 马尔克斯
   publishedDate: '2026-06-04'
@@ -656,7 +628,6 @@
   pages: 352
   rating: 9.1
   desc: 软件工程领域的经典之作，不是教具体技术栈，而是教你「如何思考」——从代码设计到团队协作，从自动化到DRY原则，每一章都能让你在职业生涯中少走几年弯路。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: |-
     The Pragmatic
     Programmer
@@ -681,7 +652,6 @@
   pages: 584
   rating: 9.3
   desc: 深度学习领域的奠基性著作，由三位该领域的先驱共同撰写。本书系统地介绍了深度学习的基本概念、算法和应用，从线性代数基础到复杂的神经网络架构，为读者提供了全面而深入的技术指南。
-  coverBg: 'linear-gradient(145deg, #0a1a3a, #1a3a6a, #0a1a3a)'
   coverTitle: 深度学习
   coverAuthor: 古德费洛等
   publishedDate: '2026-05-28'
@@ -704,7 +674,6 @@
   pages: 320
   rating: 8.9
   desc: 微小的改变，非凡的结果。作者提出「1%法则」：每天进步1%，一年后你会比原来好37倍。书中详细阐述了习惯形成的四大定律，帮助读者建立好习惯、戒除坏习惯，实现持续的自我提升。
-  coverBg: 'linear-gradient(145deg, #1a5a3a, #2a8a5a, #1a5a3a)'
   coverTitle: 原子习惯
   coverAuthor: 克利尔
   publishedDate: '2026-04-29'
@@ -727,7 +696,6 @@
   pages: 499
   rating: 9
   desc: 诺贝尔经济学奖得主卡尼曼的经典著作，揭示了人类思维的两种模式：快速、直觉的系统1和缓慢、理性的系统2。书中通过大量实验和案例，展示了我们在判断和决策中的认知偏差，以及如何避免这些陷阱。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: 思考，快与慢
   coverAuthor: 卡尼曼
   publishedDate: '2026-04-11'
@@ -750,7 +718,6 @@
   pages: 120
   rating: 9.5
   desc: 道家哲学的奠基之作，全书仅五千余字，却蕴含了深邃的宇宙观、人生观和政治智慧。「道法自然」「无为而治」「上善若水」等思想影响了中华文明两千多年，至今仍是东方智慧的重要源泉。
-  coverBg: 'linear-gradient(145deg, #1a3a2a, #2a5a3a, #1a3a2a)'
   coverTitle: 道德经
   coverAuthor: 老子
   publishedDate: '2026-04-17'
@@ -773,7 +740,6 @@
   pages: 418
   rating: 8.8
   desc: 作者与儿子骑摩托车横穿美国，途中探讨了「良质」这一哲学概念。书中融合了东西方哲学思想，质疑了现代科技与人文精神的割裂，提出了在日常生活中寻找意义与和谐的可能性。
-  coverBg: 'linear-gradient(145deg, #1a3a2a, #2a5a3a, #1a3a2a)'
   coverTitle: |-
     禅与摩托车
     维修艺术
@@ -798,7 +764,6 @@
   pages: 2408
   rating: 9.3
   desc: 这部鸿篇巨制通过主人公对童年、爱情和社交生活的回忆，探索了时间、记忆与艺术的本质。普鲁斯特以其独特的意识流手法，展现了人类内心世界的复杂性和时间流逝的不可逆性。
-  coverBg: 'linear-gradient(145deg, #5a3a20, #8a5a30, #5a3a20)'
   coverTitle: 追忆似水年华
   coverAuthor: 普鲁斯特
   publishedDate: '2026-04-01'
@@ -821,7 +786,6 @@
   pages: 128
   rating: 9.2
   desc: 推销员格里高尔一觉醒来发现自己变成了一只巨大的甲虫。这个荒诞的开端揭示了现代社会中人的异化、孤独与存在的荒谬。卡夫卡用冷静克制的笔触，描绘了一个关于家庭关系、社会压力和人性本质的寓言。
-  coverBg: 'linear-gradient(145deg, #2a2a2a, #4a4a4a, #2a2a2a)'
   coverTitle: 变形记
   coverAuthor: 卡夫卡
   publishedDate: '2026-05-25'
@@ -844,7 +808,6 @@
   pages: 412
   rating: 9.2
   desc: 在遥远的未来，银河帝国统治着众多星球。厄拉科斯星球是唯一出产香料美琅脂的地方，这种物质能延长生命、增强心智，是星际旅行的关键。年轻的保罗·厄崔迪被卷入了一场关于权力、宗教和生态的宏大斗争。
-  coverBg: 'linear-gradient(145deg, #c45a10, #e87a20, #c45a10)'
   coverTitle: 沙丘
   coverAuthor: 赫伯特
   publishedDate: '2026-04-18'
@@ -867,7 +830,6 @@
   pages: 160
   rating: 8.7
   desc: 基于古老的托尔特克智慧，作者提出了改变人生的四个简单而强大的约定：1）言辞 impeccably（完美使用语言）；2）不要把任何事情个人化；3）不要妄加揣测；4）凡事尽力而为。践行这四个约定，就能摆脱自我限制的信念，获得真正的自由。
-  coverBg: 'linear-gradient(145deg, #8a1a3a, #b52a4a, #8a1a3a)'
   coverTitle: 四个约定
   coverAuthor: 鲁伊斯
   publishedDate: '2026-05-24'
@@ -890,7 +852,6 @@
   pages: 824
   rating: 9.5
   desc: 老卡拉马佐夫被谋杀，三个儿子——虔诚的德米特里、理性的伊万和纯洁的阿辽沙——都成了嫌疑人。小说通过这场家庭悲剧，探讨了信仰与怀疑、善与恶、自由意志与道德责任等深刻的哲学和宗教问题。
-  coverBg: 'linear-gradient(145deg, #3a1a2a, #6a2a4a, #3a1a2a)'
   coverTitle: |-
     卡拉马佐夫
     兄弟
@@ -915,7 +876,6 @@
   pages: 224
   rating: 9.1
   desc: 罗马哲学家波爱修斯在狱中等待处决时写下此书。通过与哲学女神的对话，探讨了命运、自由意志、善恶本质等永恒命题。这部中世纪经典为无数身处困境的人提供了精神慰藉和智慧指引。
-  coverBg: 'linear-gradient(145deg, #5a1a8a, #7a2ab0, #5a1a8a)'
   coverTitle: 哲学的慰藉
   coverAuthor: 波爱修斯
   publishedDate: '2026-06-07'
@@ -938,7 +898,6 @@
   pages: 277
   rating: 8.8
   desc: 16岁的霍尔顿被学校开除后，在纽约街头游荡了三天。他厌恶成人世界的虚伪，渴望保护孩子们的纯真。这部小说以其独特的口语化叙述风格，捕捉了青少年的迷茫、叛逆与孤独，成为20世纪最具影响力的青春文学经典。
-  coverBg: 'linear-gradient(145deg, #1a3a2a, #2a5a3a, #1a3a2a)'
   coverTitle: |-
     麦田里的
     守望者
@@ -963,7 +922,6 @@
   pages: 432
   rating: 9.2
   desc: 托尔金构建的中洲神话体系的核心，讲述了创世之初到魔戒故事之前数万年的历史。书中记载了精灵、人类与诸神对抗黑暗魔君魔苟斯的史诗战争，以及三颗精灵宝钻的传奇命运。
-  coverBg: 'linear-gradient(145deg, #1a2a5a, #2a4a8a, #1a2a5a)'
   coverTitle: 精灵宝钻
   coverAuthor: 托尔金
   publishedDate: '2026-05-22'
@@ -986,7 +944,6 @@
   pages: 236
   rating: 9
   desc: 一本关于如何获得内心平静与觉醒的经典之作。作者指出，真正的力量存在于当下这一刻，而非过去或未来。通过观察思维、接纳当下、臣服于现实，我们可以摆脱痛苦，体验内在的宁静与喜悦。
-  coverBg: 'linear-gradient(145deg, #1a3a2a, #2a5a3a, #1a3a2a)'
   coverTitle: 当下的力量
   coverAuthor: 托利
   publishedDate: '2026-04-28'
@@ -1009,7 +966,6 @@
   pages: 264
   rating: 9.2
   desc: 库恩在这部开创性著作中提出了「范式转换」的概念，挑战了传统的科学进步观。他认为科学发展并非线性累积，而是通过常规科学与科学革命的交替进行，在革命时期旧范式被新范式取代。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: |-
     科学革命
     的结构
@@ -1034,7 +990,6 @@
   pages: 320
   rating: 9.3
   desc: 斯宾诺莎用几何学方法写成的哲学巨著，系统阐述了他的形而上学、认识论和伦理学思想。他认为上帝与自然是同一的，万物都是上帝的样式。真正的自由在于理解必然性，并通过理性获得对永恒真理的认识。
-  coverBg: 'linear-gradient(145deg, #5a1a8a, #7a2ab0, #5a1a8a)'
   coverTitle: 伦理学
   coverAuthor: 斯宾诺莎
   publishedDate: '2026-03-30'
@@ -1057,7 +1012,6 @@
   pages: 416
   rating: 9.4
   desc: 古希腊哲学家柏拉图的代表作，以对话体形式探讨了正义的本质、理想社会的构建以及哲学家在社会治理中的角色。书中提出了著名的洞穴寓言和哲人王思想，是西方政治哲学的奠基之作。
-  coverBg: 'linear-gradient(145deg, #5a1a8a, #7a2ab0, #5a1a8a)'
   coverTitle: 理想国
   coverAuthor: 柏拉图
   publishedDate: '2026-05-09'
@@ -1080,7 +1034,6 @@
   pages: 224
   rating: 8.7
   desc: 一本现代斯多葛主义的实用指南，将古希腊罗马哲学智慧转化为日常生活中的行动原则。作者通过清晰的解释和具体练习，帮助读者培养内在韧性，在不确定的世界中保持平静与理性。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: |-
     斯多葛
     生活哲学
@@ -1105,7 +1058,6 @@
   pages: 256
   rating: 9
   desc: 男孩米洛收到一个神秘的收费亭，驾驶玩具车穿过它后，来到了一个充满文字游戏和数学谜题的奇幻王国。在这个旅程中，他遇到了各种奇特的角色，学会了欣赏学习的乐趣和思考的价值。
-  coverBg: 'linear-gradient(145deg, #1a3a8a, #2952c8, #1a3a8a)'
   coverTitle: |-
     神奇的
     收费亭
@@ -1130,7 +1082,6 @@
   pages: 368
   rating: 9.1
   desc: 道金斯以基因为视角重新诠释了自然选择理论，提出「自私的基因」概念——基因是进化的基本单位，生物体只是基因的载体。书中还创造了「迷因」一词，探讨文化进化的机制，彻底改变了人们对生命本质的理解。
-  coverBg: 'linear-gradient(145deg, #1a4a3a, #2a7a5a, #1a4a3a)'
   coverTitle: 自私的基因
   coverAuthor: 道金斯
   publishedDate: '2026-05-03'
@@ -1153,7 +1104,6 @@
   pages: 320
   rating: 8.9
   desc: 柯林斯团队历时5年，研究了1435家美国公司，最终筛选出11家实现了从优秀到卓越跨越的企业。书中揭示了这些企业成功的共同特质：第五级领导者、先人后事、刺猬理念、飞轮效应等，为管理者提供了可操作的实践框架。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 从优秀到卓越
   coverAuthor: 柯林斯
   publishedDate: '2026-04-15'
@@ -1176,7 +1126,6 @@
   pages: 286
   rating: 9
   desc: 克里斯坦森在本书中提出了「颠覆性创新」理论，解释了为什么管理良好的成熟企业会失败。当新兴技术以更低的价格、更简单的功能进入市场时，主流客户往往不屑一顾，但这正是颠覆的开始。本书是理解科技创新与商业变革的必读经典。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 创新者的窘境
   coverAuthor: 克里斯坦森
   publishedDate: '2026-04-08'
@@ -1199,7 +1148,6 @@
   pages: 210
   rating: 8.7
   desc: PayPal联合创始人彼得·蒂尔的创业哲学。他认为真正的创新是从0到1的垂直进步，而非从1到n的水平复制。书中探讨了垄断企业的秘密、竞争的危害、幂次法则以及未来科技的发展方向，为创业者提供了独特的思考框架。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 从零到一
   coverAuthor: 彼得·蒂尔
   publishedDate: '2026-04-13'
@@ -1222,7 +1170,6 @@
   pages: 224
   rating: 9
   desc: 地球被沃贡人拆迁，人类亚瑟·邓特搭上好友福特·普里弗克特——一个伪装成人类的外星人的便车，开始了一场荒诞的银河系漫游。书中藏着关于生命、宇宙以及一切的终极答案：42。这是一部充满英式幽默和哲学思辨的科幻经典。
-  coverBg: 'linear-gradient(145deg, #1a2a5a, #3a4a8a, #1a2a5a)'
   coverTitle: 银河系漫游指南
   coverAuthor: 亚当斯
   publishedDate: '2026-06-08'
@@ -1245,7 +1192,6 @@
   pages: 386
   rating: 8.6
   desc: 卡尼曼继《思考，快与慢》后的又一力作，揭示了人类判断中隐藏的「噪声」——那些导致同样问题得到不同答案的随机误差。从司法判决到医疗诊断，噪声无处不在，而减少噪声能显著提升决策质量。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 噪声
   coverAuthor: 卡尼曼
   publishedDate: '2026-05-16'
@@ -1268,7 +1214,6 @@
   pages: 288
   rating: 9.1
   desc: 硅谷创业教父保罗·格雷厄姆的文集，探讨了黑客精神、编程艺术、创业哲学和财富创造。书中提出「创业就是压缩人生」的观点，认为优秀的黑客就像画家一样，通过不断迭代打磨作品，创造出真正有价值的东西。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 黑客与画家
   coverAuthor: 格雷厄姆
   publishedDate: '2026-06-18'
@@ -1291,7 +1236,6 @@
   pages: 532
   rating: 9.2
   desc: 收录了伯克希尔·哈撒韦副董事长查理·芒格过去20年来的主要公开演讲和文章。书中阐述了芒格的多元思维模型、逆向思考法、人类误判心理学等核心思想，以及他在投资、决策和人生方面的智慧结晶。
-  coverBg: 'linear-gradient(145deg, #1a4a3a, #2a7a5a, #1a4a3a)'
   coverTitle: 穷查理宝典
   coverAuthor: 芒格
   publishedDate: '2026-04-03'
@@ -1314,7 +1258,6 @@
   pages: 512
   rating: 8.9
   desc: 桥水基金创始人瑞·达利欧一生总结的生活和工作原则。他用极度开放的头脑和系统化的方法，从失败中提炼出500多条原则，帮助读者建立自己的决策系统，实现人生目标。
-  coverBg: 'linear-gradient(145deg, #1a3a6a, #2a5a9a, #1a3a6a)'
   coverTitle: 原则
   coverAuthor: 达利欧
   publishedDate: '2026-03-28'
@@ -1337,7 +1280,6 @@
   pages: 288
   rating: 8.6
   desc: Basecamp创始人挑战传统商业思维的宣言。书中提出「创业不需要商业计划」「不需要投资人」「不需要办公室」等反常识观点，主张用更精简、更务实的方式创建和经营企业，让工作回归本质。
-  coverBg: 'linear-gradient(145deg, #2a5a8a, #4a7ab0, #2a5a8a)'
   coverTitle: 重来
   coverAuthor: 弗里德/汉森
   publishedDate: '2026-04-09'
@@ -1360,7 +1302,6 @@
   pages: 200
   rating: 9.2
   desc: 弗兰克尔在纳粹集中营的亲身经历与心理学思考。作为意义疗法创始人，他提出即使在最极端的痛苦中，人也能通过寻找生命的意义来保持精神的自由。书中阐述了三种发现生命意义的方式：通过创造、通过体验、通过对苦难的态度。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: |-
     活出生命的
     意义
@@ -1385,7 +1326,6 @@
   pages: 336
   rating: 8.8
   desc: 硅谷创业顾问埃里克·里斯提出的精益创业方法论，强调通过「构建-测量-学习」的反馈循环，用最小可行产品快速验证假设，减少浪费，提高创业成功率。书中结合了丰田精益生产理念和硅谷创业实践，为创业者提供了系统化的产品开发和商业模式验证框架。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 精益创业
   coverAuthor: 里斯
   publishedDate: '2026-05-08'
@@ -1408,7 +1348,6 @@
   pages: 426
   rating: 8.9
   desc: 一本关于阅读艺术的经典指南，系统阐述了阅读的四个层次：基础阅读、检视阅读、分析阅读和主题阅读。作者强调主动阅读的重要性，教导读者如何与作者对话，如何从书中获取真正的知识，是提升阅读能力的必读书目。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: |-
     如何阅读
     一本书
@@ -1433,7 +1372,6 @@
   pages: 480
   rating: 9.1
   desc: 为什么欧亚大陆的人类征服了美洲、非洲和澳洲的土著，而不是相反？戴蒙德从地理环境、农业起源、病菌传播和技术发展等角度，解释了人类社会发展的不平等根源。这是一部颠覆传统种族主义解释、用科学方法重写人类历史的里程碑之作。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: |-
     枪炮、病菌
     与钢铁
@@ -1458,7 +1396,6 @@
   pages: 368
   rating: 9
   desc: 诺曼从认知心理学角度分析了日常用品的设计问题，揭示了为什么有些产品让人困惑、有些则 intuitive（直觉化）。书中提出了「示能」「意符」「反馈」等核心概念，是理解人与产品交互关系的经典之作，影响了苹果、谷歌等公司的设计理念。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 设计心理学
   coverAuthor: 诺曼
   publishedDate: '2026-04-04'
@@ -1481,7 +1418,6 @@
   pages: 336
   rating: 8.9
   desc: 契克森米哈伊在本书中提出了「心流」这一革命性概念——一种全神贯注、沉浸其中的最优体验状态。通过大量案例研究，作者揭示了心流产生的条件、特征，以及如何在日常生活和工作中创造更多心流体验，从而提升幸福感和创造力。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 心流
   coverAuthor: 契克森米哈伊
   publishedDate: '2026-05-13'
@@ -1504,7 +1440,6 @@
   pages: 240
   rating: 9
   desc: 美国生态伦理学之父利奥波德的代表作，以四季为线索记录了他在威斯康星州沙乡农场的观察与思考。书中提出「土地伦理」概念，呼吁人类从土地的征服者转变为土地的共同体成员，是现代环保运动的思想源泉。
-  coverBg: 'linear-gradient(145deg, #1a4a2a, #2a7a4a, #1a4a2a)'
   coverTitle: 沙乡年鉴
   coverAuthor: 利奥波德
   publishedDate: '2026-06-12'
@@ -1527,7 +1462,6 @@
   pages: 1312
   rating: 9.3
   desc: 计算机科学领域最具影响力的算法教材之一，被誉为「算法圣经」。全书系统介绍了从基础数据结构到高级算法设计的完整知识体系，包括分治、动态规划、贪心算法、图算法等核心内容，是程序员和计算机科学学生的必读经典。
-  coverBg: 'linear-gradient(145deg, #1a3a6a, #2a5a9a, #1a3a6a)'
   coverTitle: 算法导论
   coverAuthor: 科尔曼等
   publishedDate: '2026-05-01'
@@ -1550,7 +1484,6 @@
   pages: 576
   rating: 9.3
   desc: 穷大学生拉斯柯尔尼科夫因贫困辍学，为了生计杀死放高利贷的老太婆。杀人后他饱受良心谴责，在妓女索尼娅的感召下最终选择自首。小说深刻探讨了罪与罚、善与恶、自由意志与道德责任等哲学命题，是心理现实主义的巅峰之作。
-  coverBg: 'linear-gradient(145deg, #3a1a2a, #6a2a4a, #3a1a2a)'
   coverTitle: 罪与罚
   coverAuthor: 陀思妥耶夫斯基
   publishedDate: '2026-06-09'
@@ -1573,7 +1506,6 @@
   pages: 252
   rating: 8.8
   desc: 豪泽尔用18个短篇故事探讨了财富、贪婪与幸福的永恒主题。书中指出，理财的成功与否往往不取决于智商或学历，而是与行为习惯和心理因素密切相关。作者强调，在金钱的世界里，理性决策比知识更重要，而时间是最强大的财富杠杆。
-  coverBg: 'linear-gradient(145deg, #1a4a3a, #2a7a5a, #1a4a3a)'
   coverTitle: 金钱心理学
   coverAuthor: 豪泽尔
   publishedDate: '2026-04-24'
@@ -1596,7 +1528,6 @@
   pages: 168
   rating: 9
   desc: 鲍曼在这本经典著作中剖析了现代社会从「生产者社会」向「消费者社会」的转变。在消费主义盛行的时代，贫穷的定义从「失业」变成了「没有消费能力」，穷人从「被剥削者」变成了「被排斥者」。书中深刻揭示了工作伦理的虚伪性和消费社会的残酷逻辑。
-  coverBg: 'linear-gradient(145deg, #3a1a2a, #6a2a4a, #3a1a2a)'
   coverTitle: |-
     工作、消费主义
     和新穷人
@@ -1621,7 +1552,6 @@
   pages: 366
   rating: 8.9
   desc: 塔勒布提出了「黑天鹅」概念——那些极其罕见、影响巨大、事后却看似可预测的事件。从金融危机到科技革命，黑天鹅事件塑造着我们的世界。书中揭示了人类认知的局限性，以及如何在不确定性中生存甚至获益。
-  coverBg: 'linear-gradient(145deg, #1a1a2a, #3a3a4a, #1a1a2a)'
   coverTitle: 黑天鹅
   coverAuthor: 塔勒布
   publishedDate: '2026-05-23'
@@ -1644,7 +1574,6 @@
   pages: 336
   rating: 8.9
   desc: 西奥迪尼通过多年的研究和实验，揭示了人类行为背后隐藏的六大影响力原则：互惠、承诺一致、社会认同、喜好、权威和稀缺。这本书不仅教你如何识别他人对你的操控，也教你如何合乎道德地运用这些原则来提升自己的影响力。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: 影响力
   coverAuthor: 西奥迪尼
   publishedDate: '2026-06-06'
@@ -1667,7 +1596,6 @@
   pages: 368
   rating: 9.1
   desc: 卡森以生动的笔触揭示了化学农药对生态环境的毁灭性影响，唤醒了全球公众对环境问题的关注。这本书不仅改变了人们对自然的认知，更直接推动了现代环保运动的兴起，被誉为「环保运动的圣经」。
-  coverBg: 'linear-gradient(145deg, #1a4a2a, #2a7a4a, #1a4a2a)'
   coverTitle: 寂静的春天
   coverAuthor: 卡森
   publishedDate: '2026-06-05'
@@ -1690,7 +1618,6 @@
   pages: 560
   rating: 9
   desc: 乔布斯生前唯一授权的官方传记，由普利策奖得主艾萨克森执笔。书中记录了乔布斯从被亲生父母遗弃到成为改变世界的天才，从被自己创立的公司驱逐到王者归来的传奇人生。这不是一部美化偶像的传记，而是一部展现真实、复杂、充满矛盾的乔布斯的全景式作品。
-  coverBg: 'linear-gradient(145deg, #1a1a1a, #3a3a3a, #1a1a1a)'
   coverTitle: 史蒂夫·乔布斯传
   coverAuthor: 艾萨克森
   publishedDate: '2026-05-18'
@@ -1713,7 +1640,6 @@
   pages: 312
   rating: 9.2
   desc: 茨威格选取了人类历史上14个决定性瞬间，从拜占庭的陷落到滑铁卢的一分钟，从南极探险到跨洋电报。这些戏剧性的时刻展现了个人意志与历史进程的交汇，揭示了命运如何在瞬间改变人类文明的走向。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: |-
     人类群星
     闪耀时
@@ -1738,7 +1664,6 @@
   pages: 224
   rating: 8.7
   desc: 日本禅宗僧侣枡野俊明将千年禅宗智慧融入现代生活，提出「少即是多」的生活哲学。书中从整理房间、精简物品、简化人际关系等方面，教导人们如何通过减少外在负担，获得内心的宁静与自由。
-  coverBg: 'linear-gradient(145deg, #1a3a2a, #2a5a3a, #1a3a2a)'
   coverTitle: 禅与极简生活
   coverAuthor: 枡野俊明
   publishedDate: '2026-06-03'
@@ -1761,7 +1686,6 @@
   pages: 180
   rating: 9
   desc: 20世纪美国文学的经典之作，讲述了神秘富豪盖茨比对初恋黛西的执着追求。小说以爵士时代为背景，通过尼克·卡拉威的视角，展现了美国梦的幻灭、阶级固化的残酷以及金钱与爱情的复杂关系。
-  coverBg: 'linear-gradient(145deg, #1a3a5a, #2a5a8a, #1a3a5a)'
   coverTitle: |-
     了不起的
     盖茨比
@@ -1786,7 +1710,6 @@
   pages: 96
   rating: 9
   desc: 梭罗基于自己因反对奴隶制而拒绝纳税并被监禁的经历，写下了这篇著名的政治哲学论文。他主张当政府的法律与个人的良知发生冲突时，个人有道德权利甚至义务去反抗不公正的法律。这篇文章深刻影响了甘地、马丁·路德·金等后来的民权运动领袖。
-  coverBg: 'linear-gradient(145deg, #1a4a3a, #2a7a5a, #1a4a3a)'
   coverTitle: 公民不服从
   coverAuthor: 梭罗
   publishedDate: '2026-05-10'
@@ -1809,7 +1732,6 @@
   pages: 384
   rating: 9
   desc: 麻省理工学院物理学家泰格马克探讨了人工智能对人类未来的深远影响。书中将生命划分为三个阶段：1.0 生物进化、2.0 文化学习、3.0 自我设计。当 AI 能够自我改进时，人类文明将面临怎样的命运？这是一部关于人类与 AI 共存的未来图景。
-  coverBg: 'linear-gradient(145deg, #0a1a3a, #1a3a6a, #0a1a3a)'
   coverTitle: 生命 3.0
   coverAuthor: 泰格马克
   publishedDate: '2026-04-07'
@@ -1832,7 +1754,6 @@
   pages: 256
   rating: 8.8
   desc: 多贝里在本书中揭示了52种常见的思维错误，从沉没成本谬误到确认偏误，从权威偏见到从众心理。作者用生动的案例和清晰的逻辑，帮助读者识别并克服这些认知陷阱，培养更理性的思考方式。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 思考的艺术
   coverAuthor: 多贝里
   publishedDate: '2026-03-27'
@@ -1855,7 +1776,6 @@
   pages: 280
   rating: 8.9
   desc: 周岭从脑科学、认知心理学等角度，揭示了人类大脑的工作原理和认知规律。书中提出了「元认知」「舒适区边缘」「深度学习」等核心概念，帮助读者理解焦虑、拖延、注意力分散等问题的根源，并提供了一套切实可行的自我提升方法论。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 认知觉醒
   coverAuthor: 周岭
   publishedDate: '2026-05-02'
@@ -1878,7 +1798,6 @@
   pages: 368
   rating: 9
   desc: 钱钟书唯一的长篇小说，以抗战初期的知识分子方鸿渐为主角，讲述他从海外归来后在爱情、婚姻和事业上的种种遭遇。书名取自法国谚语「婚姻就像围城，城外的人想进去，城里的人想出来」，深刻讽刺了知识分子的虚荣、懦弱与困境。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: 围城
   coverAuthor: 钱钟书
   publishedDate: '2026-05-30'
@@ -1901,7 +1820,6 @@
   pages: 256
   rating: 8.8
   desc: 多贝里总结了52个常见的思维错误，从认知偏差到情绪陷阱，从社会影响到自我欺骗。这本书不是教你说服别人，而是教你如何不被别人说服，如何做出更理性的决策。每一章都是独立的小品，适合随时翻阅，是提升批判性思维的实用指南。
-  coverBg: 'linear-gradient(145deg, #5a3a1a, #8a5a2a, #5a3a1a)'
   coverTitle: 思考的艺术
   coverAuthor: 多贝里
   publishedDate: '2026-03-31'
@@ -1924,7 +1842,6 @@
   pages: 127
   rating: 9
   desc: 古巴老渔夫圣地亚哥在连续八十四天没有捕到鱼之后，终于钓到了一条巨大的马林鱼。经过两天两夜的搏斗，老人杀死了大鱼，却在归途中遭到鲨鱼的袭击，最终只带回一副巨大的鱼骨架。这是海明威获得诺贝尔文学奖的代表作，歌颂了人类面对失败时的尊严与勇气。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a7a9a, #1a4a6a)'
   coverTitle: 老人与海
   coverAuthor: 海明威
   publishedDate: '2026-04-02'
@@ -1947,7 +1864,6 @@
   pages: 192
   rating: 9.1
   desc: 加缪在这本哲学随笔中探讨了「荒诞」这一核心概念——当人类对意义的渴求遭遇世界的沉默，荒诞便产生了。但加缪拒绝自杀和虚无主义，主张像推石上山的西西弗一样，在承认荒诞的同时继续生活，在反抗中获得自由与尊严。
-  coverBg: 'linear-gradient(145deg, #2a2a2a, #4a4a4a, #2a2a2a)'
   coverTitle: 西西弗神话
   coverAuthor: 加缪
   publishedDate: '2026-04-16'
@@ -1970,7 +1886,6 @@
   pages: 336
   rating: 9.1
   desc: IBM 360系统项目经理布鲁克斯的经验总结，揭示了软件工程中最核心的悖论：向进度落后的项目中增加人手，只会使进度更加落后。书中提出了「没有银弹」「第二系统效应」等经典概念，是软件工程领域的圣经级著作。
-  coverBg: 'linear-gradient(145deg, #1a4a6a, #2a6a8a, #1a4a6a)'
   coverTitle: 人月神话
   coverAuthor: 布鲁克斯
   publishedDate: '2026-05-14'
@@ -1993,7 +1908,6 @@
   pages: 168
   rating: 8.7
   desc: 勒庞在这部经典著作中剖析了群体心理的特征与规律。他指出，当个体融入群体后，理性会被情感取代，智力会下降，道德水平也会发生变化。书中对群体冲动、易受暗示、极端化等特征的描述，至今仍是理解社会运动、舆论操控和群体行为的必读经典。
-  coverBg: 'linear-gradient(145deg, #5a2a1a, #8a4a2a, #5a2a1a)'
   coverTitle: 乌合之众
   coverAuthor: 勒庞
   publishedDate: '2026-05-15'
@@ -2016,7 +1930,6 @@
   pages: 960
   rating: 9.3
   desc: 软件工程领域的百科全书式经典，被誉为「程序员必读圣经」。麦康奈尔用近百万字的篇幅，系统阐述了从需求分析到代码构建、从变量命名到架构设计的完整开发流程。书中没有特定语言的代码，只有普适的编程智慧——如何写出可读、可维护、高质量的代码。
-  coverBg: 'linear-gradient(145deg, #1a3a6a, #2a5a9a, #1a3a6a)'
   coverTitle: 代码大全
   coverAuthor: 麦康奈尔
   publishedDate: '2026-06-15'
@@ -2039,7 +1952,6 @@
   pages: 320
   rating: 4.3
   desc: 时生，一个从未来回到过去的少年，带着对父亲的疑问和对生命的思考。东野圭吾罕见的温情之作，探讨亲情、生命与时间的意义。
-  coverBg: '#2d4a3e'
   coverTitle: 时生
   coverAuthor: 东野圭吾
   publishedDate: '2026-06-20'
@@ -2056,7 +1968,6 @@
   pages: 280
   rating: 4.4
   desc: 从人工智能到超级智能，从碳基生命到硅基文明。刘慈欣以独特的科幻视角，探讨智能的本质、演化与未来，揭示人类在宇宙智能图谱中的位置。
-  coverBg: '#1a3a5c'
   coverTitle: 智能简史
   coverAuthor: 刘慈欣
   publishedDate: '2026-06-19'
@@ -2076,7 +1987,6 @@
   desc: "英国文学史上第一部现实主义小说。讲述鲁滨逊·克鲁索在荒岛上独自生存 28 年的故事，展现人类的坚韧、智慧与对文明的渴望。"
   coverTitle: "鲁滨逊漂流记"
   coverAuthor: "丹尼尔·笛福"
-  coverBg: "#3d2817"
   publishedDate: "2026-06-27"
   quotes:
     - text: "害怕危险的心理比危险本身还要可怕一万倍。"
@@ -2093,7 +2003,6 @@
   desc: "哈耶克在1944年出版的经典著作，警告世人：过度集体化、国家干预和中央计划终将通向奴役。他以流畅的论述揭示了自由市场、民主制度与个人自由之间的深层联系，并预见了福利国家政策的潜在危害。这本书影响了撒切尔、里根等政治领袖的的经济政策思想。"
   coverTitle: "通往奴役之路"
   coverAuthor: "哈耶克"
-  coverBg: "linear-gradient(145deg, #3a1a2a, #6a2a4a, #3a1a2a)"
   publishedDate: "2026-06-29"
   quotes:
     - text: "通往奴役之路的开始，是为了让人们免于匮乏的善意愿望。"
@@ -2116,7 +2025,6 @@
   desc: "每个人的生命中，都有最艰难的那一年，将人生变得美好而辽阔。一座维多利亚风格的小岛书店，一个被遗弃的孩子，串联起 A.J. 费克里孤僻而温暖的后半生。这是一本关于书、关于爱、关于人与人之间奇妙联系的小说。"
   coverTitle: "岛上书店"
   coverAuthor: "加布瑞埃拉·泽文"
-  coverBg: "#2c5f7a"
   publishedDate: "2026-06-28"
   quotes:
     - text: "没有人是一座孤岛，每本书都是一个世界。"
@@ -2135,7 +2043,6 @@
   desc: "罗伯特·格林耗时六年完成的集大成之作，深入剖析人性的18条法则。从自恋、贪婪到魅力、从众，格林用历史案例和心理学研究揭示了人类行为背后隐藏的驱动力。理解这些法则，不仅能更好地认识自己，也能更从容地应对复杂的人际关系。"
   coverTitle: "人性的法则"
   coverAuthor: "罗伯特·格林"
-  coverBg: "linear-gradient(145deg, #3a1a2a, #6a2a4a, #3a1a2a)"
   publishedDate: "2026-06-30"
   quotes:
     - text: "我们最大的弱点在于看不到自己的弱点，而我们最大的力量在于认识到自己的弱点。"
@@ -2157,7 +2064,6 @@
   pages: 280
   rating: 4.6
   desc: '公元1587年，中国历史上看似平淡的一年。黄仁宇以"大历史观"视角，通过万历皇帝、张居正、海瑞、戚继光、李贽等人物，揭示明朝制度性困境。'
-  coverBg: '#8B4513'
   coverTitle: 万历十五年
   coverAuthor: 黄仁宇
   publishedDate: '2026-07-01'
@@ -2175,7 +2081,6 @@
   pages: 304
   rating: 4.5
   desc: "在碎片化时代如何通过深度专注创造真正价值。Newport 提出了深度工作（Deep Work）概念——在无干扰状态下进行的专业活动，能够将认知能力推向极限。"
-  coverBg: '#1a3a5c'
   coverTitle: 深度工作
   coverAuthor: Cal Newport
   publishedDate: '2026-07-02'
@@ -2195,7 +2100,6 @@
   pages: 288
   rating: 7.6
   desc: "在一座与世隔绝的小岛上，书店老板 A.J. 费克里中年丧妻，书店经营惨淡，唯一的珍贵藏品也被盗。就在他万念一灰时，一个被遗弃在书店的女婴改变了一切。玛雅的出现让 A.J. 重新与世界建立了联系，也让他明白：没有谁是一座孤岛，每本书都是一个世界。"
-  coverBg: 'linear-gradient(145deg, #6b4423, #a0693a, #6b4423)'
   coverTitle: 岛上书店
   coverAuthor: 泽文
   publishedDate: '2026-07-03'
@@ -2217,7 +2121,6 @@
   pages: 240
   rating: 8.2
   desc: "为什么我们做事总是急于求半、避难趋易？因为大脑的天性就是趋利避害、急于求成。周岭从脑科学和认知科学的角度，揭示了人类焦虑、拖延、注意力分散的根源，并提供了可操作的方法论：早冥读写跑——人生五件套，帮你在日常生活中积累复利式的成长。"
-  coverBg: 'linear-gradient(145deg, #2a4a7a, #4a6a9a, #2a4a7a)'
   coverTitle: 认知觉醒
   coverAuthor: 周岭
   publishedDate: '2026-07-04'
@@ -2239,7 +2142,6 @@
   pages: 404
   rating: 6.9
   desc: "AI、基因编辑、长寿科技正把人类推向神级门槛，可我们的大脑仍停留在旧石器时代——为处理草原上的风吹草动而生。当信息海啸撞上未升级的认知系统，焦虑、抑郁与末日恐慌便成了时代症候。这是 21 世纪最残酷的悖论：技术已封神，人却还在石器时代。两位作者试图给出穿越这道认知鸿沟的地图。"
-  coverBg: 'linear-gradient(145deg, #2a1a4a, #4a2a6a, #2a1a4a)'
   coverTitle: 吾辈如神
   coverAuthor: 戴曼迪斯/科特勒
   publishedDate: '2026-07-05'

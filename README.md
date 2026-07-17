@@ -87,7 +87,6 @@ npm run preview
 | `pages` | 页数 | `360` |
 | `rating` | 评分（1-10） | `9.3` |
 | `desc` | 简介 | `《百年孤独》...` |
-| `coverBg` | 封面背景 CSS | `linear-gradient(145deg, #1a5c2a, #2d8a4e, #1a5c2a)` |
 | `coverTitle` | 封面显示的书名（可简化） | `百年孤独` |
 | `coverAuthor` | 封面显示的作者（可简化） | `马尔克斯` |
 | `publishedDate` | 发布日期 `YYYY-MM-DD`，未发布为 `null` | `2026-06-21` 或 `null` |
@@ -106,7 +105,6 @@ npm run preview
   pages: 300
   rating: 8.5
   desc: "简介内容"
-  coverBg: "linear-gradient(145deg, #1a2a3a, #2a4a6a, #1a2a3a)"
   coverTitle: "书名"
   coverAuthor: "作者简称"
   publishedDate: null

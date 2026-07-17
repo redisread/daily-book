@@ -17,7 +17,6 @@ export const BookSchema = z.object({
   pages: z.number().int("页数必须是整数").positive("页数必须为正数"),
   rating: z.number().positive("评分必须为正数"),
   desc: z.string().min(1, "简介不能为空"),
-  coverBg: z.string().min(1, "封面背景不能为空"),
   coverTitle: z.string().min(1, "封面标题不能为空"),
   coverAuthor: z.string().min(1, "封面作者不能为空"),
   publishedDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "发布日期格式必须为 YYYY-MM-DD").nullable().optional(),
