@@ -1,4 +1,6 @@
 // 金句滑动、点赞、分享功能
+import { setupModalA11y } from './modal-a11y';
+
 export function initQuoteSwipe() {
   const container = document.getElementById('quoteSwipeContainer');
   const track = document.getElementById('quoteSwipeTrack');
@@ -85,9 +87,8 @@ export function initQuoteActions() {
     likeBtn.addEventListener('click', () => {
       liked = !liked;
       likeBtn.innerHTML = liked ? '♥' : '♡';
-      likeBtn.style.color = liked ? '#e74c3c' : '';
-      likeBtn.style.background = liked ? 'rgba(231,76,60,0.1)' : '';
-      window.showToast?.(liked ? '已喜欢这句话 ♥' : '已取消喜欢');
+      likeBtn.classList.toggle('is-liked', liked);
+      window.showToast?.(liked ? '已喜欢这句话' : '已取消喜欢');
     });
   });
 
@@ -97,7 +98,7 @@ export function initQuoteActions() {
       const quote = btn.getAttribute('data-quote') || '';
       const source = btn.getAttribute('data-source') || '';
       navigator.clipboard.writeText(`${quote}\n${source}\n\n—— 来自「每日一书」`).then(() => {
-        window.showToast?.('金句已复制到剪贴板 ✓');
+        window.showToast?.('金句已复制到剪贴板');
       });
     });
   });
@@ -136,6 +137,9 @@ export function initQuoteActions() {
   imageModalClose?.addEventListener('click', closeImageModal);
   imageModal?.querySelector('.share-modal-backdrop')?.addEventListener('click', closeImageModal);
 
+  // spec §8：Esc 关闭 + 焦点 trap + 焦点还原
+  if (imageModal) setupModalA11y(imageModal, closeImageModal, imageModalClose);
+
   // 生成并下载图片（canvas 操作延迟到点击时）
   downloadBtn?.addEventListener('click', async () => {
     const canvas = document.createElement('canvas');
@@ -145,24 +149,25 @@ export function initQuoteActions() {
     canvas.width = 1080;
     canvas.height = 1080;
 
-    // 背景渐变
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, '#1a1a2e');
-    gradient.addColorStop(1, '#16213e');
-    ctx.fillStyle = gradient;
+    // 背景：--bg 旧纸白（neo brutalism spec §7）
+    ctx.fillStyle = '#F2F0EA';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // 边框
-    ctx.strokeStyle = 'rgba(212, 168, 83, 0.3)';
-    ctx.lineWidth = 4;
+    // 边框：2px 风格硬边框（放大到 1080 画布用 8px）
+    ctx.strokeStyle = '#0A0A0A';
+    ctx.lineWidth = 8;
     ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
 
-    // 金句文字
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'italic 48px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    // 引用线：--accent 竖条
+    ctx.fillStyle = '#C03A00';
+    ctx.fillRect(100, 300, 12, 400);
+
+    // 金句文字：--fg
+    ctx.fillStyle = '#0A0A0A';
+    ctx.font = '48px "Inter", "PingFang SC", "Microsoft YaHei", sans-serif';
     ctx.textAlign = 'center';
 
-    const maxWidth = canvas.width - 160;
+    const maxWidth = canvas.width - 260;
     const lineHeight = 72;
     const words = currentShareQuote.split('');
     let line = '';
@@ -172,23 +177,23 @@ export function initQuoteActions() {
       const testLine = line + words[i];
       const metrics = ctx.measureText(testLine);
       if (metrics.width > maxWidth && i > 0) {
-        ctx.fillText(line, canvas.width / 2, y);
+        ctx.fillText(line, canvas.width / 2 + 6, y);
         line = words[i];
         y += lineHeight;
       } else {
         line = testLine;
       }
     }
-    ctx.fillText(line, canvas.width / 2, y);
+    ctx.fillText(line, canvas.width / 2 + 6, y);
 
-    // 来源
-    ctx.fillStyle = '#a0a0b0';
-    ctx.font = '28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    // 来源：--muted
+    ctx.fillStyle = '#666666';
+    ctx.font = '28px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", monospace';
     ctx.fillText(currentShareSource, canvas.width / 2, y + 100);
 
-    // 品牌
-    ctx.fillStyle = '#d4a853';
-    ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    // 品牌：--accent
+    ctx.fillStyle = '#C03A00';
+    ctx.font = '700 24px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", monospace';
     ctx.fillText('每日一书 · Daily Book', canvas.width / 2, canvas.height - 80);
 
     // 下载
@@ -197,13 +202,13 @@ export function initQuoteActions() {
     link.href = canvas.toDataURL('image/png');
     link.click();
 
-    window.showToast?.('图片已生成并下载 ✓');
+    window.showToast?.('图片已生成并下载');
   });
 
   // 复制文字
   copyTextBtn?.addEventListener('click', () => {
     navigator.clipboard.writeText(`${currentShareQuote}\n${currentShareSource}\n\n—— 来自「每日一书」`).then(() => {
-      window.showToast?.('文字已复制到剪贴板 ✓');
+      window.showToast?.('文字已复制到剪贴板');
     });
   });
 

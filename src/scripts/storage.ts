@@ -44,8 +44,8 @@ export function initBookActions(bookTitle: string) {
 
   markReadBtn?.addEventListener('click', () => {
     if (markAsRead(bookTitle)) {
-      window.showToast?.(`《${bookTitle}》已标记为已读 📚`);
-      markReadBtn.textContent = '✅ 已读';
+      window.showToast?.(`《${bookTitle}》已标记为已读`);
+      markReadBtn.textContent = '已读';
       markReadBtn.disabled = true;
     } else {
       window.showToast?.('这本书已经标记过了');
@@ -55,17 +55,17 @@ export function initBookActions(bookTitle: string) {
   if (collectBtn) {
     if (isCollected(bookTitle)) {
       collectBtn.innerHTML = '♥ 已收藏';
-      collectBtn.style.color = 'var(--accent)';
+      collectBtn.classList.add('is-collected');
     }
     collectBtn.addEventListener('click', () => {
       const collected = toggleCollection(bookTitle);
       if (collected) {
         collectBtn.innerHTML = '♥ 已收藏';
-        collectBtn.style.color = 'var(--accent)';
-        window.showToast?.('已加入收藏 ♥');
+        collectBtn.classList.add('is-collected');
+        window.showToast?.('已加入收藏');
       } else {
         collectBtn.innerHTML = '♡ 收藏';
-        collectBtn.style.color = '';
+        collectBtn.classList.remove('is-collected');
         window.showToast?.('已取消收藏');
       }
     });

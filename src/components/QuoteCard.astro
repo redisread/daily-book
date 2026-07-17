@@ -21,7 +21,7 @@ const quotes = book.quotes;
       <div class="quote-actions">
         <button class="quote-action-btn like-btn" data-index={index} title="喜欢">♡</button>
         <button class="quote-action-btn share-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="分享">⎘</button>
-        <button class="quote-action-btn image-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="生成图片">🖼</button>
+        <button class="quote-action-btn image-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="生成图片">图</button>
       </div>
     </div>
   ))}
@@ -40,7 +40,7 @@ const quotes = book.quotes;
         <div class="quote-actions">
           <button class="quote-action-btn like-btn" data-index={index} title="喜欢">♡</button>
           <button class="quote-action-btn share-btn" data-index={index} data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="分享">⎘</button>
-          <button class="quote-action-btn image-btn" data-index={index} data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="生成图片">🖼</button>
+          <button class="quote-action-btn image-btn" data-index={index} data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="生成图片">图</button>
         </div>
       </div>
     ))}
@@ -50,7 +50,7 @@ const quotes = book.quotes;
 </div>
 
 <!-- Share Image Modal -->
-<div class="share-modal" id="shareModal">
+<div class="share-modal" id="shareModal" role="dialog" aria-modal="true" aria-label="生成分享图">
   <div class="share-modal-backdrop"></div>
   <div class="share-modal-content">
     <button class="share-modal-close" id="shareModalClose">✕</button>

@@ -56,6 +56,9 @@ if (jsonLd) {
     <link rel="dns-prefetch" href="//static.cloudflareinsights.com" />
     <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin />
 
+    <!-- Neo Brutalism 设计系统（notes/daily-book-neo-brutalism-spec.md） -->
+    <link rel="stylesheet" href="/styles/neo-brutalism.css" />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="每日一书" />
@@ -82,26 +85,15 @@ if (jsonLd) {
     <title>{title}</title>
   </head>
   <body>
-    <!-- Background -->
-    <div class="ambient-bg">
-      <div class="ambient-orb"></div>
-      <div class="ambient-orb"></div>
-      <div class="ambient-orb"></div>
-    </div>
-    <div class="grain"></div>
-
     <div class="app-container">
       <!-- Skip to content for keyboard users -->
       <a href="#main-content" class="skip-link">跳到主内容</a>
 
       <!-- Header -->
       <header class="header">
-        <a href="/" class="logo" aria-label="每日一书 首页">
-          <div class="logo-icon" aria-hidden="true">📖</div>
-          <div>
-            <div class="logo-text">每日一书</div>
-            <div class="logo-sub">Daily Book</div>
-          </div>
+        <a href="/" class="logo">
+          <span class="logo-text">每日一书</span>
+          <span class="logo-sub">Daily Book</span>
         </a>
         <nav class="header-nav" aria-label="主导航">
           <a href="/" class="nav-btn active" data-nav="home">今日推荐</a>
@@ -126,28 +118,16 @@ if (jsonLd) {
     <nav class="mobile-nav" id="mobileNav">
       <ul class="mobile-nav-list">
         <li class="mobile-nav-item">
-          <a href="/" class="mobile-nav-link" data-nav="home">
-            <span class="mobile-nav-icon">📖</span>
-            <span>今日</span>
-          </a>
+          <a href="/" class="mobile-nav-link" data-nav="home">今日</a>
         </li>
         <li class="mobile-nav-item">
-          <a href="/archive" class="mobile-nav-link" data-nav="archive">
-            <span class="mobile-nav-icon">📚</span>
-            <span>往期</span>
-          </a>
+          <a href="/archive" class="mobile-nav-link" data-nav="archive">往期</a>
         </li>
         <li class="mobile-nav-item">
-          <a href="/search" class="mobile-nav-link" data-nav="search">
-            <span class="mobile-nav-icon">🔍</span>
-            <span>搜索</span>
-          </a>
+          <a href="/search" class="mobile-nav-link" data-nav="search">搜索</a>
         </li>
         <li class="mobile-nav-item">
-          <a href="/rss.xml" class="mobile-nav-link" target="_blank">
-            <span class="mobile-nav-icon">📡</span>
-            <span>RSS</span>
-          </a>
+          <a href="/rss.xml" class="mobile-nav-link" target="_blank">RSS</a>
         </li>
       </ul>
     </nav>

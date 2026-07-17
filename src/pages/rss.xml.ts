@@ -12,7 +12,7 @@ export function GET(context: APIContext) {
     description: "每天推荐一本好书，附带精选金句，让阅读成为习惯。",
     site: context.site!.toString(),
     items: recent.map(({ date, book }) => ({
-      title: `📖 ${book.title} —— ${book.author}`,
+      title: `${book.title} —— ${book.author}`,
       pubDate: date,
       link: `/book/${formatDateISO(date)}`,
       // 纯文本摘要：书名 + 作者 + 分类 + 1 条精选金句，控制在 300 字以内
