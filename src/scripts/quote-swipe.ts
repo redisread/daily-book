@@ -154,7 +154,7 @@ export function initQuoteActions() {
     ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
 
     // 引用线：--accent 竖条
-    ctx.fillStyle = '#FF4D00';
+    ctx.fillStyle = '#C03A00';
     ctx.fillRect(100, 300, 12, 400);
 
     // 金句文字：--fg
@@ -187,7 +187,7 @@ export function initQuoteActions() {
     ctx.fillText(currentShareSource, canvas.width / 2, y + 100);
 
     // 品牌：--accent
-    ctx.fillStyle = '#FF4D00';
+    ctx.fillStyle = '#C03A00';
     ctx.font = '700 24px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", monospace';
     ctx.fillText('每日一书 · Daily Book', canvas.width / 2, canvas.height - 80);
 
