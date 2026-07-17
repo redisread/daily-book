@@ -1,4 +1,6 @@
 // 金句滑动、点赞、分享功能
+import { setupModalA11y } from './modal-a11y';
+
 export function initQuoteSwipe() {
   const container = document.getElementById('quoteSwipeContainer');
   const track = document.getElementById('quoteSwipeTrack');
@@ -134,6 +136,9 @@ export function initQuoteActions() {
 
   imageModalClose?.addEventListener('click', closeImageModal);
   imageModal?.querySelector('.share-modal-backdrop')?.addEventListener('click', closeImageModal);
+
+  // spec §8：Esc 关闭 + 焦点 trap + 焦点还原
+  if (imageModal) setupModalA11y(imageModal, closeImageModal, imageModalClose);
 
   // 生成并下载图片（canvas 操作延迟到点击时）
   downloadBtn?.addEventListener('click', async () => {
