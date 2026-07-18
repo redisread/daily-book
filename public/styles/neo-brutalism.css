@@ -674,13 +674,16 @@ button { font-family: inherit; }
   background: var(--paper);
   border-bottom: 2px solid var(--fg);
   display: none;
+  /* task #41 Steven 定稿：分区线贯通全宽（负 margin 顶开 app-container 16px padding），
+     tab 内容保持 16px 内缩与正文栅格对齐 */
+  margin: 0 -16px;
 }
 .mobile-nav-list {
   display: flex;
   justify-content: space-around;
   align-items: stretch;
   list-style: none;
-  padding: 0;
+  padding: 0 16px;
   margin: 0;
 }
 .mobile-nav-item { flex: 1; text-align: center; }
