@@ -103,6 +103,24 @@ if (jsonLd) {
         </nav>
       </header>
 
+      <!-- Mobile Top Navigation（task #41：自底部上移，static 随文档流滚走） -->
+      <nav class="mobile-nav" id="mobileNav" aria-label="移动端导航">
+        <ul class="mobile-nav-list">
+          <li class="mobile-nav-item">
+            <a href="/" class="mobile-nav-link" data-nav="home">今日</a>
+          </li>
+          <li class="mobile-nav-item">
+            <a href="/archive" class="mobile-nav-link" data-nav="archive">往期</a>
+          </li>
+          <li class="mobile-nav-item">
+            <a href="/search" class="mobile-nav-link" data-nav="search">搜索</a>
+          </li>
+          <li class="mobile-nav-item">
+            <a href="/rss.xml" class="mobile-nav-link" target="_blank">RSS</a>
+          </li>
+        </ul>
+      </nav>
+
       <main id="main-content">
         <slot />
       </main>
@@ -113,24 +131,6 @@ if (jsonLd) {
         <a href="/rss.xml" target="_blank">RSS 订阅</a>
       </footer>
     </div>
-
-    <!-- Mobile Bottom Navigation -->
-    <nav class="mobile-nav" id="mobileNav">
-      <ul class="mobile-nav-list">
-        <li class="mobile-nav-item">
-          <a href="/" class="mobile-nav-link" data-nav="home">今日</a>
-        </li>
-        <li class="mobile-nav-item">
-          <a href="/archive" class="mobile-nav-link" data-nav="archive">往期</a>
-        </li>
-        <li class="mobile-nav-item">
-          <a href="/search" class="mobile-nav-link" data-nav="search">搜索</a>
-        </li>
-        <li class="mobile-nav-item">
-          <a href="/rss.xml" class="mobile-nav-link" target="_blank">RSS</a>
-        </li>
-      </ul>
-    </nav>
 
     <!-- Toast -->
     <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
