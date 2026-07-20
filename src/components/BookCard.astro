@@ -8,7 +8,7 @@ interface Props {
 const { book } = Astro.props;
 ---
 
-<div class="hero-card" data-book-title={book.title}>
+<div class="hero-card" data-book-id={book.id}>
   <div class="hero-content">
     <div class="book-cover-section">
       <div class="book-cover" id="bookCover">
@@ -46,8 +46,8 @@ const { book } = Astro.props;
         <span>评分 {book.rating}</span>
       </div>
       <div class="book-actions">
-        <button class="btn-primary" data-action="markRead" data-title={book.title}>标记已读</button>
-        <button class="btn-secondary" data-action="collect" data-title={book.title}>♡ 收藏</button>
+        <button class="btn-primary" data-action="markRead" data-book-id={book.id}>标记已读</button>
+        <button class="btn-secondary" data-action="favorite" data-book-id={book.id}>♡ 收藏</button>
         <a href="/rss.xml" class="btn-rss" target="_blank">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
           RSS
@@ -61,10 +61,12 @@ const { book } = Astro.props;
   import { initLightbox } from "../scripts/lightbox";
   import { initBookActions } from "../scripts/storage";
 
-  // 从 DOM 获取 bookTitle（不再依赖 define:vars）
+  // 从 DOM 获取 bookId + bookTitle（不再依赖 define:vars）
+  // P0-0: data-book-id 取代 data-book-title，BookCard 不再以 title 做存储 key。
   const heroCard = document.querySelector('.hero-card');
-  const bookTitle = heroCard?.getAttribute('data-book-title') ?? '';
+  const bookId = heroCard?.getAttribute('data-book-id') ?? '';
+  const bookTitle = heroCard?.querySelector('.book-title')?.textContent?.trim() ?? '';
 
   initLightbox();
-  initBookActions(bookTitle);
+  if (bookId) initBookActions(bookId, bookTitle);
 </script>

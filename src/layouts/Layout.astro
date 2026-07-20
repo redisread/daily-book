@@ -136,6 +136,14 @@ if (jsonLd) {
     <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <script>
+      // P0-0: 一次性 storage 迁移 + 跨 tab broadcast（spec §3.2 触发点）
+      import { runStorageMigrationIfNeeded } from "../scripts/storage-migration";
+      import { initStorageBroadcast } from "../scripts/storage";
+      document.addEventListener("DOMContentLoaded", () => {
+        runStorageMigrationIfNeeded();
+        initStorageBroadcast();
+      });
+
       // Highlight active nav
       const path = window.location.pathname;
       document.querySelectorAll('.nav-btn').forEach((btn) => {
