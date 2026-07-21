@@ -1,0 +1,111 @@
+---
+/**
+ * P0-3 「我的金句本」页
+ *
+ * spec: notes/daily-book/p0-3-my-quotes-spec.md v1.1
+ *
+ * 纯前端 localStorage 展示页：SSG 静态 shell + client-side hydration。
+ * 金句 5 字段 snapshot 保留在 localStorage → 即使 YAML 后续删书 / 改金句也不影响历史金句。
+ *
+ * 数据源（P0-0 P0-3 实装）：`getFavoriteQuotes` / `removeQuoteFavorite` / `onStorageChange`。
+ * 期号（P0-1）：`getBookIssueNumber` + `formatIssueNumber`。
+ */
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="我的金句本 · 每日一书" description="你收藏的字句：可回看、可分享的私人摘抄本">
+  <div class="quotes-page">
+    <div class="quotes-header">
+      <h1 class="page-title">📖 我的金句本</h1>
+      <p class="quotes-subtitle" id="quotesSubtitle">你收藏的字句</p>
+    </div>
+
+    <div class="quotes-content" id="quotesContent">
+      <!-- Client-side renders cards or empty state here -->
+    </div>
+
+    <!-- 空态 -->
+    <div class="quotes-empty" id="quotesEmpty" hidden>
+      <div class="empty-icon">📭</div>
+      <h2>你的金句本还是空的</h2>
+      <p>读到好句子，点 ♡ 收藏</p>
+      <a href="/" class="btn-primary">回首页 →</a>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { getFavoriteQuotes, removeQuoteFavorite, onStorageChange, type QuoteEntry } from "../../scripts/storage";
+  import { getBookIssueNumber } from "../../data/books";
+  import { formatIssueNumber } from "../../utils/issue-number";
+
+  const contentEl = document.getElementById("quotesContent")!;
+  const subtitleEl = document.getElementById("quotesSubtitle")!;
+  const emptyEl = document.getElementById("quotesEmpty")!;
+
+  function escapeHtml(s: string): string {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function renderCards() {
+    const quotes: QuoteEntry[] = getFavoriteQuotes();
+    const total = quotes.length;
+
+    subtitleEl.textContent = total > 0
+      ? `你收藏的字句 · 共 ${total} 条`
+      : "你收藏的字句";
+
+    if (total === 0) {
+      emptyEl.hidden = false;
+      contentEl.hidden = true;
+      contentEl.innerHTML = "";
+      return;
+    }
+
+    emptyEl.hidden = true;
+    contentEl.hidden = false;
+
+    const cards = quotes.map((q) => {
+      const issue = getBookIssueNumber(q.bookId);
+      const issueBadge = issue !== null
+        ? `<span class="quote-book-issue">${formatIssueNumber(issue, "short")}</span>`
+        : "";
+      const dateStr = q.publishedDate || "";
+      const href = q.publishedDate ? `/book/${q.publishedDate}` : "#";
+      return `
+        <article class="quotes-card">
+          <div class="quotes-card-mark">&ldquo;</div>
+          <p class="quotes-card-text">${escapeHtml(q.quoteText)}</p>
+          <div class="quotes-card-source">
+            <a href="${href}" class="quotes-card-source-link">《${escapeHtml(q.bookTitle)}》· ${escapeHtml(q.bookAuthor)}</a>
+          </div>
+          <div class="quotes-card-meta">
+            ${issueBadge}${dateStr ? `<span class="quotes-card-date">${dateStr}</span>` : ""}
+          </div>
+          <div class="quotes-card-actions">
+            <button class="quotes-card-remove" data-quote-id="${escapeHtml(q.quoteId)}" title="取消收藏">取消收藏</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    contentEl.innerHTML = cards;
+
+    contentEl.querySelectorAll<HTMLButtonElement>(".quotes-card-remove").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.quoteId!;
+        removeQuoteFavorite(id);
+        // onStorageChange 会自动 refetch
+      });
+    });
+  }
+
+  // 事件订阅：quote key 变化时刷新（本 tab add/remove 与跨 tab sync 都覆盖）
+  const unsubscribe = onStorageChange((detail) => {
+    if (detail.key === "quotes") renderCards();
+  });
+  window.addEventListener("beforeunload", unsubscribe);
+
+  // 初始渲染
+  renderCards();
+</script>

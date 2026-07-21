@@ -42,6 +42,19 @@ const KEY_PREFIX = "daily-book:";
 const READS_KEY = `${KEY_PREFIX}reads`;
 const FAVORITES_KEY = `${KEY_PREFIX}favorites`;
 const WANTS_KEY = `${KEY_PREFIX}wants`;
+const QUOTES_KEY = `${KEY_PREFIX}quotes`;
+
+// ==================== 金句 snapshot 类型（P0-3）====================
+// spec: notes/daily-book/p0-3-my-quotes-spec.md v1.1 §3.4
+// snapshot 5 字段：即使 YAML 后续删除该书或改金句，金句本仍能显示原文（robustness）。
+export interface QuoteEntry {
+  quoteId: string;       // "${bookId}:${quoteIndex}"（0-based）
+  quoteText: string;     // snapshot 收藏时的金句原文
+  bookId: string;
+  bookTitle: string;     // snapshot
+  bookAuthor: string;    // snapshot
+  publishedDate: string; // snapshot 用于计算期号 + 显示日期
+}
 
 // ==================== 内部 helper ====================
 
@@ -150,6 +163,58 @@ export function getWants(): string[] {
 // export function toggleQuoteFavorite(quote: QuoteSnapshot): boolean { ... }
 // export function getFavoriteQuotes(): QuoteEntry[] { ... }
 // export function removeQuoteFavorite(quoteId: string): void { ... }
+
+// ==================== 金句 API（P0-3 实装）====================
+// 存储：daily-book:quotes → JSON QuoteEntry[]
+// 顺序：最新收藏在前（unshift）
+// snapshot 策略：quoteText / bookTitle / bookAuthor / publishedDate 全部落地 localStorage，
+// 避免 YAML 后续编辑导致金句本显示错误或丢失原文。
+
+function safeReadQuotes(): QuoteEntry[] {
+  if (typeof localStorage === "undefined") return [];
+  try {
+    return JSON.parse(localStorage.getItem(QUOTES_KEY) || "[]") as QuoteEntry[];
+  } catch {
+    return [];
+  }
+}
+
+function safeWriteQuotes(arr: QuoteEntry[]): void {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(QUOTES_KEY, JSON.stringify(arr));
+}
+
+export function isQuoteFavorited(quoteId: string): boolean {
+  return safeReadQuotes().some((q) => q.quoteId === quoteId);
+}
+
+export function toggleQuoteFavorite(entry: QuoteEntry): boolean {
+  const arr = safeReadQuotes();
+  const idx = arr.findIndex((q) => q.quoteId === entry.quoteId);
+  if (idx > -1) {
+    arr.splice(idx, 1);
+    safeWriteQuotes(arr);
+    emitStorageChange({ key: "quotes", action: "remove", quoteId: entry.quoteId });
+    return false;
+  }
+  arr.unshift(entry); // 最新收藏在前
+  safeWriteQuotes(arr);
+  emitStorageChange({ key: "quotes", action: "add", quoteId: entry.quoteId });
+  return true;
+}
+
+export function getFavoriteQuotes(): QuoteEntry[] {
+  return safeReadQuotes();
+}
+
+export function removeQuoteFavorite(quoteId: string): void {
+  const arr = safeReadQuotes();
+  const idx = arr.findIndex((q) => q.quoteId === quoteId);
+  if (idx === -1) return;
+  arr.splice(idx, 1);
+  safeWriteQuotes(arr);
+  emitStorageChange({ key: "quotes", action: "remove", quoteId });
+}
 
 // ==================== 事件订阅（spec §4.1 / §4.2）====================
 
