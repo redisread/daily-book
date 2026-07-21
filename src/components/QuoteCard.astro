@@ -40,7 +40,7 @@ Object.assign(window.__quotesRegistry, ${JSON.stringify(quotesRegistry)});
       <div class="quote-actions">
         <button class="quote-action-btn like-btn" data-index={index} data-quote-id={`${book.id}:${index}`} title="喜欢">♡</button>
         <button class="quote-action-btn share-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="分享">⎘</button>
-        <button class="quote-action-btn image-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="生成图片">图</button>
+        <button class="quote-action-btn image-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} data-book-id={book.id} title="生成图片">图</button>
       </div>
     </div>
   ))}
@@ -59,7 +59,7 @@ Object.assign(window.__quotesRegistry, ${JSON.stringify(quotesRegistry)});
         <div class="quote-actions">
           <button class="quote-action-btn like-btn" data-index={index} data-quote-id={`${book.id}:${index}`} title="喜欢">♡</button>
           <button class="quote-action-btn share-btn" data-index={index} data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="分享">⎘</button>
-          <button class="quote-action-btn image-btn" data-index={index} data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="生成图片">图</button>
+          <button class="quote-action-btn image-btn" data-index={index} data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} data-book-id={book.id} title="生成图片">图</button>
         </div>
       </div>
     ))}
