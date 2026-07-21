@@ -2,6 +2,7 @@ import { load } from "js-yaml";
 import { BookSchema } from "../schemas/book";
 import type { Book, Quote } from "../schemas/book";
 import booksYaml from "./books.yaml?raw";
+import { buildIssueNumberIndex } from "../utils/issue-number";
 
 export type { Book, Quote };
 
@@ -159,4 +160,22 @@ export function getBookDateMap(): Map<string, string> {
     }
   }
   return map;
+}
+
+// ==================== P0-1 期号系统 ====================
+// spec: notes/daily-book/p0-1-issue-number-spec.md v1.1
+// build-time 派生一次，全站直接读，avoid 每页重新计算索引。
+export const issueNumberIndex = buildIssueNumberIndex(books);
+
+/**
+ * 取书的期号（第 N 期）。未发布书（publishedDate=null）返回 null。
+ * 消费方（首页 / 详情页 / archive / HistoryGrid / RSS / 分享图 P0-4）直接调用。
+ */
+export function getBookIssueNumber(bookId: string): number | null {
+  return issueNumberIndex.bookIdToIssue.get(bookId) ?? null;
+}
+
+/** 已发布书总数（用于 UI 「共 XX 期」等展示） */
+export function getTotalIssues(): number {
+  return issueNumberIndex.totalIssues;
 }

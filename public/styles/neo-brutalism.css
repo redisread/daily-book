@@ -153,6 +153,16 @@ button { font-family: inherit; }
   padding: 20px 0 24px;
 }
 .date-info { display: flex; flex-direction: column; gap: 2px; }
+/* P0-1: 期号横条（Neo Brutalism 硬风：粗体大字，视觉权重 > 日期） */
+.date-issue {
+  font-family: var(--font-mono);
+  font-size: 1.375rem;      /* text-2xl */
+  font-weight: 900;         /* font-black */
+  letter-spacing: 0.02em;
+  color: var(--fg);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
 .date-main {
   font-family: var(--font-mono);
   font-size: 0.875rem;
@@ -498,6 +508,7 @@ button { font-family: inherit; }
 }
 .history-card {
   display: block;
+  position: relative;                    /* P0-1: for .issue-badge absolute positioning */
   background: var(--paper);
   border: 2px solid var(--fg);
   box-shadow: var(--shadow-card);
@@ -508,6 +519,24 @@ button { font-family: inherit; }
 .history-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-card-hover);
+}
+
+/* P0-1: 期号徽章 (HistoryGrid 卡片右上角 + archive 卡片右上角，vanilla CSS Neo Brutalism 硬风) */
+.issue-badge,
+.archive-issue-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 2px 6px;
+  background: var(--fg);                 /* Neo Brutalism 主前景色（黑） */
+  color: var(--bg, var(--paper));        /* 白 */
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  border: 1.5px solid var(--fg);         /* 硬边风一致 */
+  border-radius: 0;                       /* 硬角 */
+  box-shadow: 2px 2px 0 var(--fg);       /* Neo Brutalism 硬阴影 */
 }
 .history-date {
   font-family: var(--font-mono);

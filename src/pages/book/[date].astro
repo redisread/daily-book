@@ -3,7 +3,8 @@ import Layout from "../../layouts/Layout.astro";
 import BookCard from "../../components/BookCard.astro";
 import QuoteCard from "../../components/QuoteCard.astro";
 import HistoryGrid from "../../components/HistoryGrid.astro";
-import { getBookForDate, getPublishedDates, formatDate, formatDateISO } from "../../data/books";
+import { getBookForDate, getPublishedDates, formatDate, formatDateISO, getBookIssueNumber } from "../../data/books";
+import { formatIssueNumber } from "../../utils/issue-number";
 
 export function getStaticPaths() {
   return getPublishedDates().map((date) => ({ params: { date } }));
@@ -14,6 +15,7 @@ const [year, month, day] = dateParam!.split("-").map(Number);
 const date = new Date(year, month - 1, day);
 const book = getBookForDate(date);
 const dateStr = formatDate(date);
+const issueNumber = getBookIssueNumber(book.id);
 
 // Book schema JSON-LD（结构化数据，利于搜索引擎富媒体展示）
 const bookSchema = {
@@ -35,6 +37,9 @@ const bookSchema = {
 <Layout title={`${book.title} · ${dateStr} · 每日一书`} description={`${dateStr}推荐《${book.title}》—— ${book.quotes[0].text}`} jsonLd={bookSchema}>
   <div class="date-bar">
     <div class="date-info">
+      {issueNumber !== null && (
+        <div class="date-issue">{formatIssueNumber(issueNumber, "long")}</div>
+      )}
       <div class="date-main">{dateStr}</div>
       <div class="date-reading-day">
         {formatDateISO(date) === formatDateISO(new Date()) ? "今日推荐" : "往期推荐"}
