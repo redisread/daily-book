@@ -3,19 +3,24 @@ import Layout from "../layouts/Layout.astro";
 import BookCard from "../components/BookCard.astro";
 import QuoteCard from "../components/QuoteCard.astro";
 import HistoryGrid from "../components/HistoryGrid.astro";
-import { getLatestPublishedBook, formatDate } from "../data/books";
+import { getLatestPublishedBook, formatDate, getBookIssueNumber } from "../data/books";
+import { formatIssueNumber } from "../utils/issue-number";
 
 const { date: bookDate, book } = getLatestPublishedBook();
 const dateStr = formatDate(bookDate);
 const dayOfYear = Math.floor(
   (bookDate.getTime() - new Date(bookDate.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
 );
+const issueNumber = getBookIssueNumber(book.id);
 ---
 
 <Layout title={`今日推荐：${book.title} · 每日一书`} description={`今日推荐《${book.title}》—— ${book.quotes[0].text}`}>
-  <!-- Date Bar -->
+  <!-- Date Bar (P0-1: 期号横条) -->
   <div class="date-bar">
     <div class="date-info">
+      {issueNumber !== null && (
+        <div class="date-issue">{formatIssueNumber(issueNumber, "long")}</div>
+      )}
       <div class="date-main">{dateStr}</div>
       <div class="date-reading-day">今年第 {dayOfYear} 天</div>
     </div>

@@ -1,5 +1,6 @@
 ---
-import { getPublishedBooks, formatDateShort, formatDateISO } from "../data/books";
+import { getPublishedBooks, formatDateShort, formatDateISO, getBookIssueNumber } from "../data/books";
+import { formatIssueNumber } from "../utils/issue-number";
 
 interface Props {
   days?: number;
@@ -13,17 +14,23 @@ const recent = skipToday ? allRecent.slice(1) : allRecent;
 
 <div class="history-section">
   <div class="section-header">
-    <h2 class="section-title">往期推荐</h2>
+    <h2 class="section-title">过往刊号</h2>
     <a href="/archive" class="section-more">查看全部 →</a>
   </div>
   <div class="history-grid">
-    {recent.map(({ date, book }) => (
-      <a href={`/book/${formatDateISO(date)}`} class="history-card">
-        <div class="history-date">{formatDateShort(date)}</div>
-        <div class="history-title">{book.title}</div>
-        <div class="history-author">{book.author}</div>
-        <div class="history-quote">&ldquo;{book.quotes[0].text.substring(0, 40)}&hellip;&rdquo;</div>
-      </a>
-    ))}
+    {recent.map(({ date, book }) => {
+      const issue = getBookIssueNumber(book.id);
+      return (
+        <a href={`/book/${formatDateISO(date)}`} class="history-card">
+          {issue !== null && (
+            <div class="issue-badge">{formatIssueNumber(issue, "short")}</div>
+          )}
+          <div class="history-date">{formatDateShort(date)}</div>
+          <div class="history-title">{book.title}</div>
+          <div class="history-author">{book.author}</div>
+          <div class="history-quote">&ldquo;{book.quotes[0].text.substring(0, 40)}&hellip;&rdquo;</div>
+        </a>
+      );
+    })}
   </div>
 </div>
