@@ -1,5 +1,6 @@
 // 金句滑动、点赞、分享功能
 import { setupModalA11y } from './modal-a11y';
+import { getBookIssueNumber } from '../data/books';
 
 export function initQuoteSwipe() {
   const container = document.getElementById('quoteSwipeContainer');
@@ -113,10 +114,13 @@ export function initQuoteActions() {
 
   let currentShareQuote = '';
   let currentShareSource = '';
+  // P0-4: 品牌行「daily-book · 第 XXX 期」需要 bookId → P0-1 getBookIssueNumber lookup
+  let currentShareBookId: string | null = null;
 
-  function openImageModal(quote: string, source: string) {
+  function openImageModal(quote: string, source: string, bookId: string | null) {
     currentShareQuote = quote;
     currentShareSource = source;
+    currentShareBookId = bookId;
     if (sharePreviewQuote) sharePreviewQuote.textContent = quote;
     if (sharePreviewSource) sharePreviewSource.textContent = source;
     imageModal?.classList.add('active');
@@ -130,7 +134,8 @@ export function initQuoteActions() {
     btn.addEventListener('click', () => {
       const quote = btn.getAttribute('data-quote') || '';
       const source = btn.getAttribute('data-source') || '';
-      openImageModal(quote, source);
+      const bookId = btn.getAttribute('data-book-id');
+      openImageModal(quote, source, bookId);
     });
   });
 
@@ -192,9 +197,14 @@ export function initQuoteActions() {
     ctx.fillText(currentShareSource, canvas.width / 2, y + 100);
 
     // 品牌：--accent
+    // P0-4: 「daily-book · 第 XXX 期」（fallback「daily-book」当 bookId 缺失或 issueNumber 为 null）
     ctx.fillStyle = '#C03A00';
     ctx.font = '700 24px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", monospace';
-    ctx.fillText('每日一书 · Daily Book', canvas.width / 2, canvas.height - 80);
+    const issueNumber = currentShareBookId ? getBookIssueNumber(currentShareBookId) : null;
+    const brandLine = issueNumber !== null
+      ? `daily-book · 第 ${issueNumber} 期`
+      : 'daily-book';
+    ctx.fillText(brandLine, canvas.width / 2, canvas.height - 80);
 
     // 下载
     const link = document.createElement('a');
