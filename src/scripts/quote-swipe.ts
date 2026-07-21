@@ -140,7 +140,30 @@ export function initQuoteActions() {
     });
   });
 
-  // 图片生成弹窗
+  // 图片生成弹窗（task #42: 抽为 initShareModal 共用，.image-btn 静态绑定保持原行为）
+  const openShareModal = initShareModal();
+  document.querySelectorAll('.image-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const quote = btn.getAttribute('data-quote') || '';
+      const source = btn.getAttribute('data-source') || '';
+      const bookId = btn.getAttribute('data-book-id');
+      openShareModal(quote, source, bookId);
+    });
+  });
+}
+
+export type OpenShareModalFn = (quote: string, source: string, bookId: string | null) => void;
+
+let cachedOpenShareModal: OpenShareModalFn | null = null;
+
+/**
+ * 分享图弹窗初始化（P0-4 逻辑，task #42 抽出共用）。
+ * 返回 openShareModal(quote, source, bookId)；模块级缓存保证幂等（重复调用返回同一 opener）。
+ * 使用方：initQuoteActions（书页 .image-btn）、my/quotes.astro（金句本动态卡片）。
+ */
+export function initShareModal(): OpenShareModalFn {
+  if (cachedOpenShareModal) return cachedOpenShareModal;
+
   const imageModal = document.getElementById('shareModal');
   const imageModalClose = document.getElementById('shareModalClose');
   const sharePreviewQuote = document.getElementById('sharePreviewQuote');
@@ -165,15 +188,6 @@ export function initQuoteActions() {
   function closeImageModal() {
     imageModal?.classList.remove('active');
   }
-
-  document.querySelectorAll('.image-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const quote = btn.getAttribute('data-quote') || '';
-      const source = btn.getAttribute('data-source') || '';
-      const bookId = btn.getAttribute('data-book-id');
-      openImageModal(quote, source, bookId);
-    });
-  });
 
   imageModalClose?.addEventListener('click', closeImageModal);
   imageModal?.querySelector('.share-modal-backdrop')?.addEventListener('click', closeImageModal);
@@ -258,4 +272,6 @@ export function initQuoteActions() {
     });
   });
 
+  cachedOpenShareModal = openImageModal;
+  return openImageModal;
 }
