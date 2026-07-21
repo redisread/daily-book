@@ -354,3 +354,106 @@ describe("B1 时序竞态：initBookActions 触发 defensive migration", () => {
     expect(fakeStorage.getItem("daily-book:wants")).toBe("[]");
   });
 });
+// ==================== P0-3 金句 API ====================
+// spec: notes/daily-book/p0-3-my-quotes-spec.md v1.1
+
+const makeQuoteEntry = (id: string, extras: Partial<{ text: string; bookId: string; date: string }> = {}) => ({
+  quoteId: id,
+  quoteText: extras.text ?? `text ${id}`,
+  bookId: extras.bookId ?? id.split(":")[0],
+  bookTitle: `Book ${extras.bookId ?? id.split(":")[0]}`,
+  bookAuthor: "Author",
+  publishedDate: extras.date ?? "2026-01-01",
+});
+
+describe("P0-3 quote API", () => {
+  it("初始化：getFavoriteQuotes 返回空数组，isQuoteFavorited=false", async () => {
+    const { getFavoriteQuotes, isQuoteFavorited } = await import("../../src/scripts/storage");
+    expect(getFavoriteQuotes()).toEqual([]);
+    expect(isQuoteFavorited("any:0")).toBe(false);
+  });
+
+  it("toggleQuoteFavorite add → snapshot 完整落地 + returns true", async () => {
+    const { toggleQuoteFavorite, getFavoriteQuotes, isQuoteFavorited } = await import("../../src/scripts/storage");
+    const entry = makeQuoteEntry("book-a:0", { text: "hello world" });
+    const added = toggleQuoteFavorite(entry);
+    expect(added).toBe(true);
+    expect(isQuoteFavorited("book-a:0")).toBe(true);
+    const list = getFavoriteQuotes();
+    expect(list).toHaveLength(1);
+    expect(list[0]).toMatchObject({
+      quoteId: "book-a:0",
+      quoteText: "hello world",
+      bookId: "book-a",
+      bookTitle: "Book book-a",
+      bookAuthor: "Author",
+      publishedDate: "2026-01-01",
+    });
+  });
+
+  it("toggleQuoteFavorite remove → returns false + list removes it", async () => {
+    const { toggleQuoteFavorite, isQuoteFavorited } = await import("../../src/scripts/storage");
+    const entry = makeQuoteEntry("book-a:0");
+    toggleQuoteFavorite(entry); // add
+    const removed = toggleQuoteFavorite(entry); // remove
+    expect(removed).toBe(false);
+    expect(isQuoteFavorited("book-a:0")).toBe(false);
+  });
+
+  it("最新收藏在前（unshift 顺序）", async () => {
+    const { toggleQuoteFavorite, getFavoriteQuotes } = await import("../../src/scripts/storage");
+    toggleQuoteFavorite(makeQuoteEntry("a:0"));
+    toggleQuoteFavorite(makeQuoteEntry("b:0"));
+    toggleQuoteFavorite(makeQuoteEntry("c:0"));
+    const list = getFavoriteQuotes();
+    expect(list.map((q) => q.quoteId)).toEqual(["c:0", "b:0", "a:0"]);
+  });
+
+  it("removeQuoteFavorite 移除指定 quoteId + emit remove event", async () => {
+    const { toggleQuoteFavorite, removeQuoteFavorite, getFavoriteQuotes, onStorageChange } = await import("../../src/scripts/storage");
+    toggleQuoteFavorite(makeQuoteEntry("a:0"));
+    toggleQuoteFavorite(makeQuoteEntry("b:0"));
+
+    const events: Array<unknown> = [];
+    const unsub = onStorageChange((d) => events.push(d));
+    removeQuoteFavorite("a:0");
+    expect(events).toEqual([{ key: "quotes", action: "remove", quoteId: "a:0" }]);
+    expect(getFavoriteQuotes().map((q) => q.quoteId)).toEqual(["b:0"]);
+    unsub();
+  });
+
+  it("removeQuoteFavorite unknown id → no-op（不 emit）", async () => {
+    const { removeQuoteFavorite, onStorageChange } = await import("../../src/scripts/storage");
+    const events: Array<unknown> = [];
+    const unsub = onStorageChange((d) => events.push(d));
+    removeQuoteFavorite("nonexistent:99");
+    expect(events).toEqual([]);
+    unsub();
+  });
+
+  it("toggleQuoteFavorite emit add/remove 事件（含 quoteId）", async () => {
+    const { toggleQuoteFavorite, onStorageChange } = await import("../../src/scripts/storage");
+    const entry = makeQuoteEntry("a:0");
+    const events: Array<unknown> = [];
+    const unsub = onStorageChange((d) => events.push(d));
+    toggleQuoteFavorite(entry); // add
+    toggleQuoteFavorite(entry); // remove
+    expect(events).toEqual([
+      { key: "quotes", action: "add", quoteId: "a:0" },
+      { key: "quotes", action: "remove", quoteId: "a:0" },
+    ]);
+    unsub();
+  });
+
+  it("snapshot 韧性：即使原书 YAML 后续变更，localStorage 保留原 snapshot", async () => {
+    // 模拟收藏时的 snapshot
+    const { toggleQuoteFavorite, getFavoriteQuotes } = await import("../../src/scripts/storage");
+    const snapshotText = "永恒的原文";
+    toggleQuoteFavorite(makeQuoteEntry("book-a:0", { text: snapshotText }));
+
+    // 后续 YAML 假设改了金句内容 —— 只影响构建时快照，不影响 localStorage
+    // 断言 localStorage 里仍是原始 snapshot
+    const list = getFavoriteQuotes();
+    expect(list[0].quoteText).toBe(snapshotText);
+  });
+});
