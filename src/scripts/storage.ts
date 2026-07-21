@@ -197,6 +197,9 @@ export function initBookActions(bookId: string, bookTitle: string) {
   const favoriteBtn = document.querySelector<HTMLButtonElement>(
     `[data-action="favorite"][data-book-id="${CSS.escape(bookId)}"]`
   );
+  const wantBtn = document.querySelector<HTMLButtonElement>(
+    `[data-action="want"][data-book-id="${CSS.escape(bookId)}"]`
+  );
 
   if (markReadBtn) {
     if (isRead(bookId)) {
@@ -229,6 +232,25 @@ export function initBookActions(bookId: string, bookTitle: string) {
         favoriteBtn.innerHTML = "♡ 收藏";
         favoriteBtn.classList.remove("is-favorited");
         window.showToast?.("已取消收藏");
+      }
+    });
+  }
+
+  if (wantBtn) {
+    if (isWanted(bookId)) {
+      wantBtn.innerHTML = "★ 想读";
+      wantBtn.classList.add("is-wanted");
+    }
+    wantBtn.addEventListener("click", () => {
+      const wanted = toggleWant(bookId);
+      if (wanted) {
+        wantBtn.innerHTML = "★ 想读";
+        wantBtn.classList.add("is-wanted");
+        window.showToast?.("已加入想读");
+      } else {
+        wantBtn.innerHTML = "☆ 想读";
+        wantBtn.classList.remove("is-wanted");
+        window.showToast?.("已从想读移除");
       }
     });
   }
