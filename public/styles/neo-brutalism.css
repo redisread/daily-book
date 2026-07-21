@@ -1543,6 +1543,22 @@ button { font-family: inherit; }
   background: var(--accent);
   color: var(--paper);
 }
+/* task #42: 分享按钮与取消收藏同族视觉（spec §4.4 双操作），accent 描边区分主操作 */
+.quotes-card-share {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  background: var(--paper);
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  cursor: pointer;
+  transition: background 100ms ease-out, color 100ms ease-out;
+}
+.quotes-card-share:hover {
+  background: var(--accent);
+  color: var(--paper);
+}
 /* 空态大卡 (复用 library-empty-all 相同视觉) */
 .quotes-empty {
   padding: 64px 24px;

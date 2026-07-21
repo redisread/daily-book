@@ -1,0 +1,26 @@
+---
+/**
+ * 分享图弹窗（P0-4 抽出共用，task #42）
+ *
+ * 样式走全局 neo-brutalism.css（.share-modal 系列），逻辑走 quote-swipe.ts initShareModal()。
+ * 使用方：QuoteCard.astro（书页金句）、my/quotes.astro（金句本卡片）。
+ * DOM id 固定（shareModal/shareModalClose/sharePreviewQuote/sharePreviewSource/downloadShareImage/copyShareText），
+ * 每页只应渲染一次。
+ */
+---
+
+<!-- Share Image Modal -->
+<div class="share-modal" id="shareModal" role="dialog" aria-modal="true" aria-label="生成分享图">
+  <div class="share-modal-backdrop"></div>
+  <div class="share-modal-content">
+    <button class="share-modal-close" id="shareModalClose">✕</button>
+    <div class="share-preview" id="sharePreview">
+      <p class="share-preview-quote" id="sharePreviewQuote"></p>
+      <p class="share-preview-source" id="sharePreviewSource"></p>
+    </div>
+    <div class="share-actions">
+      <button class="share-btn share-btn-primary" id="downloadShareImage">下载图片</button>
+      <button class="share-btn share-btn-secondary" id="copyShareText">复制文字</button>
+    </div>
+  </div>
+</div>
