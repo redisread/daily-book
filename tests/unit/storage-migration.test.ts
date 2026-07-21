@@ -139,6 +139,33 @@ describe("P0-0 storage 迁移", () => {
     expect(fakeStorage.getItem("dailybook_collections")).not.toBeNull();
   });
 
+  it("N1 — migration emit 仅在实际迁移时发（Martin f8eb0854）", async () => {
+    // 空环境：无旧 key → 不应发 migrate 事件
+    const { runStorageMigrationIfNeeded } = await import("../../src/scripts/storage-migration");
+    const { onStorageChange } = await import("../../src/scripts/storage");
+    const migrateEvents: Array<unknown> = [];
+    const unsub = onStorageChange((d) => {
+      if ((d as { action: string }).action === "migrate") migrateEvents.push(d);
+    });
+    runStorageMigrationIfNeeded();
+    expect(migrateEvents).toEqual([]);
+    unsub();
+  });
+
+  it("N1 — migration emit 仅命中有数据的 key（reads 有 / favorites 空 → 只发 reads）", async () => {
+    fakeStorage.setItem("dailybook_read", JSON.stringify([books[0].title]));
+
+    const { runStorageMigrationIfNeeded } = await import("../../src/scripts/storage-migration");
+    const { onStorageChange } = await import("../../src/scripts/storage");
+    const migrateEvents: Array<unknown> = [];
+    const unsub = onStorageChange((d) => {
+      if ((d as { action: string }).action === "migrate") migrateEvents.push(d);
+    });
+    runStorageMigrationIfNeeded();
+    expect(migrateEvents).toEqual([{ key: "reads", action: "migrate" }]);
+    unsub();
+  });
+
   it("Case 8 — migration 失败：不写 flag，下次重跑", async () => {
     // 让 migration flag 写入抛错（模拟 storage quota exceeded），
     // safeReadArray 自身 catch 不抛，所以从 setItem 路径注入。
@@ -269,5 +296,61 @@ describe("P0-0 KNOWN_STORAGE_KEYS 单点常量", () => {
   it("导出 4 个已知 key", async () => {
     const { KNOWN_STORAGE_KEYS } = await import("../../src/scripts/storage");
     expect(KNOWN_STORAGE_KEYS).toEqual(["reads", "favorites", "wants", "quotes"]);
+  });
+});
+
+// ==================== B1 时序竞态 defensive migration ====================
+// Martin msg=f8eb0854 B1: Astro `<script>` = deferred module scripts；
+// Layout.astro DOMContentLoaded 只**注册** listener，migration 尚未跑；
+// BookCard 模块脚本立即调用 initBookActions() → 内部 isRead() 读到空新 key → 按钮初始状态错。
+// 修复：initBookActions 首行 defensive 触发 runStorageMigrationIfNeeded()，flag-based 幂等。
+describe("B1 时序竞态：initBookActions 触发 defensive migration", () => {
+  it("老 localStorage 未跑 Layout migration → initBookActions 时读到的 isRead(bookId)=true（migration inline 补跑）", async () => {
+    // 模拟老用户 localStorage 状态：
+    // - dailybook_read 有存量 title
+    // - migration flag 未写（模拟首次 P0-0 上线）
+    // - daily-book:reads 尚未存在（Layout DOMContentLoaded 还没跑）
+    const sampleBook = books[0];
+    fakeStorage.setItem("dailybook_read", JSON.stringify([sampleBook.title]));
+
+    // 关键：initBookActions 首行会调 runStorageMigrationIfNeeded，同步补 migration
+    // 用 spyOn 观察 migration 被调用 + isRead(bookId) 正确
+    const { initBookActions, isRead } = await import("../../src/scripts/storage");
+
+    // 未 mount 真实 DOM → initBookActions 内部 querySelector 拿不到按钮，
+    // 但 runStorageMigrationIfNeeded 已经在首行调过，migration 已完成
+    // 用 document stub 让 querySelector 不 crash
+    const fakeDoc = {
+      querySelector: () => null,
+    };
+    vi.stubGlobal("document", fakeDoc);
+    // CSS.escape stub（happy-dom 无，我们不用 DOM 只走 migration path）
+    vi.stubGlobal("CSS", { escape: (s: string) => s });
+
+    initBookActions(sampleBook.id, sampleBook.title);
+
+    // 断言 migration 已跑：flag 写入 + 新 key 有正确 id
+    expect(fakeStorage.getItem("daily-book:migrated-v1")).toBe("true");
+    const reads = JSON.parse(fakeStorage.getItem("daily-book:reads") || "[]");
+    expect(reads).toEqual([sampleBook.id]);
+    // isRead 直接返回 true（数据已迁移到新 key）
+    expect(isRead(sampleBook.id)).toBe(true);
+  });
+
+  it("多次 initBookActions 调用 migration 幂等（flag-based no-op）", async () => {
+    const { initBookActions } = await import("../../src/scripts/storage");
+    const fakeDoc = { querySelector: () => null };
+    vi.stubGlobal("document", fakeDoc);
+    vi.stubGlobal("CSS", { escape: (s: string) => s });
+
+    initBookActions(books[0].id, books[0].title);
+    const flag1 = fakeStorage.getItem("daily-book:migrated-v1");
+    initBookActions(books[1].id, books[1].title);
+    const flag2 = fakeStorage.getItem("daily-book:migrated-v1");
+
+    expect(flag1).toBe("true");
+    expect(flag2).toBe("true");
+    // 第二次不应重写 wants（判 null 幂等）
+    expect(fakeStorage.getItem("daily-book:wants")).toBe("[]");
   });
 });

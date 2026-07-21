@@ -19,6 +19,7 @@
  */
 
 import { books } from "../data/books";
+import { runStorageMigrationIfNeeded } from "./storage-migration";
 
 // ==================== 单点常量（spec §4.2 / M7 建议）====================
 // 未来加 daily-book:notes / daily-book:highlights 时只改这一处。
@@ -183,6 +184,12 @@ export function initStorageBroadcast(): void {
 // ==================== BookCard init（id-based 重构）====================
 
 export function initBookActions(bookId: string, bookTitle: string) {
+  // B1 fix (Martin msg=f8eb0854 F1)：Astro `<script>` = deferred module scripts，
+  // Layout.astro 的 DOMContentLoaded 只**注册** listener，migration 尚未跑；
+  // BookCard `<script>` 立即调用 initBookActions → isRead() 读到空的新 key → 按钮初始状态错。
+  // 修复：首行 defensive 触发一次 migration —— flag-based 幂等，多次调用零副作用。
+  runStorageMigrationIfNeeded();
+
   // 用 data-book-id 找按钮（id-based 唯一，避免重名书串写）
   const markReadBtn = document.querySelector<HTMLButtonElement>(
     `[data-action="markRead"][data-book-id="${CSS.escape(bookId)}"]`

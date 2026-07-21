@@ -16,11 +16,7 @@
  */
 
 import { books } from "../data/books";
-import {
-  KNOWN_STORAGE_KEYS,
-  emitStorageChange,
-  type StorageKey,
-} from "./storage";
+import { emitStorageChange } from "./storage";
 
 const MIGRATION_FLAG = "daily-book:migrated-v1";
 const OLD_READ_KEY = "dailybook_read";
@@ -65,7 +61,9 @@ export function runStorageMigrationIfNeeded(): void {
     if (readsIds.length > 0) mergeIntoNew(NEW_READS_KEY, readsIds);
     if (favsIds.length > 0) mergeIntoNew(NEW_FAVS_KEY, favsIds);
 
-    // wants：仅在新 key 完全不存在时初始化 `[]`（保留用户后续手动加的）
+    // wants：仅在新 key 完全不存在时初始化 `[]`（Martin msg=f8eb0854 N2：与 reads/favorites 的
+    // `if > 0` 判定不一致是刻意 defensive —— wants 无旧 key 数据源，UI 侧消费默认存在 [] 简化
+    // 状态处理；reads/favorites 有旧 key 迁移语义，空写入是无意义副作用）
     if (localStorage.getItem(NEW_WANTS_KEY) === null) {
       localStorage.setItem(NEW_WANTS_KEY, "[]");
     }
@@ -74,11 +72,9 @@ export function runStorageMigrationIfNeeded(): void {
     localStorage.setItem(MIGRATION_FLAG, "true");
 
     // 报告事件（action: 'migrate'，spec §4.1：本 tab 一次性迁移完成）
-    // 类型 narrow：reads/favorites 是 StorageKey，wants 只是空初始化不 emit。
-    for (const key of ["reads", "favorites"] as StorageKey[]) {
-      if (!KNOWN_STORAGE_KEYS.includes(key)) continue;
-      emitStorageChange({ key, action: "migrate" });
-    }
+    // Martin msg=f8eb0854 N1：只在实际有数据被迁移时 emit——语义 = 「这条 key 真有存量数据被搬进来」
+    if (readsIds.length > 0) emitStorageChange({ key: "reads", action: "migrate" });
+    if (favsIds.length > 0) emitStorageChange({ key: "favorites", action: "migrate" });
   } catch (err) {
     console.error("[daily-book] storage migration failed:", err);
     // 不写 flag → 下次启动重跑
