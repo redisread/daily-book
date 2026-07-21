@@ -1,0 +1,225 @@
+---
+/**
+ * P0-2 「我的书架」页
+ *
+ * spec: notes/daily-book/p0-2-my-library-spec.md v1.1
+ *
+ * 纯前端 localStorage 展示页：SSG 静态 shell + client-side hydration。
+ * - 3 个 tab（收藏 / 已读 / 想读）
+ * - URL 反映 tab：`/my/library?tab=favorites|reads|wants`
+ * - 卡片：#N · YYYY-MM-DD · 书名 · 作者 · 状态徽章 · 取消按钮
+ * - 空态：单 tab 空 + 全空两种
+ * - 事件订阅：P0-0 `onStorageChange`，跨 tab 由 `initStorageBroadcast` 兜底
+ *
+ * 数据源（P0-0）：`getFavorites` / `getReads` / `getWants` list getter + `daily-book:*` key。
+ * 期号（P0-1）：`getBookIssueNumber(bookId)`。
+ */
+import Layout from "../../layouts/Layout.astro";
+import { books } from "../../data/books";
+
+// 服务端仅暴露 books 静态数据 + id → book meta 索引到 client；实际显示逻辑走 client hydration。
+// 内联到 window 全局：books.ts 已 build-time 静态 import，此处只做序列化 → client 消费。
+const bookMetaJson = JSON.stringify(
+  books.map((b) => ({
+    id: b.id,
+    title: b.title,
+    author: b.author,
+    coverTitle: b.coverTitle,
+    coverAuthor: b.coverAuthor,
+    publishedDate: b.publishedDate ?? null,
+  })),
+);
+---
+
+<Layout title="我的书架 · 每日一书" description="你的订阅收信箱：收藏、已读、想读三个 tab 一目了然">
+  <div class="library-page">
+    <div class="library-header">
+      <h1 class="page-title">📮 我的书架</h1>
+      <p class="library-subtitle" id="librarySubtitle">你的订阅收信箱</p>
+    </div>
+
+    <div class="library-tabs" role="tablist" aria-label="书架分类">
+      <button class="library-tab active" role="tab" data-tab="favorites" aria-selected="true">
+        ♡ 收藏 <span class="library-tab-count" id="countFavorites">0</span>
+      </button>
+      <button class="library-tab" role="tab" data-tab="reads" aria-selected="false">
+        ✓ 已读 <span class="library-tab-count" id="countReads">0</span>
+      </button>
+      <button class="library-tab" role="tab" data-tab="wants" aria-selected="false">
+        ☆ 想读 <span class="library-tab-count" id="countWants">0</span>
+      </button>
+    </div>
+
+    <div class="library-content" id="libraryContent">
+      <!-- Client-side renders cards or empty state here -->
+    </div>
+
+    <!-- 全空态（server-side 渲染，客户端根据数据决定显示/隐藏） -->
+    <div class="library-empty-all" id="libraryEmptyAll" hidden>
+      <div class="empty-icon">📭</div>
+      <h2>你的书架还是空的</h2>
+      <p>每天推一本书，点 ♡ 就收进这里</p>
+      <a href="/" class="btn-primary">回首页 →</a>
+    </div>
+  </div>
+
+  <script is:inline set:html={`window.__DAILY_BOOK_META__ = ${bookMetaJson};`} />
+</Layout>
+
+<script>
+  import { getFavorites, getReads, getWants, toggleFavorite, unmarkAsRead, toggleWant, onStorageChange } from "../../scripts/storage";
+  import { getBookIssueNumber } from "../../data/books";
+  import { formatIssueNumber } from "../../utils/issue-number";
+  // build-time 索引固化到 client bundle，直接调用 getBookIssueNumber 即可
+
+  interface BookMeta {
+    id: string;
+    title: string;
+    author: string;
+    coverTitle: string;
+    coverAuthor: string;
+    publishedDate: string | null;
+  }
+
+  type TabKey = "favorites" | "reads" | "wants";
+  const TABS: TabKey[] = ["favorites", "reads", "wants"];
+
+  const meta: BookMeta[] = (window as unknown as { __DAILY_BOOK_META__: BookMeta[] }).__DAILY_BOOK_META__ || [];
+  const metaById = new Map(meta.map((m) => [m.id, m]));
+
+  const contentEl = document.getElementById("libraryContent")!;
+  const subtitleEl = document.getElementById("librarySubtitle")!;
+  const emptyAllEl = document.getElementById("libraryEmptyAll")!;
+  const tabButtons = document.querySelectorAll<HTMLButtonElement>(".library-tab");
+
+  // ---- URL tab 参数 ----
+  function getTabFromUrl(): TabKey {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get("tab") as TabKey | null;
+    return t && TABS.includes(t) ? t : "favorites";
+  }
+
+  function setTabInUrl(tab: TabKey) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", tab);
+    window.history.replaceState({}, "", url.toString());
+  }
+
+  // ---- 渲染 ----
+  function renderTab(tab: TabKey) {
+    // 更新 tab 按钮 active + aria-selected
+    tabButtons.forEach((btn) => {
+      const isActive = btn.dataset.tab === tab;
+      btn.classList.toggle("active", isActive);
+      btn.setAttribute("aria-selected", String(isActive));
+    });
+
+    // 取当前 tab 的 id 数组
+    const ids = tab === "favorites" ? getFavorites() : tab === "reads" ? getReads() : getWants();
+
+    // 更新 count 徽章
+    document.getElementById("countFavorites")!.textContent = String(getFavorites().length);
+    document.getElementById("countReads")!.textContent = String(getReads().length);
+    document.getElementById("countWants")!.textContent = String(getWants().length);
+
+    // 副标题总计
+    const total = getFavorites().length + getReads().length + getWants().length;
+    subtitleEl.textContent = total > 0
+      ? `你的订阅收信箱 · 共 ${total} 条`
+      : "你的订阅收信箱";
+
+    // 全空态判定：3 tab 全为空
+    const allEmpty = total === 0;
+    emptyAllEl.hidden = !allEmpty;
+    contentEl.hidden = allEmpty;
+    if (allEmpty) return;
+
+    // 单 tab 空态
+    if (ids.length === 0) {
+      const hint = tab === "favorites"
+        ? "还没有收藏的书 · 每天推一本，点 ♡ 收进来"
+        : tab === "reads"
+          ? "还没有已读的书"
+          : "还没有想读的书";
+      contentEl.innerHTML = `<div class="library-empty-tab"><p>${hint}</p></div>`;
+      return;
+    }
+
+    // 卡片列表（按 id 顺序倒序渲染 —— 最近操作的在前，spec §3.3）
+    const cards = ids
+      .map((id) => metaById.get(id))
+      .filter((b): b is BookMeta => Boolean(b))
+      .map((b) => {
+        const issue = getBookIssueNumber(b.id);
+        const issueBadge = issue !== null
+          ? `<span class="library-card-issue">${formatIssueNumber(issue, "short")}</span>`
+          : "";
+        const dateStr = b.publishedDate ?? "";
+        const href = b.publishedDate ? `/book/${b.publishedDate}` : "#";
+        const statusLabel = tab === "favorites" ? "♡ 已收藏" : tab === "reads" ? "✓ 已读" : "☆ 想读";
+        return `
+          <article class="library-card">
+            <a href="${href}" class="library-card-link">
+              <div class="library-card-cover">
+                <div class="library-card-cover-title">${escapeHtml(b.coverTitle)}</div>
+                <div class="library-card-cover-author">${escapeHtml(b.coverAuthor)}</div>
+              </div>
+              <div class="library-card-info">
+                <div class="library-card-meta">
+                  ${issueBadge}${dateStr ? `<span class="library-card-date">${dateStr}</span>` : ""}
+                </div>
+                <h3 class="library-card-title">${escapeHtml(b.title)}</h3>
+                <p class="library-card-author">${escapeHtml(b.author)}</p>
+                <p class="library-card-status">${statusLabel}</p>
+              </div>
+            </a>
+            <button class="library-card-remove" data-book-id="${b.id}" data-tab="${tab}" aria-label="从${statusLabel}移除" title="取消">×</button>
+          </article>
+        `;
+      })
+      .join("");
+
+    contentEl.innerHTML = cards;
+
+    // 绑定 remove 按钮
+    contentEl.querySelectorAll<HTMLButtonElement>(".library-card-remove").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = btn.dataset.bookId!;
+        const t = btn.dataset.tab as TabKey;
+        if (t === "favorites") toggleFavorite(id);
+        else if (t === "reads") unmarkAsRead(id);
+        else if (t === "wants") toggleWant(id);
+        // storage.ts 内部 emit，onStorageChange 会自动 refetch，无需手动 render
+      });
+    });
+  }
+
+  function escapeHtml(s: string): string {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  // ---- Tab 切换 ----
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.tab as TabKey;
+      setTabInUrl(tab);
+      renderTab(tab);
+    });
+  });
+
+  // ---- 事件订阅（P0-0 spec §4.1）----
+  // detail.key in ['favorites', 'reads', 'wants'] 时 refetch 当前 tab（filter 'add'/'remove'/'sync'）
+  const unsubscribe = onStorageChange((detail) => {
+    if (["favorites", "reads", "wants"].includes(detail.key)) {
+      renderTab(getTabFromUrl());
+    }
+  });
+
+  // Astro page transition 卸载时清理（防内存泄漏）
+  window.addEventListener("beforeunload", unsubscribe);
+
+  // ---- 初始 render ----
+  renderTab(getTabFromUrl());
+</script>
