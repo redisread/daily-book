@@ -220,6 +220,47 @@ describe("P0-0 storage API (id-based)", () => {
   });
 });
 
+describe("P1 read-at 双写（spec v1.1 §3.2）", () => {
+  it("markAsRead 成功分支双写 read-at 时间戳", async () => {
+    const { markAsRead, getReadAt } = await import("../../src/scripts/storage");
+    const id = books[0].id;
+    const before = Date.now();
+    expect(markAsRead(id)).toBe(true);
+    const ts = getReadAt(id);
+    expect(ts).not.toBeNull();
+    expect(ts!).toBeGreaterThanOrEqual(before);
+  });
+
+  it("markAsRead 重复（返回 false）不改写 read-at", async () => {
+    const { markAsRead, getReadAt, __test } = await import("../../src/scripts/storage");
+    const id = books[1].id;
+    fakeStorage.setItem(__test.READ_AT_KEY, JSON.stringify({ [id]: 12345 }));
+    fakeStorage.setItem(__test.READS_KEY, JSON.stringify([id]));
+    expect(markAsRead(id)).toBe(false); // 已读 → 失败分支
+    expect(getReadAt(id)).toBe(12345); // read-at 未被覆盖
+  });
+
+  it("unmarkAsRead 成功分支删除 read-at；未读（返回 false）无副作用", async () => {
+    const { markAsRead, unmarkAsRead, getReadAt } = await import("../../src/scripts/storage");
+    const id = books[2].id;
+    markAsRead(id);
+    expect(getReadAt(id)).not.toBeNull();
+    expect(unmarkAsRead(id)).toBe(true);
+    expect(getReadAt(id)).toBeNull();
+    expect(unmarkAsRead(id)).toBe(false); // 未读 → 失败分支
+    expect(getReadAt(id)).toBeNull();
+  });
+
+  it("read-at 缺失（老数据）→ getReadAt 返回 null（印章降级无日期）", async () => {
+    const { getReadAt, __test } = await import("../../src/scripts/storage");
+    const id = books[0].id;
+    fakeStorage.setItem(__test.READS_KEY, JSON.stringify([id])); // 老数据：reads 有、read-at 无
+    expect(getReadAt(id)).toBeNull();
+    fakeStorage.setItem(__test.READ_AT_KEY, "{bad json"); // 损坏数据也不炸
+    expect(getReadAt(id)).toBeNull();
+  });
+});
+
 describe("P0-0 事件订阅", () => {
   it("Case 5 — markAsRead → onStorageChange 收到 { key: 'reads', action: 'add', bookId }", async () => {
     const { markAsRead, onStorageChange } = await import("../../src/scripts/storage");
@@ -293,9 +334,9 @@ describe("P0-0 事件订阅", () => {
 });
 
 describe("P0-0 KNOWN_STORAGE_KEYS 单点常量", () => {
-  it("导出 4 个已知 key", async () => {
+  it("导出 5 个已知 key", async () => {
     const { KNOWN_STORAGE_KEYS } = await import("../../src/scripts/storage");
-    expect(KNOWN_STORAGE_KEYS).toEqual(["reads", "favorites", "wants", "quotes"]);
+    expect(KNOWN_STORAGE_KEYS).toEqual(["reads", "favorites", "wants", "quotes", "read-at"]);
   });
 });
 

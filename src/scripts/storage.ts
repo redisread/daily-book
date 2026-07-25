@@ -24,7 +24,7 @@ import { runStorageMigrationIfNeeded } from "./storage-migration";
 // ==================== 单点常量（spec §4.2 / M7 建议）====================
 // 未来加 daily-book:notes / daily-book:highlights 时只改这一处。
 // type union / broadcast 白名单 / 消费方 filter 全 derive 自此。
-export const KNOWN_STORAGE_KEYS = ["reads", "favorites", "wants", "quotes"] as const;
+export const KNOWN_STORAGE_KEYS = ["reads", "favorites", "wants", "quotes", "read-at"] as const;
 export type StorageKey = (typeof KNOWN_STORAGE_KEYS)[number];
 
 export type StorageAction = "add" | "remove" | "migrate" | "clear" | "sync";
@@ -43,6 +43,7 @@ const READS_KEY = `${KEY_PREFIX}reads`;
 const FAVORITES_KEY = `${KEY_PREFIX}favorites`;
 const WANTS_KEY = `${KEY_PREFIX}wants`;
 const QUOTES_KEY = `${KEY_PREFIX}quotes`;
+const READ_AT_KEY = `${KEY_PREFIX}read-at`;
 
 // ==================== 金句 snapshot 类型（P0-3）====================
 // spec: notes/daily-book/p0-3-my-quotes-spec.md v1.1 §3.4
@@ -72,15 +73,40 @@ function safeWriteArray(key: string, arr: string[]): void {
   localStorage.setItem(key, JSON.stringify(arr));
 }
 
+function safeReadMap(key: string): Record<string, number> {
+  if (typeof localStorage === "undefined") return {};
+  try {
+    const v: unknown = JSON.parse(localStorage.getItem(key) || "{}");
+    if (v && typeof v === "object" && !Array.isArray(v)) return v as Record<string, number>;
+    return {};
+  } catch {
+    return {};
+  }
+}
+
+function safeWriteMap(key: string, map: Record<string, number>): void {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(key, JSON.stringify(map));
+}
+
 function has(arr: string[], id: string): boolean {
   return arr.includes(id);
 }
 
 // ==================== 已读 API ====================
+//
+// P1 特性 B read-at 双写（spec v1.1 §3.2）：
+//   - `daily-book:read-at` = JSON map `{[bookId]: timestamp}`，记录标记已读时刻。
+//   - 写/删只挂在 markAsRead / unmarkAsRead **函数内部成功分支**，禁止调用侧散写。
+//   - reads 为唯一事实源（印章显隐跟 reads）；read-at 仅展示装饰（印章日期），漂移不影响功能。
+//   - 写入顺序：read-at **先于** reads —— 跨 tab 收到 reads sync 事件时 read-at 必然已就位。
 
 export function markAsRead(bookId: string): boolean {
   const arr = safeReadArray(READS_KEY);
   if (has(arr, bookId)) return false;
+  const readAt = safeReadMap(READ_AT_KEY);
+  readAt[bookId] = Date.now();
+  safeWriteMap(READ_AT_KEY, readAt);
   arr.push(bookId);
   safeWriteArray(READS_KEY, arr);
   emitStorageChange({ key: "reads", action: "add", bookId });
@@ -96,6 +122,11 @@ export function unmarkAsRead(bookId: string): boolean {
   const idx = arr.indexOf(bookId);
   if (idx === -1) return false;
   arr.splice(idx, 1);
+  const readAt = safeReadMap(READ_AT_KEY);
+  if (bookId in readAt) {
+    delete readAt[bookId];
+    safeWriteMap(READ_AT_KEY, readAt);
+  }
   safeWriteArray(READS_KEY, arr);
   emitStorageChange({ key: "reads", action: "remove", bookId });
   return true;
@@ -103,6 +134,12 @@ export function unmarkAsRead(bookId: string): boolean {
 
 export function getReads(): string[] {
   return safeReadArray(READS_KEY);
+}
+
+/** 读取标记已读时刻；缺失（老数据 / 双写漂移）返回 null —— 印章降级只显示「已阅」无日期 */
+export function getReadAt(bookId: string): number | null {
+  const ts = safeReadMap(READ_AT_KEY)[bookId];
+  return typeof ts === "number" && Number.isFinite(ts) ? ts : null;
 }
 
 // ==================== 收藏 API ====================
@@ -246,6 +283,57 @@ export function initStorageBroadcast(): void {
   });
 }
 
+// ==================== 已读印章（P1 特性 B，spec v1.1 §3.2）====================
+// 显隐：isRead(bookId) + 订阅 storage:changed（key=reads）跨 tab 同步。
+// 动效：仅当次标记时播 180ms 盖印（stampReadSeal）；刷新恢复 / 跨 tab 同步**不播**。
+// 日期：read-at[bookId] → MM/DD；缺失降级只显示「已阅」。
+
+function formatSealDate(ts: number): string {
+  const d = new Date(ts);
+  return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function renderSeal(seal: HTMLElement, bookId: string): void {
+  const dateEl = seal.querySelector<HTMLElement>(".read-seal-date");
+  if (dateEl) {
+    const ts = getReadAt(bookId);
+    if (ts !== null) {
+      dateEl.textContent = formatSealDate(ts);
+      dateEl.hidden = false;
+    } else {
+      dateEl.hidden = true; // 降级规则（§3.2）：只显示「已阅」无日期
+    }
+  }
+  seal.hidden = false;
+}
+
+/** 初始化印章显隐 + 跨 tab 同步（不播动效）。由 initBookActions 接线。 */
+export function initReadSeal(bookId: string): void {
+  const seal = document.querySelector<HTMLElement>("#readSeal");
+  if (!seal) return;
+  const sync = () => {
+    if (isRead(bookId)) {
+      renderSeal(seal, bookId);
+    } else {
+      seal.hidden = true;
+    }
+  };
+  sync();
+  onStorageChange((detail) => {
+    if (detail.key === "reads") sync();
+  });
+}
+
+/** 当次标记的盖印动效：渲染 + 播 180ms stamp。由 markRead 点击成功分支调用。 */
+export function stampReadSeal(bookId: string): void {
+  const seal = document.querySelector<HTMLElement>("#readSeal");
+  if (!seal) return;
+  renderSeal(seal, bookId);
+  seal.classList.remove("seal-stamp");
+  void seal.offsetWidth; // 强制 reflow，允许连续盖印重播
+  seal.classList.add("seal-stamp");
+}
+
 // ==================== BookCard init（id-based 重构）====================
 
 export function initBookActions(bookId: string, bookTitle: string) {
@@ -254,6 +342,9 @@ export function initBookActions(bookId: string, bookTitle: string) {
   // BookCard `<script>` 立即调用 initBookActions → isRead() 读到空的新 key → 按钮初始状态错。
   // 修复：首行 defensive 触发一次 migration —— flag-based 幂等，多次调用零副作用。
   runStorageMigrationIfNeeded();
+
+  // P1 特性 B：印章显隐初始化 + onStorageChange 订阅（刷新恢复不播动效）
+  initReadSeal(bookId);
 
   // 用 data-book-id 找按钮（id-based 唯一，避免重名书串写）
   const markReadBtn = document.querySelector<HTMLButtonElement>(
@@ -276,6 +367,7 @@ export function initBookActions(bookId: string, bookTitle: string) {
         window.showToast?.(`《${bookTitle}》已标记为已读`);
         markReadBtn.textContent = "已读";
         markReadBtn.disabled = true;
+        stampReadSeal(bookId); // P1 特性 B：当次盖印动效（§3.2，仅当次标记时播）
       } else {
         window.showToast?.("这本书已经标记过了");
       }
@@ -327,6 +419,7 @@ export const __test = {
   READS_KEY,
   FAVORITES_KEY,
   WANTS_KEY,
+  READ_AT_KEY,
   KEY_PREFIX,
   // 反查 map：tests 不直接 import books.ts，避免循环依赖
   titleToIdMap: (): Map<string, string> => new Map(books.map((b) => [b.title, b.id])),
