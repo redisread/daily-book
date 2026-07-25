@@ -1889,7 +1889,6 @@
   coverTitle: 人月神话
   coverAuthor: 布鲁克斯
   publishedDate: '2026-05-14'
-  editorNote: Brooks 的外科手术团队与我们的 agent harness 惊人相似：一个主刀、一群助手、规则是作者不审自己的稿。五十年前的组织智慧，正好理解今天的 agent 团队。
   quotes:
     - text: 向进度落后的项目中增加人手，只会使进度更加落后。
       page: 第二章
@@ -2157,3 +2156,502 @@
       page: 偏差陷阱
     - text: "那些让我们的生活陷入不安的指数级发展力量，也赋予了我们重塑世界的能力，这就是我们所说的「富足的神迹」。"
       page: 偏差陷阱
+
+- id: soulstealers
+  title: 叫魂
+  author: 孔飞力
+  category: 历史
+  year: 1990
+  pages: 368
+  rating: 9.0
+  desc: 乾隆年间，一种「叫魂」妖术谣言席卷大清。孔飞力以这一事件为切口，剖析专制皇权、官僚体制与民间恐慌如何相互咬合。表面是猎巫，本质是权力对信息的垄断与滥用。
+  coverTitle: 叫魂
+  coverAuthor: 孔飞力
+  publishedDate: '2026-07-06'
+  editorNote: 妖术谣言背后是信息垄断：当权力能定义真相，恐慌就成了统治工具。对今天信息茧房与算法治理是一记警钟。
+  quotes:
+    - text: 1768年的妖术大恐慌，既非一场蓄意阴谋，也非一次自发群众运动，而是专制权力与民间信仰碰撞的产物。
+      page: 第一章
+    - text: 普通民众对权力的愤怒，往往通过迫害更弱者来发泄。
+      page: 第五章
+    - text: 在一个官僚体制中，信息的向上流动与权力的向下渗透同样重要。
+      page: 第八章
+    - text: 皇帝既是制度的最高维护者，也是制度最有力的破坏者。
+      page: 第十章
+    - text: 谣言的寿命取决于权力愿意为它付出多少注意力。
+      page: 结语
+
+
+- id: the-intelligent-investor
+  title: 聪明的投资者
+  author: 本杰明·格雷厄姆
+  category: 投资
+  year: 1949
+  pages: 640
+  rating: 9.2
+  desc: 价值投资之父格雷厄姆为普通投资者写的防御手册。核心不是预测市场，而是用「安全边际」和「市场先生」的寓言，建立不受情绪左右的决策系统。
+  coverTitle: 聪明的投资者
+  coverAuthor: 格雷厄姆
+  publishedDate: '2026-07-07'
+  editorNote: 格雷厄姆的「市场先生」寓言，把投资从预测变成情绪管理。对 AI 泡沫期的判断同样适用：安全边际比故事更重要。
+  quotes:
+    - text: 投资操作必须以深入分析为基础，确保本金安全，并获得适当的回报。
+      page: 第一章
+    - text: 市场先生每天报出一个价格，但他并非智者，只是情绪极不稳定的合伙人。
+      page: 第八章
+    - text: 投资者最大的问题，甚至最可怕的敌人，很可能就是他自己。
+      page: 第八章
+    - text: 安全边际是价值投资的中心思想，它缓冲了错误、坏运气和不确定性。
+      page: 第二十章
+    - text: 投机不是非法的，也不是不道德的，只是不赚钱的。
+      page: 第一章
+
+
+- id: the-social-animal
+  title: 社会性动物
+  author: 埃利奥特·阿伦森
+  category: 心理学
+  year: 1972
+  pages: 400
+  rating: 9.1
+  desc: 社会心理学入门经典。阿伦森用实验与故事解释我们为何从众、偏见、自我辩护、爱屋及乌。理解这些机制，不是为了操控别人，而是为了减少被操控。
+  coverTitle: 社会性动物
+  coverAuthor: 阿伦森
+  publishedDate: '2026-07-08'
+  editorNote: 社会心理学是 agent 时代的必修课：理解人如何被情境塑造，才能设计不利用人性弱点的系统。
+  quotes:
+    - text: 我们并非总是理性的动物，而是善于为自己不合理的行为寻找合理解释的动物。
+      page: 第四章
+    - text: 从众既可能带来智慧，也可能造成灾难，关键在于信息压力与规范压力的边界。
+      page: 第二章
+    - text: 偏见常常不是为了伤害别人，而是为了让自己感觉更好。
+      page: 第九章
+    - text: 认知失调理论告诉我们，人会调整自己的态度来匹配行为，而不是反过来。
+      page: 第六章
+    - text: 传播者越是讨喜，信息就越容易被接受——无论内容本身如何。
+      page: 第七章
+
+
+- id: a-random-walk-down-wall-street
+  title: 漫步华尔街
+  author: 伯顿·马尔基尔
+  category: 投资
+  year: 1973
+  pages: 464
+  rating: 8.8
+  desc: 马尔基尔用四十年数据论证：试图战胜市场大多数时候是徒劳的。书中对比基本面分析、技术分析和有效市场假说，最终指向指数化投资与资产配置。
+  coverTitle: 漫步华尔街
+  coverAuthor: 马尔基尔
+  publishedDate: '2026-07-09'
+  editorNote: 漫步华尔街的核心教训：在信息高度噪音化的市场里，少动比多动更接近真理。对算法交易时代尤其适用。
+  quotes:
+    - text: 一只蒙着眼睛的猴子向报纸金融版掷飞镖，选出的投资组合也不会比专家差多少。
+      page: 第一章
+    - text: 市场短期是投票机，长期是称重机。
+      page: 第三章
+    - text: 投资中最危险的一句话是：「这次不一样。」
+      page: 第十章
+    - text: 分散投资是唯一的免费午餐。
+      page: 第十二章
+    - text: 试图预测市场的人，最终只是在为自己的信念付费。
+      page: 第十五章
+
+
+- id: amusing-ourselves-to-death
+  title: 娱乐至死
+  author: 尼尔·波兹曼
+  category: 媒介批判
+  year: 1985
+  pages: 208
+  rating: 8.7
+  desc: 波兹曼警告：赫胥黎的预言正在成真——人们不是被禁止的，而是被热爱的东西淹没。电视与图像媒介让一切公共话语都变成娱乐，危险不在于虚假，而在于严肃被消解。
+  coverTitle: 娱乐至死
+  coverAuthor: 波兹曼
+  publishedDate: '2026-07-10'
+  editorNote: 波兹曼四十年前预言了短视频时代的注意力危机：当一切内容都被设计成娱乐，深刻思考就成了稀缺能力。
+  quotes:
+    - text: 我们将毁于我们所热爱的东西。
+      page: 前言
+    - text: 电视的一般表达方式是娱乐，一切公共话语都日渐以娱乐的方式出现。
+      page: 第四章
+    - text: 在电视里，新闻节目化身为娱乐，政治沦为了形象管理。
+      page: 第七章
+    - text: 媒介即隐喻，它不动声色地定义了真理的呈现方式。
+      page: 第二章
+    - text: 人们感到痛苦的不是他们用笑声代替了思考，而是他们不知道自己为什么笑以及为什么不再思考。
+      page: 第十一章
+
+
+- id: the-elements-of-user-experience
+  title: 用户体验要素
+  author: Jesse James Garrett
+  category: 产品设计
+  year: 2002
+  pages: 208
+  rating: 8.5
+  desc: Garrett 用五层模型——战略层、范围层、结构层、框架层、表现层——把用户体验从感觉变成可拆解的工作语言。是互联网产品设计的奠基之作。
+  coverTitle: 用户体验要素
+  coverAuthor: Garrett
+  publishedDate: '2026-07-11'
+  editorNote: 五层模型是 agent 产品设计的隐身骨架：再聪明的模型，如果表现层和战略层错位，用户也感受不到价值。
+  quotes:
+    - text: 用户体验不是产品本身，而是产品如何被感知、被使用、被记忆。
+      page: 第一章
+    - text: 战略层回答两个问题：我们要得到什么？用户要得到什么？
+      page: 第三章
+    - text: 范围层是边界谈判，决定做什么和不做什么。
+      page: 第五章
+    - text: 结构层把抽象需求转化为可识别的模式与流程。
+      page: 第七章
+    - text: 表现层是用户最先看到的，却应该是最后设计的。
+      page: 第九章
+
+
+- id: out-of-control
+  title: 失控
+  author: 凯文·凯利
+  category: 科技思辨
+  year: 1994
+  pages: 528
+  rating: 8.9
+  desc: 凯文·凯利三十年前预言了去中心化、涌现、蜂巢思维、分布式系统。今天回看，这本书像是一本为 AI 与互联网写的史前地图。
+  coverTitle: 失控
+  coverAuthor: 凯文·凯利
+  publishedDate: '2026-07-12'
+  editorNote: 三十年前凯文·凯利就画出了分布式智能的草图。今天多 agent 系统的涌现行为，正是书里场景的落地。
+  quotes:
+    - text: 机器正在变得生物化，生物正在变得工程化。
+      page: 第一章
+    - text: 群愚的集体智慧，往往超过最聪明的个体。
+      page: 第二章
+    - text: 去中心化的系统没有控制者，却拥有更强的适应力。
+      page: 第四章
+    - text: 进化擅长的是找到「足够好」的解，而不是最优解。
+      page: 第七章
+    - text: 未来属于那些能够与机器共同进化的人。
+      page: 第二十四章
+
+
+- id: the-gray-rhino
+  title: 灰犀牛
+  author: 米歇尔·渥克
+  category: 风险管理
+  year: 2012
+  pages: 304
+  rating: 7.8
+  desc: 如果说黑天鹅是难以预见的小概率事件，灰犀牛就是显而易见却被忽视的大概率危机。渥克分析我们为何对明显威胁视而不见，并提出五步应对框架。
+  coverTitle: 灰犀牛
+  coverAuthor: 渥克
+  publishedDate: '2026-07-13'
+  editorNote: 黑天鹅负责解释意外，灰犀牛负责解释不作为。对 agent 安全、技术债务、气候风险都适用：真正的危险往往早已可见。
+  quotes:
+    - text: 灰犀牛体型巨大，本不该被忽视，我们却一再回避它，直到它冲过来。
+      page: 第一章
+    - text: 危机的五个阶段：否认、拖延、判断、惊恐、行动。
+      page: 第三章
+    - text: 承认问题存在，是避免灾难的第一步。
+      page: 第五章
+    - text: 那些对预警采取行动的人，往往不是最聪明的，而是最愿意直面坏消息的。
+      page: 第八章
+    - text: 真正的韧性来自提前为可预见危机做好准备。
+      page: 第十一章
+
+
+- id: fooled-by-randomness
+  title: 随机漫步的傻瓜
+  author: 纳西姆·尼古拉斯·塔勒布
+  category: 投资
+  year: 2001
+  pages: 316
+  rating: 8.5
+  desc: 塔勒布早期作品，主题是随机性如何愚弄我们。成功常被误归为能力，失败常被误归为运气。学会与不确定性共处，比预测未来更重要。
+  coverTitle: 随机漫步的傻瓜
+  coverAuthor: 塔勒布
+  publishedDate: '2026-07-14'
+  editorNote: 塔勒布最锋利的提醒：别把运气当能力。AI 领域太多「成功者」的故事，正是随机性幻觉的重灾区。
+  quotes:
+    - text: 历史会爬向最大可能发生的地方，但我们只记得实际发生的那一条路径。
+      page: 第一章
+    - text: 幸运的傻瓜看起来像是专业的投资者，直到幸运离开他。
+      page: 第三章
+    - text: 我们擅长事后解释，却不擅长事前预测。
+      page: 第五章
+    - text: 在一个随机世界里，活得久比赚得快更重要。
+      page: 第八章
+    - text: 否定自己的能力，是智者的标志。
+      page: 第十章
+
+
+- id: nonviolent-communication
+  title: 非暴力沟通
+  author: 马歇尔·卢森堡
+  category: 沟通
+  year: 1999
+  pages: 264
+  rating: 8.7
+  desc: 卢森堡提出观察、感受、需要、请求四要素，把对抗性对话转化为合作性对话。核心不是技巧，而是真诚地看见自己与对方的需要。
+  coverTitle: 非暴力沟通
+  coverAuthor: 卢森堡
+  publishedDate: '2026-07-15'
+  editorNote: 人机协作的下一步不是更聪明的模型，而是更清晰的表达。非暴力沟通的「观察-感受-需要-请求」框架对写 prompt 同样有效。
+  quotes:
+    - text: 语言是窗，也可以是墙。它取决于我们如何使用它。
+      page: 第一章
+    - text: 区分观察与评论，是非暴力沟通的基础。
+      page: 第二章
+    - text: 每一种情绪背后，都藏着一个未被满足的需要。
+      page: 第四章
+    - text: 请求越具体，越容易被执行；请求越模糊，越容易引发防御。
+      page: 第六章
+    - text: 倾听他人的痛苦，不是为了解决问题，而是为了理解。
+      page: 第七章
+
+
+- id: peak
+  title: 刻意练习
+  author: 安德斯·艾利克森
+  category: 自我提升
+  year: 1993
+  pages: 336
+  rating: 8.0
+  desc: 艾利克森用三十年研究推翻「天赋决定论」。卓越不是天生，而是「刻意练习」的结果：明确目标、即时反馈、持续跳出舒适区。
+  coverTitle: 刻意练习
+  coverAuthor: 艾利克森
+  publishedDate: '2026-07-16'
+  editorNote: 天赋是偷懒的借口，刻意练习才是可复制的进阶路径。对 agent 团队同样成立：不是堆数量，是建反馈闭环。
+  quotes:
+    - text: 天才不是天生的，而是练出来的。
+      page: 第一章
+    - text: 刻意练习发生在学习区，而不是舒适区或恐慌区。
+      page: 第三章
+    - text: 没有反馈的练习，只是在重复错误。
+      page: 第五章
+    - text: 一万小时定律的问题不在于时间，而在于时间的质量。
+      page: 第七章
+    - text: 专家与新手的区别，不是知识的总量，而是知识组织的方式。
+      page: 第九章
+
+
+- id: drive
+  title: 内在动机
+  author: 爱德华·德西
+  category: 心理学
+  year: 1995
+  pages: 240
+  rating: 8.3
+  desc: 德西通过大量实验证明：外在奖励会削弱内在动机。真正的驱动力来自自主、专精和目的。这对管理、教育和产品设计都有颠覆性启示。
+  coverTitle: 内在动机
+  coverAuthor: 德西
+  publishedDate: '2026-07-17'
+  editorNote: 德西的发现是 agent 协作的底层逻辑：过度外部激励会扼杀创造力。给团队自主、专精、目的，比给 KPI 更有效。
+  quotes:
+    - text: 奖赏和控制一样，都会损害人的内在动机。
+      page: 第二章
+    - text: 自主是人类最基本的心理需要之一。
+      page: 第四章
+    - text: 专精意味着把一件事做得越来越好，而不是已经达到最好。
+      page: 第六章
+    - text: 当人们为了自己的目标而行动时，他们更能坚持，也更有创造力。
+      page: 第八章
+    - text: 真正的激励来自内心，而不是胡萝卜或大棒。
+      page: 第十章
+
+
+- id: cognitive-surplus
+  title: 认知盈余
+  author: 克莱·舍基
+  category: 社会学
+  year: 2010
+  pages: 256
+  rating: 8.1
+  desc: 舍基提出：互联网最大的资源不是信息，而是人们未被利用的自由时间与认知能力。维基百科、开源社区都是认知盈余的产物。
+  coverTitle: 认知盈余
+  coverAuthor: 舍基
+  publishedDate: '2026-07-18'
+  editorNote: 认知盈余解释了开源和众包为什么能赢：把碎片时间变成可协作的生产资料。agent 时代，这种盈余可能被进一步放大。
+  quotes:
+    - text: 认知盈余是互联网时代的新型资源，它来自人们愿意分享的自由时间和才能。
+      page: 第一章
+    - text: 工具不会创造行为，但会改变行为的成本结构。
+      page: 第三章
+    - text: 当分享变得廉价，合作就变得可能。
+      page: 第五章
+    - text: 社区的形成不是因为工具，而是因为人们有共同的兴趣和机会。
+      page: 第七章
+    - text: 真正的挑战不是技术，而是把盈余转化为价值的社会契约。
+      page: 第九章
+
+
+- id: the-long-tail
+  title: 长尾理论
+  author: 克里斯·安德森
+  category: 商业
+  year: 2006
+  pages: 256
+  rating: 8.0
+  desc: 安德森指出：互联网降低了存储和分发成本，让尾部小众产品的总需求可以超过头部热门。这是理解 Spotify、Netflix、YouTube 商业模式的关键。
+  coverTitle: 长尾理论
+  coverAuthor: 安德森
+  publishedDate: '2026-07-19'
+  editorNote: 长尾是互联网对规模经济的重新定义：小众聚合起来，比大众更值钱。个人 IP 和 niche 内容的机会都在这里。
+  quotes:
+    - text: 我们的文化和经济重心正在加速从少数热门转向大量小众。
+      page: 第一章
+    - text: 长尾的秘诀在于：把所有难找的东西变得容易找到。
+      page: 第三章
+    - text: 当选择足够丰富，需求会沿着长尾向下移动。
+      page: 第五章
+    - text: 互联网降低了发现的成本，让冷门内容也能找到受众。
+      page: 第七章
+    - text: 未来不是 blockbuster 的世界，而是无数 micro-hit 的世界。
+      page: 第十章
+
+
+- id: free-the-future-of-a-radical-price
+  title: 免费
+  author: 克里斯·安德森
+  category: 商业
+  year: 2009
+  pages: 288
+  rating: 7.6
+  desc: 安德森分析「免费」如何成为互联网时代的核心定价策略。免费不是慈善，而是交叉补贴、广告、 freemium 等商业模式的前端入口。
+  coverTitle: 免费
+  coverAuthor: 安德森
+  publishedDate: '2026-07-20'
+  editorNote: 「免费」是互联网最锋利的获客武器，也是最难算账的商业模式。AI 时代的免费 API 和付费 tier，都在这本书的延长线上。
+  quotes:
+    - text: 免费是一种心理力量，它让人们立刻放下戒备。
+      page: 第一章
+    - text: 在数字世界，边际成本趋近于零，价格也会趋近于零。
+      page: 第三章
+    - text: 免费不是商业模式，而是商业模式的一部分。
+      page: 第五章
+    - text: 交叉补贴的精髓：让一部分人免费，另一部分人付费。
+      page: 第七章
+    - text: 免费创造价值，但围绕免费的生态系统才真正赚钱。
+      page: 第九章
+
+
+- id: the-pyramid-principle
+  title: 金字塔原理
+  author: 芭芭拉·明托
+  category: 思维方法
+  year: 1987
+  pages: 302
+  rating: 8.4
+  desc: 明托为麦肯锡咨询发明的结构化表达方法。核心是先结论、后论据，上层思想是下层思想的概括。是写报告、做汇报、理清思路的底层工具。
+  coverTitle: 金字塔原理
+  coverAuthor: 明托
+  publishedDate: '2026-07-21'
+  editorNote: 金字塔原理是 agent 输出质量的基础设施：先给结论，再给分层论据。对提示工程和长文组织都直接可用。
+  quotes:
+    - text: 文章的结构应该呈现金字塔形，先抛出核心观点，再用论据支撑。
+      page: 第一章
+    - text: 思考是归类分组和概括的过程。
+      page: 第三章
+    - text: MECE 原则：相互独立，完全穷尽。
+      page: 第五章
+    - text: 听众只能记住有限的信息，所以先说最重要的。
+      page: 第七章
+    - text: 混乱的思想源于混乱的分类。
+      page: 第九章
+
+
+- id: thinking-in-systems
+  title: 系统之美
+  author: 德内拉·梅多斯
+  category: 系统思考
+  year: 2008
+  pages: 240
+  rating: 8.8
+  desc: 梅多斯是《增长的极限》作者之一，本书是她留给普通人的系统思考入门。书中介绍反馈回路、存量流量、延迟、瓶颈等核心概念。
+  coverTitle: 系统之美
+  coverAuthor: 梅多斯
+  publishedDate: '2026-07-22'
+  editorNote: 系统思考是破解复杂问题的元能力。agent 团队、产品增长、个人 IP 都是系统，找到杠杆点比猛推更有效。
+  quotes:
+    - text: 系统思考不是预测未来，而是理解结构如何产生行为。
+      page: 第一章
+    - text: 反馈回路是系统最基本的单元。
+      page: 第三章
+    - text: 延迟让原因和结果在时间和空间上分离，从而让我们困惑。
+      page: 第五章
+    - text: 高杠杆点往往 反直觉：最有效的干预常常最不显眼。
+      page: 第七章
+    - text: 不要责怪系统里的个体，要理解塑造行为的结构。
+      page: 第九章
+
+
+- id: the-evolution-of-cooperation
+  title: 合作的进化
+  author: 罗伯特·阿克塞尔罗德
+  category: 博弈论
+  year: 1984
+  pages: 241
+  rating: 8.6
+  desc: 阿克塞尔罗德用计算机锦标赛证明：在重复囚徒困境中，「一报还一报」是最稳健的策略。合作的进化不需要中央权威，只需要持续互动和明确信号。
+  coverTitle: 合作的进化
+  coverAuthor: 阿克塞尔罗德
+  publishedDate: '2026-07-23'
+  editorNote: 一报还一报是跨 agent 协作的朴素协议：先合作，再镜像复制对方行为。它证明最简单的策略往往最稳健。
+  quotes:
+    - text: 在重复囚徒困境中，一报还一报赢得了锦标赛。
+      page: 第一章
+    - text: 合作的条件不是信任，而是持续的关系。
+      page: 第三章
+    - text: 善良、可被激怒、宽容、清晰，是一报还一报成功的四个特征。
+      page: 第五章
+    - text: 成功策略之所以成功，是因为它们能与其他成功策略相处。
+      page: 第七章
+    - text: 合作可以在没有中央权威的情况下自发进化。
+      page: 第九章
+
+
+- id: the-mythical-man-month-revisit
+  title: 人月神话
+  author: 弗雷德里克·布鲁克斯
+  category: 软件工程
+  year: 1975
+  pages: 336
+  rating: 9.1
+  desc: IBM 360系统项目经理布鲁克斯的经验总结，揭示了软件工程中最核心的悖论：向进度落后的项目中增加人手，只会使进度更加落后。书中提出了「没有银弹」「第二系统效应」等经典概念，是软件工程领域的圣经级著作。
+  coverTitle: 人月神话
+  coverAuthor: 布鲁克斯
+  publishedDate: '2026-07-24'
+  editorNote: Brooks 的外科手术团队与我们的 agent harness 惊人相似：一个主刀、一群助手、规则是作者不审自己的稿。五十年前的组织智慧，正好理解今天的 agent 团队。
+  quotes:
+    - text: 向进度落后的项目中增加人手，只会使进度更加落后。
+      page: 第二章
+    - text: 没有银弹——在十年内，没有任何一种技术或管理方法能使软件生产率提高一个数量级。
+      page: 第十六章
+    - text: 第二系统效应：工程师倾向于在第二个系统中过度设计，试图纠正第一个系统的所有遗憾。
+      page: 第五章
+    - text: 优秀的程序员和糟糕的程序员之间的生产率差异可达十倍，而他们的薪资差异却远小于此。
+      page: 第三章
+    - text: 软件项目的核心困难在于概念结构的复杂性，而非表达这些概念的语法。
+      page: 第一章
+
+
+- id: antifragile
+  title: 反脆弱
+  author: 纳西姆·尼古拉斯·塔勒布
+  category: 风险管理
+  year: 2012
+  pages: 544
+  rating: 8.3
+  desc: 塔勒布提出脆弱、强韧、反脆弱三元结构。真正重要的不是抗压，而是从不确定性中获益。波动、随机和压力，对反脆弱系统而言是养分而非威胁。
+  coverTitle: 反脆弱
+  coverAuthor: 塔勒布
+  publishedDate: '2026-07-25'
+  editorNote: 本周反复出现一条主线：克制不是软弱，而是结构性的冗余。DeepSeek 开源、Addy 保留审查点、Uncle Bob 用约束替代读 diff——Taleb 统称「反脆弱设计」。
+  quotes:
+    - text: 风会熄灭蜡烛，却能让火越烧越旺。
+      page: 前言
+    - text: 脆弱的事物喜欢安宁，反脆弱的事物则从混乱中成长。
+      page: 第一章
+    - text: 过度优化会移除冗余，而冗余是生存的前提。
+      page: 第三章
+    - text: 选择权比预测更重要：小成本试错，有限下行，无限上行。
+      page: 第七章
+    - text: 杀不死我的，未必让我更强大；但能从冲击中学习的系统会。
+      page: 第十章
