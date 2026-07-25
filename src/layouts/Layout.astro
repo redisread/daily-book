@@ -99,8 +99,6 @@ if (jsonLd) {
           <a href="/" class="nav-btn active" data-nav="home">今日推荐</a>
           <a href="/archive" class="nav-btn" data-nav="archive">过往刊号</a>
           <a href="/search" class="nav-btn" data-nav="search">搜索</a>
-          <a href="/my/library" class="nav-btn" data-nav="library">我的书架</a>
-          <a href="/my/quotes" class="nav-btn" data-nav="quotes">我的金句本</a>
           <a href="/rss.xml" class="nav-btn" target="_blank" rel="noopener" title="RSS 订阅">RSS</a>
         </nav>
       </header>
@@ -116,12 +114,6 @@ if (jsonLd) {
           </li>
           <li class="mobile-nav-item">
             <a href="/search" class="mobile-nav-link" data-nav="search">搜索</a>
-          </li>
-          <li class="mobile-nav-item">
-            <a href="/my/library" class="mobile-nav-link" data-nav="library">书架</a>
-          </li>
-          <li class="mobile-nav-item">
-            <a href="/my/quotes" class="mobile-nav-link" data-nav="quotes">金句本</a>
           </li>
           <li class="mobile-nav-item">
             <a href="/rss.xml" class="mobile-nav-link" target="_blank">RSS</a>
@@ -144,14 +136,6 @@ if (jsonLd) {
     <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <script>
-      // P0-0: 一次性 storage 迁移 + 跨 tab broadcast（spec §3.2 触发点）
-      import { runStorageMigrationIfNeeded } from "../scripts/storage-migration";
-      import { initStorageBroadcast } from "../scripts/storage";
-      document.addEventListener("DOMContentLoaded", () => {
-        runStorageMigrationIfNeeded();
-        initStorageBroadcast();
-      });
-
       // Highlight active nav
       const path = window.location.pathname;
       document.querySelectorAll('.nav-btn').forEach((btn) => {

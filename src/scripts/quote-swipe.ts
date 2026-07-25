@@ -1,14 +1,6 @@
-// 金句滑动、点赞、分享功能
+// 金句滑动、分享功能
 import { setupModalA11y } from './modal-a11y';
-import { isQuoteFavorited, toggleQuoteFavorite, onStorageChange, type QuoteEntry } from './storage';
 import { getBookIssueNumber } from '../data/books';
-
-// P0-3: window.__quotesRegistry 从 QuoteCard inline script dump
-declare global {
-  interface Window {
-    __quotesRegistry?: Record<string, QuoteEntry>;
-  }
-}
 
 export function initQuoteSwipe() {
   const container = document.getElementById('quoteSwipeContainer');
@@ -89,46 +81,6 @@ export function initQuoteSwipe() {
 }
 
 export function initQuoteActions() {
-  // 点赞按钮（P0-3: 内存态 → localStorage 持久化 + 跨 tab 同步）
-  document.querySelectorAll<HTMLElement>('.like-btn').forEach((likeBtn) => {
-    const quoteId = likeBtn.getAttribute('data-quote-id');
-    if (!quoteId) return;
-
-    // 初始化：从 localStorage 读取状态（P0-3 spec §5.2 hydration）
-    const setBtnState = (liked: boolean) => {
-      likeBtn.innerHTML = liked ? '♥' : '♡';
-      likeBtn.classList.toggle('is-liked', liked);
-    };
-    setBtnState(isQuoteFavorited(quoteId));
-
-    likeBtn.addEventListener('click', () => {
-      const registry = window.__quotesRegistry;
-      const entry = registry?.[quoteId];
-      if (!entry) {
-        // registry 未 dump → 退化到内存态 UI toggle（不 persist）
-        const nowLiked = likeBtn.classList.toggle('is-liked');
-        likeBtn.innerHTML = nowLiked ? '♥' : '♡';
-        window.showToast?.(nowLiked ? '已喜欢这句话' : '已取消喜欢');
-        return;
-      }
-      const nowLiked = toggleQuoteFavorite(entry);
-      setBtnState(nowLiked);
-      window.showToast?.(nowLiked ? '已收藏到金句本' : '已从金句本移除');
-    });
-  });
-
-  // 跨 tab / 其他页面变更 → 同步 UI（P0-3 spec §5.3）
-  onStorageChange((detail) => {
-    if (detail.key !== 'quotes') return;
-    const quoteId = detail.quoteId;
-    if (!quoteId) return;
-    const btn = document.querySelector<HTMLElement>(`.like-btn[data-quote-id="${CSS.escape(quoteId)}"]`);
-    if (!btn) return;
-    const liked = isQuoteFavorited(quoteId);
-    btn.innerHTML = liked ? '♥' : '♡';
-    btn.classList.toggle('is-liked', liked);
-  });
-
   // 复制按钮
   document.querySelectorAll('.share-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -159,7 +111,7 @@ let cachedOpenShareModal: OpenShareModalFn | null = null;
 /**
  * 分享图弹窗初始化（P0-4 逻辑，task #42 抽出共用）。
  * 返回 openShareModal(quote, source, bookId)；模块级缓存保证幂等（重复调用返回同一 opener）。
- * 使用方：initQuoteActions（书页 .image-btn）、my/quotes.astro（金句本动态卡片）。
+ * 使用方：initQuoteActions（书页 .image-btn）。
  */
 export function initShareModal(): OpenShareModalFn {
   if (cachedOpenShareModal) return cachedOpenShareModal;
