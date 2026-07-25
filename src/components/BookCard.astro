@@ -38,6 +38,12 @@ const { book } = Astro.props;
       <h1 class="book-title">{book.title}</h1>
       <p class="book-author"><span>{book.author}</span></p>
       <p class="book-desc">{book.desc}</p>
+      {book.editorNote && (
+        <aside class="editor-note" aria-label="编辑的话">
+          <div class="editor-note-label">—— 编辑的话</div>
+          <p class="editor-note-text">{book.editorNote}</p>
+        </aside>
+      )}
       <div class="book-meta-inline">
         <span>{book.year}</span>
         <span class="meta-dot">·</span>

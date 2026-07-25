@@ -333,6 +333,29 @@ button { font-family: inherit; }
   color: var(--muted);
   margin-bottom: 28px;
 }
+/* P1 编辑的话（spec v1.1 §2.3）：desc 裸排、editorNote 装盒——「编辑在说话」与「书的简介」视觉分层 */
+.editor-note {
+  border: 2px solid var(--border);
+  background: var(--paper);
+  box-shadow: 4px 4px 0 rgba(10, 10, 10, 0.18);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+.editor-note-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.editor-note-text {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--fg);
+  margin: 0;
+}
 .book-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* ========== §6.5 按钮 ========== */

@@ -20,6 +20,8 @@ export const BookSchema = z.object({
   coverTitle: z.string().min(1, "封面标题不能为空"),
   coverAuthor: z.string().min(1, "封面作者不能为空"),
   publishedDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "发布日期格式必须为 YYYY-MM-DD").nullable().optional(),
+  // P1 编辑的话（spec v1.1 §2.2）：每期必有，40–100 字，禁 emoji（zod length 按 UTF-16 计）；老书缺省不渲染
+  editorNote: z.string().min(1, "编辑的话不能为空").max(100, "编辑的话最多 100 字").optional(),
   quotes: z.array(QuoteSchema).min(1, "至少一条金句").max(10, "最多 10 条金句"),
 });
 
