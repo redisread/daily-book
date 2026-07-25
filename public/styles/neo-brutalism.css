@@ -366,10 +366,7 @@ button { font-family: inherit; }
   line-height: 1.85;
   color: var(--muted);
   margin-bottom: 24px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  /* task #45 T1：简介展示全不省略，去 3 行 clamp（Victor msg=750633b8） */
 }
 .book-meta-inline {
   display: flex;
