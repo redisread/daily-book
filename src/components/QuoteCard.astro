@@ -8,26 +8,7 @@ interface Props {
 
 const { book } = Astro.props;
 const quotes = book.quotes;
-
-// P0-3: DOM 只放 data-quote-id (轻量)，snapshot 5 字段走 window.__quotesRegistry inline dump
-const quotesRegistry = Object.fromEntries(
-  quotes.map((q, index) => [`${book.id}:${index}`, {
-    quoteId: `${book.id}:${index}`,
-    quoteText: q.text,
-    bookId: book.id,
-    bookTitle: book.title,
-    bookAuthor: book.author,
-    publishedDate: book.publishedDate ?? "",
-  }])
-);
 ---
-
-<!-- P0-3: 首屏 inline script 一次性 dump 当前书的 quote registry
-     多本书通过 Object.assign 合并到 window.__quotesRegistry（其他 QuoteCard 追加即可） -->
-<script is:inline set:html={`
-window.__quotesRegistry = window.__quotesRegistry || {};
-Object.assign(window.__quotesRegistry, ${JSON.stringify(quotesRegistry)});
-`} />
 
 <!-- Desktop: vertical quotes list -->
 <div class="quote-list-desktop">
@@ -39,7 +20,6 @@ Object.assign(window.__quotesRegistry, ${JSON.stringify(quotesRegistry)});
         ——{book.author}《{book.title}》{q.page}
       </div>
       <div class="quote-actions">
-        <button class="quote-action-btn like-btn" data-index={index} data-quote-id={`${book.id}:${index}`} title="喜欢">♡</button>
         <button class="quote-action-btn share-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="分享">⎘</button>
         <button class="quote-action-btn image-btn" data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} data-book-id={book.id} title="生成图片">图</button>
       </div>
@@ -58,7 +38,6 @@ Object.assign(window.__quotesRegistry, ${JSON.stringify(quotesRegistry)});
           ——{book.author}《{book.title}》{q.page}
         </div>
         <div class="quote-actions">
-          <button class="quote-action-btn like-btn" data-index={index} data-quote-id={`${book.id}:${index}`} title="喜欢">♡</button>
           <button class="quote-action-btn share-btn" data-index={index} data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} title="分享">⎘</button>
           <button class="quote-action-btn image-btn" data-index={index} data-quote={q.text} data-source={`——${book.author}《${book.title}》${q.page}`} data-book-id={book.id} title="生成图片">图</button>
         </div>

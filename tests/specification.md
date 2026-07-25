@@ -140,11 +140,11 @@
 | **Feature ID** | F09 |
 | **Feature Name** | BookCard（书籍详情卡片） |
 | **文件** | `src/components/BookCard.astro` |
-| **Description** | 展示书籍封面、详细信息（分类、书名、作者、简介、出版年、页数、评分）和操作按钮（标记已读、收藏、RSS） |
-| **Expected Behaviour** | 1. 左侧显示书籍封面（CSS 生成，可点击放大） 2. 右侧显示分类/书名/作者/简介/meta/操作按钮 3. 点击封面打开 lightbox 4. "标记已读"按钮使用 localStorage 存储 5. "收藏"按钮使用 localStorage 存储 |
+| **Description** | 展示书籍封面、详细信息（分类、书名、作者、简介、出版年、页数、评分）和操作按钮（RSS） |
+| **Expected Behaviour** | 1. 左侧显示书籍封面（CSS 生成，可点击放大） 2. 右侧显示分类/书名/作者/简介（全文，task #45 去 clamp）/editorNote（有则装盒）/meta/RSS 按钮 3. 点击封面打开 lightbox |
 | **Edge Cases** | 1. rating 不存在 → meta 不显示评分行 2. pages 不存在 → meta 不显示页数行 |
 | **Validation Rules** | coverTitle/coverAuthor 使用 `set:text`（已修复 XSS），lightbox 中内容相同 |
-| **Dependencies** | F14(book 数据), F16(lightbox.ts), F18(storage.ts) |
+| **Dependencies** | F14(book 数据), F16(lightbox.ts) |
 
 ---
 
@@ -260,20 +260,6 @@
 | **Edge Cases** | 1. 无金句 → initQuoteSwipe return 2. 拖拽距离 < 50px → 不切换 3. clipboard API 不可用 → 静默失败 4. Canvas 生成失败 → 静默失败 5. 图片弹窗 ESC 或点击背景关闭 |
 | **Validation Rules** | - |
 | **Dependencies** | F10(QuoteCard) |
-
----
-
-## F18 — 已读/收藏本地存储
-
-| 字段 | 内容 |
-|---|---|
-| **Feature ID** | F18 |
-| **Feature Name** | 已读/收藏本地存储 |
-| **文件** | `src/scripts/storage.ts` |
-| **Description** | 使用 localStorage 存储"标记已读"和"收藏"状态 |
-| **Expected Behaviour** | 1. markAsRead: 添加书名到 dailybook_read 数组，重复添加返回 false 2. toggleCollection: 切换 dailybook_collections 数组状态 3. initBookActions: 绑定按钮事件 + 初始化收藏按钮样式 |
-| **Edge Cases** | 1. localStorage 满/禁用 → JSON.parse 异常 → 返回空数组 |
-| **Validation Rules** | - |
 
 ---
 
