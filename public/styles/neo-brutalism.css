@@ -253,7 +253,7 @@ button { font-family: inherit; }
   color: var(--accent);
   opacity: 0.9;
   transform: rotate(-12deg);
-  mix-blend-mode: multiply; /* 让章「吃进」封面纸感 */
+  /* N1 拍板（Steven msg=622e3775）：去 multiply —— 红×黑≈黑，深色封面上章体近隐形；normal blend 双色背景均可辨 */
   pointer-events: none; /* 不遮挡封面 lightbox 点击区（§3.3） */
 }
 .read-seal::before {
