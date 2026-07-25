@@ -29,6 +29,31 @@ describe('books data', () => {
   });
 });
 
+// P1 特性 A（spec v1.1 §2.2 / §5 #4）：editorNote zod 卡口
+describe('editorNote schema gate', () => {
+  it('7-24《人月神话》样张在 100 字内（zod length 按 UTF-16 计）', () => {
+    const mm = books.find((b) => b.id === 'the-mythical-man-month');
+    expect(mm?.editorNote).toBeTruthy();
+    expect(mm!.editorNote!.length).toBeLessThanOrEqual(100);
+    expect(mm!.editorNote).toBe(
+      'Brooks 的外科手术团队与我们的 agent harness 惊人相似：一个主刀、一群助手、规则是作者不审自己的稿。五十年前的组织智慧，正好理解今天的 agent 团队。'
+    );
+  });
+
+  it('超 100 字被 zod 拒绝；缺失合法（老书向后兼容）', async () => {
+    const { BookSchema } = await import('../../src/schemas/book');
+    const base = {
+      id: 'gate-test', title: 't', author: 'a', category: 'c', year: 2000,
+      pages: 100, rating: 8, desc: 'd', coverTitle: 't', coverAuthor: 'a',
+      quotes: [{ text: 'q', page: 'p' }],
+    };
+    expect(BookSchema.safeParse(base).success).toBe(true); // 无 editorNote
+    expect(BookSchema.safeParse({ ...base, editorNote: 'x'.repeat(100) }).success).toBe(true);
+    expect(BookSchema.safeParse({ ...base, editorNote: 'x'.repeat(101) }).success).toBe(false);
+    expect(BookSchema.safeParse({ ...base, editorNote: '' }).success).toBe(false);
+  });
+});
+
 describe('formatDate', () => {
   it('should format date in Chinese', () => {
     const date = new Date(2026, 5, 18); // June 18, 2026
