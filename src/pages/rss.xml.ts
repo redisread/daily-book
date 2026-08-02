@@ -2,6 +2,7 @@ import rss from "@astrojs/rss";
 import type { APIContext } from "astro";
 import { getPublishedBooks, formatDateISO, getBookIssueNumber } from "../data/books";
 import { formatIssueNumber } from "../utils/issue-number";
+import { buildBookRssContent } from "../utils/rss";
 
 export function GET(context: APIContext) {
   const recent = getPublishedBooks(30);
@@ -15,13 +16,15 @@ export function GET(context: APIContext) {
     items: recent.map(({ date, book }) => {
       const issue = getBookIssueNumber(book.id);
       const issuePrefix = issue !== null ? `${formatIssueNumber(issue, "long")} · ` : "";
+      const link = `/book/${formatDateISO(date)}`;
       return {
         title: `${issuePrefix}${book.title} —— ${book.author}`,
         pubDate: date,
-        link: `/book/${formatDateISO(date)}`,
-        // 纯文本摘要：书名 + 作者 + 分类 + 1 条精选金句，控制在 300 字以内
-        description: `${book.author}《${book.title}》（${book.category}）\n\n今日精选金句：${book.quotes[0].text}`,
+        link,
+        // 简短摘要供阅读器列表展示；全文信息放在 content 中
+        description: `${book.author}《${book.title}》（${book.category}）\n\n${book.desc}\n\n今日精选金句：${book.quotes[0].text}`,
         categories: [book.category],
+        content: buildBookRssContent(book, new URL(`${link}/`, context.site!).toString()),
       };
     }),
     customData: `<language>zh-cn</language><lastBuildDate>${buildTimeStr}</lastBuildDate><ttl>1440</ttl>`,
