@@ -18,7 +18,9 @@
 ├── public/              # 静态资源
 ├── src/
 │   ├── components/      # Astro 组件
-│   ├── data/            # 数据文件
+│   ├── data/
+│   │   ├── books/       # 每本书一个 Markdown 文件（唯一数据源）
+│   │   └── books.ts     # 数据加载层
 │   ├── layouts/         # 页面布局
 │   └── pages/           # 页面路由
 ├── .github/workflows/   # CI/CD 配置
@@ -70,12 +72,13 @@ npm run preview
 | `npm run dev` | 启动本地开发服务器 (`localhost:4321`) |
 | `npm run build` | 构建生产版本到 `./dist/` |
 | `npm run preview` | 本地预览构建结果 |
+| `npm run books:check` | 校验书籍 Markdown 数据完整性与唯一性 |
 | `npm run typecheck` | TypeScript 类型检查 |
 | `npm run lint` | ESLint 代码检查 |
 
 ## 📖 添加每日一书
 
-所有书籍数据集中在 `src/data/books.yaml`，每本书是一个条目，字段说明：
+每本书是一个 Markdown 文件：`src/data/books/<id>.md`，frontmatter 存放结构化字段，字段说明：
 
 | 字段 | 说明 | 示例 |
 | :--- | :--- | :--- |
@@ -90,32 +93,37 @@ npm run preview
 | `coverTitle` | 封面显示的书名（可简化） | `百年孤独` |
 | `coverAuthor` | 封面显示的作者（可简化） | `马尔克斯` |
 | `publishedDate` | 发布日期 `YYYY-MM-DD`，未发布为 `null` | `2026-06-21` 或 `null` |
+| `editorNote` | 编辑的话，40-100 字，新书必填 | `今天选这本书是因为...` |
 | `quotes` | 金句列表，每条含 `text` 和 `page` | 至少 1 条，最多 10 条 |
 
 ### 添加新书
 
-1. 在 `src/data/books.yaml` 末尾添加新条目：
+1. 新建 `src/data/books/<id>.md`，文件名必须等于 frontmatter 的 `id`：
 
-```yaml
-- id: new-book-id
-  title: "书名"
-  author: "作者"
-  category: "分类"
-  year: 2026
-  pages: 300
-  rating: 8.5
-  desc: "简介内容"
-  coverTitle: "书名"
-  coverAuthor: "作者简称"
-  publishedDate: null
-  quotes:
-    - text: "金句内容"
-      page: "第10页"
+```markdown
+---
+id: new-book-id
+title: 书名
+author: 作者
+category: 分类
+year: 2026
+pages: 300
+rating: 8.5
+desc: 简介内容
+coverTitle: 书名
+coverAuthor: 作者简称
+publishedDate: null
+editorNote: 编辑的话，40-100 字
+quotes:
+  - text: 金句内容
+    page: 第10页
+---
 ```
 
 2. 运行质量检查：
 
 ```bash
+npm run books:check
 npm run typecheck
 npm test
 ```
@@ -127,9 +135,9 @@ npm test
 新书 `publishedDate` 两种取法：
 
 - `publishedDate: null` —— 待发布，稍后由人工定日期。
-- 北京时间当前日期 —— 直接发布。取值用 `TZ=Asia/Shanghai date +%Y-%m-%d`，勿用 `new Date()`（构建环境 UTC 会差一天）。填前 `grep` 确认该日期未被其他书占用。
+- 北京时间当前日期 —— 直接发布。取值用 `TZ=Asia/Shanghai date +%Y-%m-%d`，勿用 `new Date()`（构建环境 UTC 会差一天）。`npm run books:check` 会拦截重复日期。
 
-将 `publishedDate: null` 改为实际日期（如 `2026-06-21`），推送后自动部署。
+将文件里的 `publishedDate: null` 改为实际日期（如 `2026-06-21`），运行 `npm run books:check` 确认无重复后推送，自动部署。
 
 ## 🔄 CI/CD
 

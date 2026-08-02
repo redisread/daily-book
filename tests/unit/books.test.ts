@@ -15,7 +15,7 @@ import {
 } from '../../src/data/books';
 
 describe('books data', () => {
-  it('should load and validate books from YAML', () => {
+  it('should load and validate books from Markdown files', () => {
     expect(books.length).toBeGreaterThan(0);
     expect(books[0]).toHaveProperty('id');
     expect(books[0]).toHaveProperty('title');
@@ -26,6 +26,31 @@ describe('books data', () => {
     expect(typeof books[0].year).toBe('number');
     expect(typeof books[0].pages).toBe('number');
     expect(typeof books[0].rating).toBe('number');
+  });
+});
+
+describe('books Markdown source', () => {
+  it('should keep ids and published dates unique', () => {
+    const ids = new Set(books.map((book) => book.id));
+    const dates = new Set(
+      books
+        .map((book) => book.publishedDate)
+        .filter((date): date is string => date != null)
+    );
+    expect(ids.size).toBe(books.length);
+    expect(dates.size).toBe(books.filter((book) => book.publishedDate != null).length);
+  });
+
+  it('should separate the duplicated cognitive-awakening entries', () => {
+    const first = books.find((book) => book.id === 'cognitive-awakening');
+    const revisit = books.find((book) => book.id === 'cognitive-awakening-revisit');
+    expect(first?.publishedDate).toBe('2026-05-02');
+    expect(revisit?.publishedDate).toBe('2026-07-04');
+  });
+
+  it('should load legacy markdown content into body', () => {
+    const book = books.find((item) => item.id === 'island-bookstore');
+    expect(book?.body).toContain('## 推荐语');
   });
 });
 
