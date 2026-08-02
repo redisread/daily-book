@@ -1,20 +1,18 @@
-import { load } from "js-yaml";
-import { BookSchema } from "../schemas/book";
+import { bookFromFile, compareBooks } from "./book-file";
 import type { Book, Quote } from "../schemas/book";
-import booksYaml from "./books.yaml?raw";
 import { buildIssueNumberIndex } from "../utils/issue-number";
 
 export type { Book, Quote };
 
-const parsed = load(booksYaml);
+const bookModules = import.meta.glob<string>("./books/*.md", {
+  eager: true,
+  query: "?raw",
+  import: "default",
+});
 
-const validation = BookSchema.array().safeParse(parsed);
-if (!validation.success) {
-  const issues = validation.error.issues.map(i => ({ path: i.path.join("."), message: i.message, code: i.code }));
-  console.error("books.yaml 校验失败:", JSON.stringify(issues, null, 2));
-  throw new Error("书籍数据校验失败，无法启动");
-}
-export const books: Book[] = validation.data;
+export const books: Book[] = Object.entries(bookModules)
+  .map(([path, raw]) => bookFromFile(raw, path.split("/").pop() ?? ""))
+  .sort(compareBooks);
 
 export interface PublishedEntry {
   date: string;

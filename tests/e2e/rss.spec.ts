@@ -8,7 +8,7 @@ test.describe("RSS feed", () => {
     // 基础结构
     expect(xml).toMatch(/<rss[^>]*version="2\.0"/);
     expect(xml).toContain("<channel>");
-    expect(xml).toContain("<title>每日一书 · Daily Book</title>");
+    expect(xml).toContain("<title>每日一书 · 每日刊物</title>");
     expect(xml).toContain("<item>");
   });
 
