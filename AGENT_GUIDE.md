@@ -2,7 +2,7 @@
 
 ## 项目概览
 
-「每日一书」是一个基于 Astro 的静态网站，部署在 Cloudflare Pages 上。每天推荐一本书籍，附带精选金句，并提供 RSS 订阅。
+「每日一书」是一个基于 Astro 的 Cloudflare-native 全栈应用，部署在 Cloudflare Workers 上。内容页面使用 SSG，运行时端点使用 Worker SSR/API，静态文件由 Workers Static Assets 提供。
 
 ### 项目路径
 

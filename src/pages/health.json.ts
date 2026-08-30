@@ -1,25 +1,25 @@
 import type { APIRoute } from 'astro';
 
-// 静态站点：prerender 在 build 时执行一次，输出固定 JSON。
-// health 反映部署状态 + build 时间（无 Workers runtime，不做动态探活）。
-export const prerender = true;
+export const prerender = false;
 
-const buildTime = new Date().toISOString();
-
-export const GET: APIRoute = () => {
-  return new Response(
-    JSON.stringify({
+export function createHealthResponse(request: Request, now = new Date()): Response {
+  return Response.json(
+    {
       status: 'healthy',
       service: 'daily-book',
-      buildTime,
-      version: '0.0.1',
-    }),
+      runtime: 'cloudflare-workers',
+      timestamp: now.toISOString(),
+      requestId: request.headers.get('cf-ray'),
+    },
     {
       status: 200,
       headers: {
-        'Content-Type': 'application/json',
         'Cache-Control': 'no-store',
       },
-    }
+    },
   );
+}
+
+export const GET: APIRoute = ({ request }) => {
+  return createHealthResponse(request);
 };

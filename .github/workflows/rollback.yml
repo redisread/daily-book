@@ -1,0 +1,51 @@
+name: Rollback Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_id:
+        description: Cloudflare Worker version ID
+        required: true
+        type: string
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate version ID
+        env:
+          VERSION_ID: ${{ inputs.version_id }}
+        run: |
+          if [[ ! "$VERSION_ID" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ ]]; then
+            echo "Invalid Cloudflare Worker version ID"
+            exit 1
+          fi
+
+      - name: Roll back Cloudflare Worker
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          VERSION_ID: ${{ inputs.version_id }}
+        run: npx wrangler rollback "$VERSION_ID" --name daily-book --yes --message "GitHub Actions rollback by $GITHUB_ACTOR"

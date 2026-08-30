@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
+export const prerender = true;
+
 const quotes = [
   { text: "我们拥有的书籍，就是我们尚未需要的图书馆。", author: "翁贝托·艾柯" },
   { text: "读一本好书，就是和高尚的人谈话。", author: "歌德" },
@@ -28,4 +30,3 @@ const q = quotes[Math.floor(Math.random() * quotes.length)];
     <a href="/" class="not-found-btn">返回首页</a>
   </div>
 </Layout>
-

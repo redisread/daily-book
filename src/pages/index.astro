@@ -6,6 +6,8 @@ import HistoryGrid from "../components/HistoryGrid.astro";
 import { getLatestPublishedBook, formatDate, getBookIssueNumber } from "../data/books";
 import { formatIssueNumber } from "../utils/issue-number";
 
+export const prerender = true;
+
 const { date: bookDate, book } = getLatestPublishedBook();
 const dateStr = formatDate(bookDate);
 const dayOfYear = Math.floor(

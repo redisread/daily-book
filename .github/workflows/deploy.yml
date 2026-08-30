@@ -37,8 +37,14 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
+      - name: Wrangler types check
+        run: npm run cf:types:check
+
       - name: Lint
         run: npm run lint
+
+      - name: Unit tests
+        run: npm test
 
   security:
     runs-on: ubuntu-latest
@@ -59,8 +65,30 @@ jobs:
         # critical 漏洞阻断；high 仅作 astro 上游参考
         run: npm audit --audit-level=critical
 
+  e2e:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
   deploy:
-    needs: [quality, security]
+    needs: [quality, security, e2e]
     runs-on: ubuntu-latest
     environment: production
     permissions:
@@ -83,8 +111,8 @@ jobs:
 
       - name: Verify build output
         run: |
-          if [ ! -d "dist" ]; then
-            echo "Build output directory 'dist' not found"
+          if [ ! -d "dist/client" ] || [ ! -f "dist/server/wrangler.json" ]; then
+            echo "Astro Cloudflare build output is incomplete"
             exit 1
           fi
           echo "Build size: $(du -sh dist | cut -f1)"
@@ -104,9 +132,12 @@ jobs:
             echo "✅ Bundle size OK"
           fi
 
+      - name: Wrangler deploy dry-run
+        run: npx wrangler deploy --dry-run
+
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
+          command: deploy --strict

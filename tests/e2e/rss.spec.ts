@@ -26,4 +26,19 @@ test.describe("RSS feed", () => {
     expect(body[0]).toHaveProperty("title");
     expect(body[0]).toHaveProperty("author");
   });
+
+  test("health endpoint is rendered by the Cloudflare runtime", async ({ request }) => {
+    const res = await request.get("/health.json", {
+      headers: { "cf-ray": "playwright-ray" },
+    });
+
+    expect(res.status()).toBe(200);
+    expect(res.headers()["cache-control"]).toBe("no-store");
+    await expect(res.json()).resolves.toMatchObject({
+      status: "healthy",
+      service: "daily-book",
+      runtime: "cloudflare-workers",
+      requestId: "playwright-ray",
+    });
+  });
 });

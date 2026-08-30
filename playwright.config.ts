@@ -13,7 +13,7 @@ export default defineConfig({
   },
   // 自动启动 dev server，CI 也能直接 npm run test:e2e
   webServer: {
-    command: "npm run build && npx astro preview --host 0.0.0.0 --port 4321",
+    command: "npm run build && npx wrangler dev --config dist/server/wrangler.json --port 4321",
     url: "http://localhost:4321",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

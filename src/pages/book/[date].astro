@@ -6,6 +6,8 @@ import HistoryGrid from "../../components/HistoryGrid.astro";
 import { getBookForDate, getPublishedDates, formatDate, formatDateISO, getBookIssueNumber } from "../../data/books";
 import { formatIssueNumber } from "../../utils/issue-number";
 
+export const prerender = true;
+
 export function getStaticPaths() {
   return getPublishedDates().map((date) => ({ params: { date } }));
 }

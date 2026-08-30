@@ -3,6 +3,8 @@ import Layout from "../layouts/Layout.astro";
 import { getPublishedBooks, formatDate, formatDateISO, getBookIssueNumber } from "../data/books";
 import { formatIssueNumber } from "../utils/issue-number";
 
+export const prerender = true;
+
 const recent = getPublishedBooks(30);
 
 // Group by year-month

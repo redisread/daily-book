@@ -2,6 +2,8 @@
 dist/
 # generated types
 .astro/
+.wrangler/
+*.cpuprofile
 
 # dependencies
 node_modules/
