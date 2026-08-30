@@ -86,7 +86,7 @@ jobs:
   deploy-preview:
     needs: [quality, security, e2e]
     # Skip deploy for fork PRs (secrets not available)
-    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository && vars.CLOUDFLARE_PREVIEW_ENABLED == 'true'
     runs-on: ubuntu-latest
     environment: preview
     permissions:
@@ -198,7 +198,7 @@ jobs:
             }
 
   cleanup-preview:
-    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository && vars.CLOUDFLARE_PREVIEW_ENABLED == 'true'
     runs-on: ubuntu-latest
     environment: preview
     permissions:

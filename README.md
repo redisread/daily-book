@@ -163,7 +163,7 @@ npm test
 - Bundle 大小检查（warn: 5MB, fail: 10MB）
 - Wrangler dry-run 通过后部署到生产环境
 
-仓库 Actions Secrets 需要配置 `CLOUDFLARE_ACCOUNT_ID`、生产专用的 `CLOUDFLARE_API_TOKEN`，以及仅能管理预览 Worker 的 `CLOUDFLARE_PREVIEW_API_TOKEN`。合并 PR 到 `main` 后，`push` 事件会自动触发生产部署；如需恢复旧版本，可从 `main` 手动运行 `Rollback Production` 工作流并填写 Cloudflare Worker version ID。
+仓库 Actions Secrets 需要配置 `CLOUDFLARE_ACCOUNT_ID`、生产专用的 `CLOUDFLARE_API_TOKEN`，以及仅能管理预览 Worker 的 `CLOUDFLARE_PREVIEW_API_TOKEN`。PR 预览默认关闭；只有将仓库 Actions Variable `CLOUDFLARE_PREVIEW_ENABLED` 设置为 `true` 后才会部署和清理预览 Worker。合并 PR 到 `main` 后，`push` 事件会自动触发生产部署；如需恢复旧版本，可从 `main` 手动运行 `Rollback Production` 工作流并填写 Cloudflare Worker version ID。
 
 ## 🛠️ 技术栈
 
