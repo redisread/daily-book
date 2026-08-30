@@ -25,7 +25,6 @@
 │   └── pages/           # 页面路由
 ├── .github/workflows/   # CI/CD 配置
 ├── wrangler.jsonc       # 生产 Worker、Static Assets 与域名配置
-├── wrangler.preview.jsonc # PR 预览 Worker 配置
 └── package.json
 ```
 
@@ -147,15 +146,13 @@ npm test
 
 ## 🔄 CI/CD
 
-项目配置了两套 GitHub Actions 工作流：
+项目使用 GitHub Actions 执行质量门禁和生产发布，使用 Cloudflare Git Integration 生成 PR 预览。
 
-### Preview 部署（PR 触发）
-- 代码质量检查（typecheck + lint）
-- 安全扫描（npm audit）
-- 无凭据构建并校验 preview Worker，产物保留 1 天
-- 配置预览凭据与开关后，将已验证产物部署到预览环境
-- 自动评论预览 URL
-- PR 关闭后自动清理对应的 `daily-book-pr<number>` Worker
+### PR 验证与 Preview（PR 触发）
+- `ci.yml` 执行书籍数据、类型、Wrangler 类型、lint 和单元测试
+- `ci.yml` 执行安全扫描与 Chromium 端到端测试
+- Cloudflare Git Integration 构建 Worker 版本，不切换生产流量
+- Cloudflare Bot 自动评论 Commit Preview URL 与 Branch Preview URL
 
 ### Production 部署（push main 触发）
 - 质量门禁（书籍数据、类型、Wrangler 类型、lint、单元测试）
@@ -164,7 +161,7 @@ npm test
 - Bundle 大小检查（warn: 5MB, fail: 10MB）
 - Wrangler dry-run 通过后部署到生产环境
 
-仓库 Actions Secrets 需要配置 `CLOUDFLARE_ACCOUNT_ID`、生产专用的 `CLOUDFLARE_API_TOKEN`，以及仅能管理预览 Worker 的 `CLOUDFLARE_PREVIEW_API_TOKEN`。PR 预览默认关闭；只有将仓库 Actions Variable `CLOUDFLARE_PREVIEW_ENABLED` 设置为 `true` 后才会部署和清理预览 Worker。合并 PR 到 `main` 后，`push` 事件会自动触发生产部署；如需恢复旧版本，可从 `main` 手动运行 `Rollback Production` 工作流并填写 Cloudflare Worker version ID。
+仓库 Actions Secrets 只需配置 `CLOUDFLARE_ACCOUNT_ID` 和生产专用的 `CLOUDFLARE_API_TOKEN`。合并 PR 到 `main` 后，`deploy.yml` 自动部署生产流量；Cloudflare Git Integration 仅上传版本。需要恢复旧版本时，可从 `main` 手动运行 `Rollback Production` 工作流并填写 Cloudflare Worker version ID。
 
 ## 🛠️ 技术栈
 
