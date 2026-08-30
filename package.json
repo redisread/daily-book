@@ -30,7 +30,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.9",
+    "@astrojs/check": "^0.9.10",
     "@cloudflare/workers-types": "^5.20260830.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.0",
