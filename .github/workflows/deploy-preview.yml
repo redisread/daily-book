@@ -83,15 +83,12 @@ jobs:
       - name: End-to-end tests
         run: npm run test:e2e
 
-  deploy-preview:
-    needs: [quality, security, e2e]
-    # Skip deploy for fork PRs (secrets not available)
-    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository && vars.CLOUDFLARE_PREVIEW_ENABLED == 'true'
+  preview-build:
+    needs: [quality, security]
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
-    environment: preview
     permissions:
       contents: read
-      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -145,13 +142,39 @@ jobs:
       - name: Wrangler deploy dry-run
         run: npx wrangler deploy --dry-run --name daily-book-pr${{ github.event.pull_request.number }}
 
+      - name: Upload preview build
+        uses: actions/upload-artifact@v7
+        with:
+          name: preview-build-${{ github.event.pull_request.number }}-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 1
+
+  deploy-preview:
+    needs: [quality, security, e2e, preview-build]
+    # Skip deploy for fork PRs and repositories without isolated preview credentials.
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository && vars.CLOUDFLARE_PREVIEW_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Download preview build
+        uses: actions/download-artifact@v8
+        with:
+          name: preview-build-${{ github.event.pull_request.number }}-${{ github.sha }}
+          path: dist/
+
       - name: Deploy Preview Worker
         id: deploy
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_PREVIEW_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --name daily-book-pr${{ github.event.pull_request.number }} --strict
+          wranglerVersion: '4.127.1'
+          command: deploy --config dist/server/wrangler.json --name daily-book-pr${{ github.event.pull_request.number }} --strict
 
       - name: Comment preview URL
         uses: actions/github-script@v9

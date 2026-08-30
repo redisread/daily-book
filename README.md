@@ -152,7 +152,8 @@ npm test
 ### Preview 部署（PR 触发）
 - 代码质量检查（typecheck + lint）
 - 安全扫描（npm audit）
-- 部署到预览环境
+- 无凭据构建并校验 preview Worker，产物保留 1 天
+- 配置预览凭据与开关后，将已验证产物部署到预览环境
 - 自动评论预览 URL
 - PR 关闭后自动清理对应的 `daily-book-pr<number>` Worker
 
