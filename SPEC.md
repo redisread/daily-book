@@ -111,7 +111,7 @@ tests/unit/
 
 ### 北京时间取法
 
-构建环境（Cloudflare Pages）默认 UTC，直接用 `new Date()` 取「今天」可能比北京时间晚一天。取当前日期必须显式指定时区：
+构建环境（GitHub Actions / Cloudflare Workers 构建）默认 UTC，直接用 `new Date()` 取「今天」可能比北京时间晚一天。取当前日期必须显式指定时区：
 
 ```bash
 TZ=Asia/Shanghai date +%Y-%m-%d   # macOS / Linux 通用

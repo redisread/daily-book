@@ -6,6 +6,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "cf:types": "wrangler types",
+    "cf:types:check": "wrangler types --check",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:dry-run": "npm run build && wrangler deploy --dry-run",
     "astro": "astro",
     "typecheck": "astro check",
     "lint": "eslint src",
@@ -16,16 +20,18 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.2.5",
     "@astrojs/rss": "^4.0.17",
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/space-grotesk": "^5.2.10",
-    "astro": "^6.4.8",
+    "astro": "^7.2.9",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@cloudflare/workers-types": "^5.20260830.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.0",
     "@types/js-yaml": "^4.0.9",
@@ -34,6 +40,7 @@
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.61.1",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "wrangler": "^4.127.1"
   }
 }

@@ -4,6 +4,8 @@ import { getPublishedBooks, formatDateISO, getBookIssueNumber } from "../data/bo
 import { formatIssueNumber } from "../utils/issue-number";
 import { buildBookRssContent } from "../utils/rss";
 
+export const prerender = true;
+
 export function GET(context: APIContext) {
   const recent = getPublishedBooks(30);
   const buildTime = new Date();

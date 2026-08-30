@@ -2,6 +2,8 @@
 import Layout from "../layouts/Layout.astro";
 import { books, getAllCategories, getBookDateMap } from "../data/books";
 
+export const prerender = true;
+
 const categories = getAllCategories();
 const bookDateMap = getBookDateMap();
 

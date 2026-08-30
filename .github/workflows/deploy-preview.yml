@@ -3,7 +3,7 @@ name: Deploy Preview
 on:
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, closed]
 
 concurrency:
   group: preview-${{ github.event.pull_request.number }}
@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   quality:
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,10 +32,17 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
+      - name: Wrangler types check
+        run: npm run cf:types:check
+
       - name: Lint
         run: npm run lint
 
+      - name: Unit tests
+        run: npm test
+
   security:
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -52,15 +60,35 @@ jobs:
       - name: Security audit
         run: npm audit --audit-level=critical
 
-  deploy-preview:
-    needs: [quality, security]
-    # Skip deploy for fork PRs (secrets not available)
-    if: github.event.pull_request.head.repo.full_name == github.repository
+  e2e:
+    needs: quality
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
-    environment: preview
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+  preview-build:
+    needs: [quality, security]
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -76,14 +104,77 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          CLOUDFLARE_CONFIG_PATH: wrangler.preview.jsonc
+
+      - name: Validate preview isolation
+        run: |
+          jq -e '
+            .name == "daily-book-preview" and
+            .workers_dev == true and
+            .preview_urls == true and
+            ((.routes // []) | length == 0) and
+            .assets.binding == "ASSETS" and
+            .assets.directory == "../client" and
+            ([
+              .kv_namespaces,
+              .d1_databases,
+              .r2_buckets,
+              .services,
+              .hyperdrive,
+              .vectorize,
+              .analytics_engine_datasets,
+              .dispatch_namespaces,
+              .pipelines,
+              .workflows,
+              .send_email,
+              .mtls_certificates,
+              .secrets_store_secrets
+            ] | all(.[]; length == 0)) and
+            (.durable_objects.bindings | length == 0) and
+            (.queues.producers | length == 0) and
+            (.queues.consumers | length == 0) and
+            (.images == null) and
+            (.ai == null) and
+            (.media == null)
+          ' dist/server/wrangler.json > /dev/null
+
+      - name: Wrangler deploy dry-run
+        run: npx wrangler deploy --dry-run --name daily-book-pr${{ github.event.pull_request.number }}
+
+      - name: Upload preview build
+        uses: actions/upload-artifact@v7
+        with:
+          name: preview-build-${{ github.event.pull_request.number }}-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 1
+
+  deploy-preview:
+    needs: [quality, security, e2e, preview-build]
+    # Skip deploy for fork PRs and repositories without isolated preview credentials.
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository && vars.CLOUDFLARE_PREVIEW_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Download preview build
+        uses: actions/download-artifact@v8
+        with:
+          name: preview-build-${{ github.event.pull_request.number }}-${{ github.sha }}
+          path: dist/
 
       - name: Deploy Preview Worker
         id: deploy
         uses: cloudflare/wrangler-action@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFLARE_PREVIEW_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.preview.toml --name daily-book-pr${{ github.event.pull_request.number }}
+          wranglerVersion: '4.127.1'
+          command: deploy --config dist/server/wrangler.json --name daily-book-pr${{ github.event.pull_request.number }} --strict
 
       - name: Comment preview URL
         uses: actions/github-script@v9
@@ -128,3 +219,74 @@ jobs:
                 body,
               });
             }
+
+  cleanup-preview:
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository && vars.CLOUDFLARE_PREVIEW_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout main deployment tooling
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Delete exact preview Worker
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PREVIEW_API_TOKEN }}
+          PREVIEW_WORKER: daily-book-pr${{ github.event.pull_request.number }}
+        run: |
+          if [[ ! "$PREVIEW_WORKER" =~ ^daily-book-pr[1-9][0-9]*$ ]]; then
+            echo "Invalid preview Worker name"
+            exit 1
+          fi
+
+          worker_exists() {
+            if STATUS_OUTPUT=$(npx wrangler deployments status --name "$PREVIEW_WORKER" --json 2>&1); then
+              return 0
+            fi
+            if grep -q "code: 10007" <<<"$STATUS_OUTPUT"; then
+              return 1
+            fi
+            echo "$STATUS_OUTPUT"
+            return 2
+          }
+
+          ABSENT_CHECKS=0
+          for ATTEMPT in 1 2 3 4 5 6; do
+            set +e
+            worker_exists
+            STATUS=$?
+            set -e
+
+            if [[ "$STATUS" -eq 2 ]]; then
+              exit 1
+            fi
+            if [[ "$STATUS" -eq 1 ]]; then
+              ABSENT_CHECKS=$((ABSENT_CHECKS + 1))
+              if [[ "$ABSENT_CHECKS" -ge 2 ]]; then
+                echo "Preview Worker is absent"
+                exit 0
+              fi
+            else
+              ABSENT_CHECKS=0
+              npx wrangler delete "$PREVIEW_WORKER" --dry-run
+              npx wrangler delete "$PREVIEW_WORKER" --force
+            fi
+
+            sleep 5
+          done
+
+          echo "Preview Worker still exists after cleanup retries"
+          exit 1

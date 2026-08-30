@@ -126,8 +126,8 @@
 | **文件** | `src/pages/health.json.ts` |
 | **路由** | `/health.json` |
 | **User Story** | 作为运维，我想检查站点是否正常部署。 |
-| **Expected Behaviour** | 输出 JSON: `{"status":"healthy","service":"daily-book","buildTime":"...","version":"0.0.1"}` |
-| **Edge Cases** | build 时执行一次，不动态探活 |
+| **Expected Behaviour** | Worker 运行时输出 JSON，包含 `status`、`service`、`runtime`、`timestamp`、`requestId` |
+| **Edge Cases** | 本地请求无 `cf-ray` 时 `requestId` 为 `null` |
 | **Validation Rules** | Cache-Control: no-store |
 | **Dependencies** | - |
 
@@ -305,13 +305,13 @@
 
 ---
 
-## F22 — Cloudflare Pages 部署
+## F22 — Cloudflare Workers 部署
 
 | 字段 | 内容 |
 |---|---|
 | **Feature ID** | F22 |
-| **Feature Name** | Cloudflare Pages 部署 |
-| **Description** | 通过 wrangler 部署到 Cloudflare Pages，域名 daily-book.jiahongw.com |
+| **Feature Name** | Cloudflare Workers 全栈部署 |
+| **Description** | 通过 Wrangler 部署 Astro Worker 与 Static Assets，域名 daily-book.jiahongw.com |
 | **Edge Cases** | 预览部署因 API token 权限可能失败 |
 | **Validation Rules** | - |
 
@@ -323,9 +323,9 @@
 |---|---|
 | **Feature ID** | F23 |
 | **Feature Name** | wrangler 配置 |
-| **文件** | `wrangler.toml` |
-| **Description** | Cloudflare Workers 部署配置：路由、assets 目录 |
-| **Expected Behaviour** | 静态资产从 dist/ 部署，路由 daily-book.jiahongw.com |
+| **文件** | `wrangler.jsonc` |
+| **Description** | Cloudflare Workers 部署配置：Astro Worker 入口、Static Assets、Custom Domain、可观测性 |
+| **Expected Behaviour** | SSG 资产从 dist/client 部署，SSR/API 请求由 Astro Worker 处理 |
 | **Validation Rules** | - |
 
 ---

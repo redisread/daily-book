@@ -22,7 +22,7 @@ updates:
           - typescript-eslint
           - eslint-plugin-*
     ignore:
-      # astro 走 ^6 锁定大版本，避免 Dependabot 提 major 升级
+      # 框架大版本单独评估，避免自动混入常规依赖更新
       - dependency-name: astro
         update-types: ['version-update:semver-major']
 
