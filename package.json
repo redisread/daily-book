@@ -35,11 +35,11 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.0",
     "@types/js-yaml": "^4.0.9",
-    "eslint": "^10.5.0",
-    "eslint-plugin-astro": "^2.0.0",
+    "eslint": "^10.9.1",
+    "eslint-plugin-astro": "^3.1.0",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.1",
+    "typescript-eslint": "^8.68.0",
     "vitest": "^4.1.9",
     "wrangler": "^4.127.1"
   }
