@@ -27,7 +27,7 @@
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/space-grotesk": "^5.2.10",
     "astro": "^7.2.9",
-    "zod": "^4.4.3"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
