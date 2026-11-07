@@ -403,7 +403,7 @@ assertions are counted once. Root unit tests are139 (98+32+9); the existing loca
 historical rehearsal verifier separately exercises29 native D1 recovery cases.
 Final normal production-build mode remains explicitly local fake49, not a
 production binding/deployment. It is scanned across Worker/client/config output
-for all six test modes and fixture markers, and the configured key must remain
+for all six runtime test modes, the isolated54 history receipt and fixture markers, and the configured key must remain
 only a valueless secret declaration; original actual-value key artifact/log scans
 in admin/archive/search modes are retained unmodified.
 
