@@ -3,7 +3,8 @@ import { readIssue } from '../../../src/domain/issues';
 export const dynamic = 'force-dynamic';
 export default async function Issue({ params }: { params: Promise<{ id: string }> }) {
   const result = await readIssue((await params).id);
-  // Proxy handles exact private-resource status before streaming; this recheck prevents a visibility race from exposing content.
+  // Proxy and page share the same request-local SQL result, including status.
+  // This is a defensive invariant check, not a second visibility/DB read.
   if (result.kind !== 'published') notFound();
   const issue = result.issue;
   return <main data-issue-id={issue.id}>

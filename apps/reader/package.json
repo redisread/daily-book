@@ -30,7 +30,9 @@
     "typecheck": "tsc --noEmit",
     "db:local": "cf d1 migrations apply 00000000-0000-4000-8000-000000000049 --local --persist-to .cloudflare/state --dir migrations",
     "seed:local": "node scripts/seed-local.mjs",
-    "verify": "npm run db:local && npm run seed:local && node scripts/verify-schema.mjs && npm run types && npm run typecheck && npm run build && node scripts/verify-runtime.mjs dev && node scripts/verify-runtime.mjs built"
+    "verify": "npm run verify:baseline && npm run verify:races",
+    "verify:baseline": "npm run db:local && npm run seed:local && node scripts/verify-schema.mjs && npm run types && npm run typecheck && npm run build && node scripts/verify-runtime.mjs dev && node scripts/verify-runtime.mjs built",
+    "verify:races": "node scripts/verify-races.mjs dev && npm run build -- --mode reader-race-test && node scripts/verify-build-isolation.mjs race && node scripts/verify-races.mjs built && npm run build && node scripts/verify-build-isolation.mjs default"
   },
   "description": "Formal Daily Book reader: local-only schema and public read slice.",
   "engines": {

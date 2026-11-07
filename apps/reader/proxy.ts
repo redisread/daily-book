@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { readIssueVisibility } from './src/domain/issues';
 import { unavailablePage } from './src/http';
+import { afterVisibilityDecision } from './src/request-reads';
 
 // Enforce real HTTP status before HTML or RSC streaming begins. Never render private entities.
 export async function proxy(request: NextRequest): Promise<Response> {
@@ -10,6 +11,7 @@ export async function proxy(request: NextRequest): Promise<Response> {
   try { id = decodeURIComponent(match[1]); } catch { return unavailablePage(404, request.headers.get('RSC') === '1'); }
   try {
     const visibility = await readIssueVisibility(id);
+    await afterVisibilityDecision(id, visibility);
     if (visibility === 'not-found') return unavailablePage(404, request.headers.get('RSC') === '1');
     if (visibility === 'withdrawn') return unavailablePage(410, request.headers.get('RSC') === '1');
     return NextResponse.next();

@@ -2,9 +2,9 @@ import { bindings, defineConfig, defineWorker } from "cf/config";
 
 // Local read slice only. Do not attach production resources or deploy this config.
 export default defineConfig({
-  worker: defineWorker({
-    name: "daily-book-reader-local",
-    entrypoint: "vinext/server/fetch-handler",
+  worker: defineWorker(({ mode }) => ({
+    name: mode === "reader-race-test" ? "daily-book-reader-race-local" : "daily-book-reader-local",
+    entrypoint: mode === "reader-race-test" ? "./fixtures/race-worker.ts" : "./worker.ts",
     compatibilityDate: "2026-11-07",
     compatibilityFlags: ["nodejs_compat"],
     assets: {
@@ -14,7 +14,11 @@ export default defineConfig({
     observability: { enabled: true, logs: { enabled: true }, traces: { enabled: true } },
     env: {
       ASSETS: bindings.assets(),
-      DB: bindings.d1({ id: "00000000-0000-4000-8000-000000000049", name: "daily-book-reader-local-only", dev: { remote: false } }),
+      DB: bindings.d1({
+        id: mode === "reader-race-test" ? "00000000-0000-4000-8000-000000000053" : "00000000-0000-4000-8000-000000000049",
+        name: mode === "reader-race-test" ? "daily-book-reader-race-local-only" : "daily-book-reader-local-only",
+        dev: { remote: false },
+      }),
     },
-  }),
+  })),
 });

@@ -1,6 +1,7 @@
 import { env } from 'cloudflare:workers';
 import { encodeCursor, validId, type PageInput } from './pagination';
 import type { IssueLookup, IssuePage, PublicIssue } from './types';
+import { readIssueOnce } from '../request-reads';
 
 // Build JSON only for published records: private body/book/quote values are never returned to callers.
 const PUBLIC_JSON = `json_object(
@@ -18,6 +19,11 @@ export function classifyVisibility(status: Row['status'] | undefined): IssueLook
 }
 export async function readIssue(id: string): Promise<IssueLookup> {
   if (!validId(id)) return { kind: 'not-found' };
+  return readIssueOnce(id, () => loadIssue(id));
+}
+async function loadIssue(id: string): Promise<IssueLookup> {
+  // Linearization point: this single SQL statement's snapshot supplies both the
+  // visibility decision and the complete public projection for this request.
   const row = await env.DB.prepare(`SELECT i.status,CASE WHEN i.status='published' THEN ${PUBLIC_JSON} ELSE NULL END AS public_json
     FROM issues i JOIN books b ON b.id=i.book_id WHERE i.id=?`).bind(id).first<Row>();
   const kind = classifyVisibility(row?.status);
@@ -26,9 +32,7 @@ export async function readIssue(id: string): Promise<IssueLookup> {
   return { kind: 'published', issue: JSON.parse(row.public_json) as PublicIssue };
 }
 export async function readIssueVisibility(id: string): Promise<IssueLookup['kind']> {
-  if (!validId(id)) return 'not-found';
-  const row = await env.DB.prepare('SELECT status FROM issues WHERE id=?').bind(id).first<Pick<Row, 'status'>>();
-  return classifyVisibility(row?.status);
+  return (await readIssue(id)).kind;
 }
 export async function listPublishedIssues({ limit, cursor }: PageInput): Promise<IssuePage> {
   // Boundaries originate from the validated cursor; SQL ordering matches its two keys exactly.
