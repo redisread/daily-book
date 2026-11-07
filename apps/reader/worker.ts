@@ -3,7 +3,8 @@ import type appRouter from 'vinext/server/app-router-entry';
 import { privateResponse,rejectAdminMethod } from './src/admin/http';
 import {parseArchiveInput} from './src/archive-input';
 import {InvalidRequest} from './src/domain/pagination';
-import {unavailablePage} from './src/http';
+import {unavailablePage,apiError,failedRead} from './src/http';
+import {publicRssResponse} from './src/rss';
 import { withRequestReads, type DecisionObserver } from './src/request-reads';
 
 // Keep the public entry selector. Its generated virtual-module declaration is
@@ -19,6 +20,14 @@ export function createReaderWorker(observer?: DecisionObserver) {
         // Validate the original URL before framework normalization/streaming:
         // vinext consumes _rsc before proxy/page code, including duplicates.
         if(archive){try{parseArchiveInput(url.searchParams);}catch(error){return unavailablePage(error instanceof InvalidRequest?400:503,args[0].headers.get('RSC')==='1');}}
+        if(pathname==='/rss.xml') {
+          if(!['GET','HEAD'].includes(args[0].method)){
+            const response=apiError(405,'METHOD_NOT_ALLOWED','RSS仅支持GET和HEAD。');response.headers.set('Allow','GET, HEAD');return response;
+          }
+          if(url.searchParams.size)return apiError(400,'INVALID_QUERY','RSS地址不接受查询参数。');
+          try{const response=await publicRssResponse();return args[0].method==='HEAD'?new Response(null,{status:response.status,headers:response.headers}):response;}
+          catch(error){return failedRead(error);}
+        }
         const management = pathname.startsWith('/api/v1/admin/');
         // This phase has no management write surface. Reject every other method
         // at the Worker boundary, with the same auth/error policy as GET routes.

@@ -272,3 +272,40 @@ temporary key. Root unit tests include17 new pure input-boundary cases.
 
 These are local tests, not production resources, deployment or import approval.
 Search, RSS and management writes remain unimplemented.
+
+## RSS slice (task64, independent from search)
+
+This branch starts at reviewed1b12b79 and adds only `GET/HEAD /rss.xml`,
+server-rendered alternate discovery and a real footer subscription link. It
+has no search dependency, schema/FTS/import-pin change, write API or deployment.
+The Worker dispatches this fixed resource before framework negotiation so it
+always serves RSS, even with stray Flight/state headers; no query is accepted,
+HEAD has no body, other methods405/Allow GET,HEAD. Errors are the existing
+structured JSON/no-store form; success is UTF8 application/rss+xml/no-store.
+
+D1 is the sole item source, one SELECT of the latest20 published rows ordered
+publication_date DESC,id DESC. Only id/date/title/author/book description is
+projected; body/editor note/quotes/private rows are not selected. Titles and
+XML-safe descriptions remain plain text. XML1.0-invalid control characters
+are replaced with U+FFFD, never emitted as invalid numeric entities. Empty
+feeds remain RSS2.0. All GUIDs are canonical issue permalinks, independent of
+rank/title, unchanged across withdrawal/restoration and shared Book edits.
+
+Canonical origin is the explicit `site` in fixed8b astro.config.mjs:
+https://daily-book.jiahongw.com. It is recorded in src/site.ts, never derived
+from request Host/Forwarded/X-Forwarded-* headers. Dates are calendar dates
+serialized as00:00:00 +0800 with the corresponding weekday (Beijing), not
+claimed exact publishing times; the channel description states this precision.
+
+`npm run verify:rss` builds first to generate SDK binding types on a fresh
+checkout, then runs34dev/34built native checks and1default fixture-isolation
+check, finally restoring the normal49 build. It uses fixed fictitious64 and
+.cloudflare/rss-state,49964/49965; no
+remote configuration or production key. It seeds/restores only its owned
+fixtures and terminates only its owned process group. Actual RSS-specific and
+strict XML parsers validate live Worker output; cases include delimiters,
+invalid XML controls, Unicode, latest20 ordering/precision, forged Host and
+state headers, HEAD/405/400, read-only fingerprints, GUID restoration and empty
+feeds. Actual JS-disabled Chrome checks alternate/footer accessibility.
+The full verify command preserves all existing1000 checks plus69 RSS checks.
+Root tests add9 pure formatter/date cases; rss-parser3.13.0 is dev-only.
