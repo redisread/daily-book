@@ -1,3 +1,13 @@
+# Integrated local reader (task61 phase1)
+
+This branch integrates the independently accepted public theme530b6cb,
+management read-only7241921 and historical rehearsal9ac82f7 on the commonde8d
+read-consistency baseline. All remain local-only; no schema/historical-source
+change, deployment, management write, search or RSS implementation is implied.
+The full suite runs baseline480 + management243 + theme131 =854 unique explicit
+checks (build-isolation results are counted once). For the original-page visual
+comparison set BOOK_THEME_BASELINE to your own clean fixed8b checkout as below.
+
 # Daily Book Reader：正式模型与公开读取切片
 
 本包是正式 vinext 应用骨架，**不是阶段1 probe 的延续接口，也不是生产切换**。父 Astro 应用、原内容与生产配置保留不变；本次仅本地 D1 schema、共享读取服务、公开 API 与最小 SSR。完整主题、搜索、管理写接口、历史导入和部署均不在范围。
@@ -149,3 +159,77 @@ scans every generated server/client/config file for the value. Reports contain n
 key; any unexpected diagnostic occurrence is redacted and makes verification fail.
 Default build is restored after the suite. Native process evidence and JSON results
 are under `.cloudflare/evidence/admin-*-result.json`.
+
+## Original-theme migration (task58, independent branch)
+
+This branch starts at accepted `de8d061`, independently of the management API
+branch. It migrates only `/` and `/issues/:id`, using direct D1 services and the
+existing request-local snapshot. Metadata shares the same read result; there is
+no self-HTTP request or cross-request content cache. It does not integrate admin
+APIs, archive/search/RSS, old date URLs, shelves, favorites or write behavior.
+
+`app/original-theme.css` is a byte-identical copy of fixed historical source
+`8b991098f984a5f8870bd01741e3cb937b63d50d:public/styles/neo-brutalism.css`.
+The three font packages/versions and five self-hosted Latin faces match that
+source. Their OFL licenses accompany this source in `licenses/`. Existing CJK
+fallbacks, palette, hard borders/shadows, book cover and quote layout are retained.
+`globals.css` adds only content reflow, native-dialog and keyboard/snap styling;
+normal desktop/375px palette, font families/title sizes and cover dimensions are
+compared against the actual original Astro page in Chrome.
+
+Only implemented home/detail links are exposed. Old archive/search/RSS/history
+sections and unimplemented sharing/image actions are not presented as clickable
+placeholders. The homepage displays the latest published Issue, including an
+implemented Issue permalink, or its truthful empty state. Detail displays all
+ordered quotes and existing notes; a missing/blank note is omitted without filler.
+Numbers/cover line breaks and full descriptions remain as stored. No raw body is
+rendered or passed across a component boundary: React Flight development diagnostics
+can serialize Server Component props too, so `displayIssue` constructs a display-only
+DTO before that boundary. Public404/410 privacy and the single-read race tests remain.
+
+The cover uses a native modal dialog with a bounded keyboard focus cycle, Escape,
+backdrop close and trigger focus restoration. All quotes exist in one ordered DOM:
+desktop stacked cards, narrow-screen native horizontal scroll-snap with touch,
+Arrow/Home/End and truthful previous/next controls; no duplicate hidden quote lists.
+Content remains server-rendered if JS is disabled; enhancement controls do not
+pretend to work before hydration. Reduced motion is respected. Long content and
+200% text-only scaling grow rather than truncate fixed-height covers/cards.
+
+### Visual/browser reproduction
+
+The independent `reader-theme-test` mode uses fictitious dummy58 with only
+`.cloudflare/theme-state`; baseline49/race53 remain separate. One reference fixture
+copies only displayed fields from the published129th old source record to compare
+like-for-like. Synthetic IDs/body and additional clearly labeled stress/private
+fixtures are test-only, not a historical import. Original Markdown and schema are
+unchanged. See `fixtures/theme-reference-provenance.json` for source path/hash.
+
+For full original-vs-new comparison, prepare your own clean detached checkout at
+fixed8b and install its existing locked dependencies. Do not use a moving/shared
+checkout as the source of truth. The helper checks its Git head and src/public
+cleanliness before starting the original Astro local server. It only hides the
+Astro development toolbar for screenshots, not original product content/styles.
+
+```sh
+# This directory: install the locked Reader dependencies.
+npm ci --ignore-scripts
+# A separate clean8b checkout: npm ci --ignore-scripts
+export BOOK_THEME_BASELINE=/absolute/path/to/your/clean-fixed8b-checkout
+npm run verify
+```
+
+This preserves the original480 checks, then runs actual installed Google Chrome
+with native workerd in development and built modes. It compares desktop1280px and
+375px home/detail screenshots and computed design properties; checks all quotes,
+permalink/return/skip links, dialog focus/escape, long strings, missing fields,
+12/1/0 quote cases, 320px, exact200% computed text scaling (not a viewport-only zoom
+simulation), no document horizontal overflow or text clipping, real Chrome touch
+swipe, public404/410, empty latest-published state, inert script-looking text and
+built JS-disabled SSR. Font loading is awaited; no remote font service is used.
+
+Without `BOOK_THEME_BASELINE`, the updated-app checks can run, but the result
+explicitly records the original comparison as **not run**; it is not acceptance
+coverage for that comparison. Reports/screenshots are written under
+`.cloudflare/evidence/theme/`; only self-owned child process groups are stopped,
+synthetic dummy58 is restored, and the default build is restored by the suite.
+No database, credentials or environment files belong in a source/review package.

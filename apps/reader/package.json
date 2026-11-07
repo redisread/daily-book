@@ -8,7 +8,10 @@
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-server-dom-webpack": "19.3.1",
-    "vinext": "1.4.4"
+    "vinext": "1.4.4",
+    "@fontsource/inter": "5.2.8",
+    "@fontsource/jetbrains-mono": "5.2.8",
+    "@fontsource/space-grotesk": "5.2.10"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "2.0.0-beta.v.12",
@@ -19,7 +22,8 @@
     "@vitejs/plugin-rsc": "0.5.39",
     "cf": "1.0.0-beta.28",
     "typescript": "7.0.2",
-    "vite": "8.3.6"
+    "vite": "8.3.6",
+    "@playwright/test": "1.61.1"
   },
   "type": "module",
   "scripts": {
@@ -30,12 +34,13 @@
     "typecheck": "tsc --noEmit",
     "db:local": "cf d1 migrations apply 00000000-0000-4000-8000-000000000049 --local --persist-to .cloudflare/state --dir migrations",
     "seed:local": "node scripts/seed-local.mjs",
-    "verify": "npm run verify:baseline && npm run verify:races && npm run verify:admin",
+    "verify": "npm run verify:baseline && npm run verify:races && npm run verify:admin && npm run verify:theme",
     "verify:baseline": "npm run db:local && npm run seed:local && node scripts/verify-schema.mjs && npm run types && npm run typecheck && npm run build && node scripts/verify-runtime.mjs dev && node scripts/verify-runtime.mjs built",
     "verify:races": "node scripts/verify-races.mjs dev && npm run build -- --mode reader-race-test && node scripts/verify-build-isolation.mjs race && node scripts/verify-races.mjs built && npm run build && node scripts/verify-build-isolation.mjs default",
-    "verify:admin": "npm run types && npm run typecheck && npm run build -- --mode reader-admin-test && node scripts/verify-admin.mjs dev && node scripts/verify-admin.mjs built && npm run build && node scripts/verify-build-isolation.mjs default"
+    "verify:admin": "npm run types && npm run typecheck && npm run build -- --mode reader-admin-test && node scripts/verify-admin.mjs dev && node scripts/verify-admin.mjs built && npm run build && node scripts/verify-build-isolation.mjs default",
+    "verify:theme": "npm run types && npm run typecheck && npm run build -- --mode reader-theme-test && node scripts/verify-theme.mjs dev && node scripts/verify-theme.mjs built && npm run build && node scripts/verify-build-isolation.mjs default"
   },
-  "description": "Daily Book: public reader and Worker-secret protected read-only management APIs.",
+  "description": "Daily Book: original-theme public reader and secret-protected read-only management APIs.",
   "engines": {
     "node": "^22.23.0 || ^24.22.0 || ^26.12.0"
   }
