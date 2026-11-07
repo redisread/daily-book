@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1,
+  "sourceCommit": "8b991098f984a5f8870bd01741e3cb937b63d50d",
+  "decision": "Steven ef472b29; separate overlay, immutable inventory remains unchanged",
+  "bookIdentities": [
+    {
+      "canonicalId": "the-mythical-man-month",
+      "sourceIds": ["the-mythical-man-month", "the-mythical-man-month-revisit"]
+    }
+  ],
+  "otherSuspectedGroups": "preserve-independent-records",
+  "issuesAndQuotes": "preserve-every-identity-text-source-position-and-publication-number"
+}
