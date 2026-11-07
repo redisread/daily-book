@@ -1,6 +1,9 @@
 import vinext from 'vinext/server/fetch-handler';
 import type appRouter from 'vinext/server/app-router-entry';
 import { privateResponse,rejectAdminMethod } from './src/admin/http';
+import {parseArchiveInput} from './src/archive-input';
+import {InvalidRequest} from './src/domain/pagination';
+import {unavailablePage} from './src/http';
 import { withRequestReads, type DecisionObserver } from './src/request-reads';
 
 // Keep the public entry selector. Its generated virtual-module declaration is
@@ -11,14 +14,24 @@ export function createReaderWorker(observer?: DecisionObserver) {
     ...framework,
     fetch(...args: Parameters<typeof framework.fetch>): Promise<Response> {
       return withRequestReads(async () => {
-        const management = new URL(args[0].url).pathname.startsWith('/api/v1/admin/');
+        const url=new URL(args[0].url);const pathname=url.pathname;
+        const archive=/^\/archive\/?$/.test(pathname);
+        // Validate the original URL before framework normalization/streaming:
+        // vinext consumes _rsc before proxy/page code, including duplicates.
+        if(archive){try{parseArchiveInput(url.searchParams);}catch(error){return unavailablePage(error instanceof InvalidRequest?400:503,args[0].headers.get('RSC')==='1');}}
+        const management = pathname.startsWith('/api/v1/admin/');
         // This phase has no management write surface. Reject every other method
         // at the Worker boundary, with the same auth/error policy as GET routes.
         if (management && !['GET','HEAD'].includes(args[0].method)) return rejectAdminMethod(args[0]);
         const response = await framework.fetch(...args);
         // Also keep framework-generated management 404/405/HEAD responses
         // private/no-store. Authentication stays inside each registered route.
-        return management ? privateResponse(response) : response;
+        if(management)return privateResponse(response);
+        if(archive){
+          const headers=new Headers(response.headers);headers.set('Cache-Control','no-store');
+          return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+        }
+        return response;
       }, observer);
     },
   };

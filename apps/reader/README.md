@@ -1,11 +1,13 @@
-# Integrated local reader (task61 phase1)
+# Integrated local reader (task61)
 
 This branch integrates the independently accepted public theme530b6cb,
 management read-only7241921 and historical rehearsal9ac82f7 on the commonde8d
 read-consistency baseline. All remain local-only; no schema/historical-source
 change, deployment, management write, search or RSS implementation is implied.
-The full suite runs baseline480 + management243 + theme131 =854 unique explicit
-checks (build-isolation results are counted once). For the original-page visual
+The historical baseline sections below record their original scopes; the
+implemented archive extension on this integrated branch is documented last.
+The phase1 integration baseline ran480 + management243 + theme131 =854 unique
+explicit checks (build-isolation results counted once), before archive changes. For the original-page visual
 comparison set BOOK_THEME_BASELINE to your own clean fixed8b checkout as below.
 
 # Daily Book Reader：正式模型与公开读取切片
@@ -233,3 +235,40 @@ coverage for that comparison. Reports/screenshots are written under
 `.cloudflare/evidence/theme/`; only self-owned child process groups are stopped,
 synthetic dummy58 is restored, and the default build is restored by the suite.
 No database, credentials or environment files belong in a source/review package.
+
+## Archive extension (task61 phase2)
+
+`/archive` is a public, read-only SSR page. Its only business query key is
+`cursor`; page size is always20, ordering is publication date DESC then ID DESC,
+and it directly uses the existing public D1 list service. The single bounded
+framework transport key `_rsc` is reserved (≤128 URL-safe characters); it never
+selects status, authentication, data scope or a cache. Every other key, repeated
+key or malformed cursor returns real400 before framework normalization or
+streaming, not a silent redirect or a200 error page. The Worker validates the
+original URL because vinext consumes `_rsc` before proxy/page code. All archive
+responses, including status errors and protocol normalization, are no-store.
+
+Month groups and cards reuse the fixed8b theme. Each real issue link displays
+its stored number/date/title/author, not an inferred continuous number. The
+card data contains only these display fields, never body/notes/quotes. Long
+text wraps rather than using the old title ellipsis. The header/mobile nav now
+link only to implemented Home and Archive; current navigation also renders on
+the server. Native next links work without JS; a null nextCursor omits the link.
+Previous navigation uses browser history, not offset/page-number synthesis.
+Valid empty pages and empty archives say so without private fallback data.
+
+`npm run verify` now runs the original854 unique checks plus146 archive checks
+(72dev +73built +1default fixture-isolation). It restores the normal build.
+`npm run verify:archive` runs just the archive suite, using fixed fictitious61
+and `.cloudflare/archive-state`,49761/49762. It creates a fresh exclusive0600
+mode-specific test secret and removes only that owned file; never overwrite an
+existing one. It seeds/resets only its own test database, terminates only its
+owned process group, and captures actual Chrome/workerd evidence. Cases cover
+44rows over3pages, no-JS paging/back, bad/duplicate/unknown queries, HTML/Flight,
+HEAD/status/no-store, stored identity, shared private management separation,
+no business writes, boundary withdrawal, empty states, long text at320/375/1280
+and exact computed200% text sizing. Built output is scanned against the actual
+temporary key. Root unit tests include17 new pure input-boundary cases.
+
+These are local tests, not production resources, deployment or import approval.
+Search, RSS and management writes remain unimplemented.
