@@ -3,7 +3,8 @@ import type appRouter from 'vinext/server/app-router-entry';
 import { privateResponse,rejectAdminMethod } from './src/admin/http';
 import {parseArchiveInput} from './src/archive-input';
 import {InvalidRequest} from './src/domain/pagination';
-import {unavailablePage} from './src/http';
+import {unavailablePage,failedRead} from './src/http';
+import {parseSearchInput} from './src/domain/search-input';
 import { withRequestReads, type DecisionObserver } from './src/request-reads';
 
 // Keep the public entry selector. Its generated virtual-module declaration is
@@ -16,6 +17,10 @@ export function createReaderWorker(observer?: DecisionObserver) {
       return withRequestReads(async () => {
         const url=new URL(args[0].url);const pathname=url.pathname;
         const archive=/^\/archive\/?$/.test(pathname);
+        let decodedPath=pathname;try{decodedPath=decodeURIComponent(pathname);}catch{/* framework owns invalid path syntax */}
+        const searchPage=/^\/search\/?$/.test(decodedPath);const searchApi=/^\/api\/v1\/search\/?$/.test(decodedPath);
+        if(searchPage||searchApi){try{if(searchApi)parseSearchInput(url.searchParams,false);else parseSearchInput(url.searchParams,true);}
+          catch(error){return searchApi?failedRead(error):unavailablePage(error instanceof InvalidRequest?400:503,args[0].headers.get('RSC')==='1','search');}}
         // Validate the original URL before framework normalization/streaming:
         // vinext consumes _rsc before proxy/page code, including duplicates.
         if(archive){try{parseArchiveInput(url.searchParams);}catch(error){return unavailablePage(error instanceof InvalidRequest?400:503,args[0].headers.get('RSC')==='1');}}
@@ -27,7 +32,7 @@ export function createReaderWorker(observer?: DecisionObserver) {
         // Also keep framework-generated management 404/405/HEAD responses
         // private/no-store. Authentication stays inside each registered route.
         if(management)return privateResponse(response);
-        if(archive){
+        if(archive||searchPage||searchApi){
           const headers=new Headers(response.headers);headers.set('Cache-Control','no-store');
           return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
         }

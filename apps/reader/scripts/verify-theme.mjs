@@ -47,7 +47,7 @@ try{
   check('Reference book/date/issue identity is displayed',(await page.locator('.book-title').innerText())===reference.displayedBook.title&&(await page.locator('.date-issue').innerText())==='第 129 期'&&(await page.locator('time').getAttribute('datetime'))===reference.publicationDate);
   check('Every reference quote is rendered in stable order',JSON.stringify(await page.locator('[data-quote-id] .quote-text').allTextContents())===JSON.stringify(reference.quotes.map(q=>q.text)));
   check('Raw stored body is not serialized into HTML/RSC markup',!(await page.content()).includes('BODY_NOT_FOR_SSR_THEME'));
-  const hrefs=await page.locator('a[href]').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href')));check('Only implemented home/archive/issue links; no search/RSS/my/admin placeholder',hrefs.every(href=>href==='/'||href==='/archive'||href==='#main-content'||href==='/issues/theme-reference'));
+  const hrefs=await page.locator('a[href]').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href')));check('Only implemented home/archive/search/issue links; no RSS/my/admin placeholder',hrefs.every(href=>href==='/'||href==='/archive'||href==='/search'||href==='#main-content'||href==='/issues/theme-reference'));
   for(const width of [1280,375]){
     await page.setViewportSize({width,height:900});await fonts(page);await noOverflow(page,`Reference ${width}`);await textReflow(page,`Reference ${width}`);await shot(page,`${mode}-new-home-${width}.png`);
     const current=await styles(page);

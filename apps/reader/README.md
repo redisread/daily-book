@@ -272,3 +272,68 @@ temporary key. Root unit tests include17 new pure input-boundary cases.
 
 These are local tests, not production resources, deployment or import approval.
 Search, RSS and management writes remain unimplemented.
+
+## Public search slice (task63, independent from RSS)
+
+This branch starts at reviewed1b12b79. `GET /search` is the original-theme SSR
+GET form; `GET /api/v1/search?q=&cursor=&limit=` shares its native D1 service.
+Only published Book title/author/category/description and Issue editor_note
+are searched. Body and quotes are neither searched nor projected; private
+rows are excluded outside the entire OR expression. Output is exactly
+`{items:[{id,date,number,title,author}],nextCursor}` (number is the stored issue
+number), never a full Issue or Book. No self-HTTP, content cache, FTS, schema
+or historical importer/pin change is introduced.
+
+Query contract:
+- q is trimmed, then1–100 Unicode codepoints (not UTF16 code units/graphemes).
+  Missing q on the page gives an input prompt with no catalogue read; explicitly
+  empty/whitespace q is400 on both page/API. Missing API q is400.
+- Matching is literal substring via SQLite instr(lower(field),boundQuery).
+  `%` and `_` are literal, not wildcards. Only ASCII A–Z case is folded to a–z,
+  matching SQLite's default lower(); non-ASCII is exact codepoints. No NFC,
+  Unicode case folding, word segmentation, tokenization or relevance ranking
+  is promised. Trim+ASCII fold is the cursor's canonical q; echo preserves
+  the trimmed input's original case. Equivalent ASCII case/trim may reuse a
+  cursor, a different normalized query may not.
+- date DESC,id DESC keyset paging,20default/100max. Cursor is canonical base64url
+  of a versioned public-search scope/q/date/id object, bound to normalized q;
+  bounded2048 bytes on wire, exact keys, valid calendar date/ID/UTF8 required.
+  Plain public/admin cursors cannot be reused. Altering limit does not change
+  the query's scope. No offset/page synthesis; null cursor means no next link.
+- Unknown/repeated/malformed parameters return actual400 before framework
+  normalization or streaming. Only the page reserves one URL-safe _rsc≤128;
+  the JSON API does not accept that parameter. Raw Worker validation keeps
+  framework consumption from hiding duplicates. HTML/RSC/JSON and errors,
+  HEAD/framework405/normalization responses are no-store. Auth/state headers
+  cannot increase visibility. Error copy is fixed and never echoes input.
+
+The SSR form and ordinary next links work with JS disabled; query echo and
+result strings use React text/attribute escaping, not innerHTML. HTML maxlength
+is deliberately omitted: browsers count UTF16 units, which would incorrectly
+reject100 astral codepoints. Server validation remains authoritative. The
+page only renders the five selected summary fields. A user-supplied query can
+be echoed even when its text resembles a private marker; that is not a private
+DB projection. API JSON never echoes q and excluded-field searches return0.
+
+Original8b search form/grid/card tokens are retained without fake category
+filter controls or legacy whole-library JSON/client filtering. Navigation adds
+only the implemented search. Mobile labels are compact with full accessible
+names so three destinations reflow at200% text. Long cards and query labels
+wrap; native editable search input text can scroll normally within the control.
+RSS is not mixed into this independent branch.
+
+`npm run verify:search` first builds to generate SDK types on a fresh checkout,
+runs real dev/built workerd+Chrome checks in fictitious63/search-state on
+49863/49864, then restores fixtures and the normal49 build. Only owned0600
+exclusive test key files/process groups are created/removed; no production key
+or remote D1 use. Cases include five fields, Chinese/ASCII/Unicode/NFC variants,
+100 astral characters, SQL/HTML delimiters, actual400/cursor scope,43 matches
+across3pages without gaps/repeats, HTML/Flight/JSON public isolation, read-only
+fingerprints, withdrawal at boundary, no-JS GET/paging/history, real Tab/Enter,
+320/375/1280 long text and exact200% computed fonts. Built outputs are scanned
+against the actual temporary key; normal artifacts exclude test63 fixtures.
+The full verify retains existing1000 checks; search has102dev+103built+1default
+checks (206) in addition. Root tests add32 pure input-boundary cases.
+
+No deployment, production migration, management write or RSS integration is
+implied. RSS8c61867 remains a separately reviewed branch until further direction.

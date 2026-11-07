@@ -1,0 +1,20 @@
+import {describe,it,expect} from 'vitest';
+import {Buffer} from 'node:buffer';
+import {normalizeSearchQuery,parseSearchInput,encodeSearchCursor} from '../../apps/reader/src/domain/search-input';
+import {InvalidRequest} from '../../apps/reader/src/domain/pagination';
+const cursor=encodeSearchCursor({id:'issue-one',date:'2026-11-07'},'book');
+describe('public search boundary',()=>{
+ it('normalizes only trim and ASCII case, not Unicode/NFC',()=>{expect(normalizeSearchQuery('  BOOK ÉΩ Café 中文  ')).toBe('book ÉΩ café 中文');});
+ it('keeps trimmed query for echo and canonical query for matching/cursor',()=>expect(parseSearchInput(new URLSearchParams({q:' BOOK '}),false)).toEqual({q:'BOOK',normalizedQ:'book',limit:20,cursor:null}));
+ it('uses a prompt only when page q is absent',()=>expect(parseSearchInput(new URLSearchParams(),true)).toBeNull());
+ it('counts astral text by Unicode codepoints, not UTF16 code units',()=>{expect(parseSearchInput(new URLSearchParams({q:'😀'.repeat(100)}),false).q.length).toBe(200);expect(()=>parseSearchInput(new URLSearchParams({q:'😀'.repeat(101)}),false)).toThrow(InvalidRequest);});
+ it('binds cursors to normalized q while allowing equivalent case/whitespace',()=>expect(parseSearchInput(new URLSearchParams({q:' BOOK ',cursor}),false).cursor?.q).toBe('book'));
+ it('rejects a cursor from another query',()=>expect(()=>parseSearchInput(new URLSearchParams({q:'other',cursor}),false)).toThrow(InvalidRequest));
+ it('retains the existing20/default100/max limit semantics',()=>{expect(parseSearchInput(new URLSearchParams({q:'x',limit:'100'}),false).limit).toBe(100);});
+ for(const query of ['','q=','q=+++','q=x&q=y','q=x&limit=0','q=x&limit=101','q=x&limit=01','q=x&limit=20&limit=20','q=x&foo=1','cursor=x','q=x&cursor=','q=x&cursor=%','q=x&_rsc=abc'])it(`API rejects missing/duplicate/unknown/bad query ${query}`,()=>expect(()=>parseSearchInput(new URLSearchParams(query),false)).toThrow(InvalidRequest));
+ for(const query of ['q=','q=+++','q=x&q=y','q=x&unknown=1','q=x&_rsc=a&_rsc=b','q=x&_rsc='+ 'x'.repeat(129),'q=x&_rsc=a%20b','cursor=x'])it(`Page rejects invalid input rather than rendering prompt ${query.slice(0,50)}`,()=>expect(()=>parseSearchInput(new URLSearchParams(query),true)).toThrow(InvalidRequest));
+ it('allows one bounded reserved transport parameter only for page',()=>expect(parseSearchInput(new URLSearchParams('q=x&_rsc=abc_1-'),true)?.q).toBe('x'));
+ it('does not accept extra cursor fields or impossible dates',()=>{const raw={v:1,scope:'public-search',q:'book',publicationDate:'2026-02-30',id:'issue-one'};for(const obj of [raw,{...raw,publicationDate:'2026-11-07',extra:1}])expect(()=>parseSearchInput(new URLSearchParams({q:'book',cursor:Buffer.from(JSON.stringify(obj)).toString('base64url')}),false)).toThrow(InvalidRequest);});
+ it('supports bounded worst-case query JSON escaping in a cursor',()=>{const q='\u0001'.repeat(100);const value=encodeSearchCursor({id:'a'.repeat(128),date:'2026-11-07'},q);expect(parseSearchInput(new URLSearchParams({q,cursor:value}),false).cursor?.q).toBe(q);});
+ it('rejects invalid UTF8 rather than canonicalizing replacement characters',()=>{const bytes=Buffer.concat([Buffer.from('{"v":1,"scope":"public-search","q":"'),Buffer.from([255]),Buffer.from('","publicationDate":"2026-11-07","id":"x"}')]);expect(()=>parseSearchInput(new URLSearchParams({q:'�',cursor:bytes.toString('base64url')}),false)).toThrow(InvalidRequest);});
+});
