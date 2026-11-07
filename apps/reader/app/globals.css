@@ -1,0 +1,4 @@
+body { font-family: system-ui, sans-serif; line-height: 1.7; max-width: 50rem; margin: 2rem auto; padding: 0 1rem; }
+main { overflow-wrap: anywhere; }
+a { color: inherit; }
+blockquote { margin: 1rem 0; padding: 0 1rem; border-inline-start: 3px solid currentColor; }
