@@ -82,3 +82,70 @@ fixture包含28个published（可测默认20与分页）、仅草稿/仅撤回�
 本切片仍无公开写接口，**未来幂等/审计、管理写入与读写整合尚未验收**。受控读取竞态通过不等于全部业务并发或生产就绪；正式切换仍需后续完整交付和明确授权。
 
 直接依赖沿用已验证的精确版本：vinext1.4.4、React/DOM/RSC19.3.1、Vite8.3.6、Cloudflare Vite plugin2.0.0-beta.v.12、cf1.0.0-beta.28。官方工具链仍是beta；上游fflate依赖链的5个moderate告警、sourcemap/dynamic-import构建警告仍需上线前复核，本应用未接入不受信任ZIP/OG处理。未验证完整主题、父Astro CI或任何线上环境。
+
+## Protected read-only management (task57)
+
+The management surface is **read-only**. It does not implement writes, publication,
+conditional writes, a management UI, cloud provisioning or deployment. The frozen
+schema and historical mapping/import tool are unchanged.
+
+- `GET /api/v1/admin/issues`: `{items,nextCursor}`, default20 / max100.
+  Optional single `status=draft|published|withdrawn`; omission includes all states.
+  Order is publication date DESC (NULL last), then ID DESC. Bounded versioned
+  base64url cursors carry a distinct `admin-issues` scope and the exact requested
+  status filter (NULL means no filter); changing/omitting that filter rejects reuse.
+  Cursor boundaries work across the non-NULL/NULL transition without offsets.
+- `GET /api/v1/admin/issues/:id`: `{data:issue}` with current Book and all ordered
+  quotes, including draft/withdrawn body and nullable historical fields.
+- `GET /api/v1/admin/books/:id`: `{data:book}`, including unreferenced Books.
+- Unknown/duplicate list parameters, malformed/noncanonical/overlong cursors and
+  any detail query parameter are400. Unknown/invalid detail IDs are404.
+- Error envelope remains `{error:{code,message},requestId}` with matching
+  `X-Request-ID`. All management responses, including framework404/405 and HEAD,
+  are `Cache-Control: no-store` and `Vary: Authorization`.
+
+Only `Authorization: Bearer …` is accepted. `CONTENT_API_KEY` is declared with
+`bindings.secret()` and read only from the Worker binding, not client variables,
+query parameters, cookies or visibility/state headers. No fallback/default key is
+provided; provided Bearer tokens are bounded to4096 characters. Missing configuration returns503; absent, malformed and wrong credentials
+return the same generic401 error before any database read. Comparisons hash both
+values to fixed-size SHA256 then use the existing `nodejs_compat` timing-safe
+comparison API. No key value or request headers are logged/reflected. The Worker
+rejects non-GET/HEAD management requests after authentication, without executing
+framework handlers or a database write. The old probe remains absent.
+
+Book detail emits a quoted strong `"b:<safe-id>:<version>"` ETag. Issue detail emits
+`"i:<base64url(JSON([issueId,issueVersion,bookId,bookVersion]))>"`, so changing a shared
+Book version changes every referencing Issue tag even when its own version is
+unchanged. IDs/tuple encoding cannot inject header syntax. Unsafe version integers
+fail closed rather than produce colliding tags. Quote-set edits belong to the
+owning Issue version; future authorized mutation code must increment that version,
+and Book edits must increment the Book version. This phase emits tags only and
+neither validates write preconditions nor strips/pretends to strengthen `W/` tags.
+Tests use identity transport to inspect the server's actual strong validator.
+
+Management SQL never populates the public request-read cache. Public CASE/WHERE
+visibility remains in SQL; sharing the SQL JSON projection does not share a
+private row or change a public response. Even a valid management Bearer leaves
+public draft404/withdrawn410 and published-only lists unchanged, including RSC.
+
+### Native verification
+
+`npm run verify` keeps the original480 checks and adds `verify:admin` in both dev
+and built native workerd. `reader-admin-test` uses only fictitious dummy57 and
+`.cloudflare/admin-state`; normal/race dummy49/53 and history dummy54 are separate.
+Only synthetic fixtures are seeded; no historic content is imported by this test.
+The helper has no remote/config/target override. Test-secret files are fresh,
+mode-specific, permission0600, refused if already present, and removed only when
+created by this run. It never reads/requests a production secret.
+
+`node scripts/verify-admin.mjs dev|built` verifies missing-secret503 first, then
+creates a random local Worker secret for positive/negative authentication, cursor
+filter/scope/null ordering, all states/nullable fields, safe composite strong tags,
+shared Book/quote-version changes, HEAD/method refusal, unchanged D1 after rejected
+methods, public/admin isolation (including RSC and concurrent reads), and no value
+in captured logs. The built test rebuilds with the secret actually configured and
+scans every generated server/client/config file for the value. Reports contain no
+key; any unexpected diagnostic occurrence is redacted and makes verification fail.
+Default build is restored after the suite. Native process evidence and JSON results
+are under `.cloudflare/evidence/admin-*-result.json`.

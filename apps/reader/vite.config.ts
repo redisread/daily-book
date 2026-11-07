@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     vinext(),
     cloudflare({
       viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
-      persistState: { path: mode === "reader-race-test" ? ".cloudflare/race-state" : ".cloudflare/state" },
+      persistState: { path: mode === "reader-race-test" ? ".cloudflare/race-state" : mode === "reader-admin-test" ? ".cloudflare/admin-state" : ".cloudflare/state" },
       remoteBindings: false,
       tunnel: false,
     }),
