@@ -83,3 +83,6 @@ main:focus { outline-offset:4px; }
 .public-search-page .results-count { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; }
 .public-search-page .book-title,.public-search-page .book-author { overflow-wrap:anywhere; }
 .public-search-page .history-date { display:block; }
+
+.footer { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; }
+.footer a { display:inline-flex; align-items:center; min-block-size:44px; color:var(--fg); text-underline-offset:4px; padding:8px 4px; }

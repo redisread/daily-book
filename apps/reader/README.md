@@ -1,3 +1,12 @@
+# Integrated public reader (task67)
+
+Current branch integrates reviewed search0ad49ec87c9d3862f491d99926a01b71d6909e28
+and RSS8c61867afb8e6e6946c90a317d5e444c42337471 on their common1b12b79 baseline.
+Only merge/config/test evidence changes are made. No schema/FTS/import-pin,
+management write, production import, push or deployment is authorized.
+The historical branch-specific sections below preserve their original scopes;
+the CURRENT branch includes both search and RSS, with the original interfaces.
+
 # Integrated local reader (task61)
 
 This branch integrates the independently accepted public theme530b6cb,
@@ -337,3 +346,70 @@ checks (206) in addition. Root tests add32 pure input-boundary cases.
 
 No deployment, production migration, management write or RSS integration is
 implied. RSS8c61867 remains a separately reviewed branch until further direction.
+
+## RSS slice (task64, independent from search)
+
+This branch starts at reviewed1b12b79 and adds only `GET/HEAD /rss.xml`,
+server-rendered alternate discovery and a real footer subscription link. It
+has no search dependency, schema/FTS/import-pin change, write API or deployment.
+The Worker dispatches this fixed resource before framework negotiation so it
+always serves RSS, even with stray Flight/state headers; no query is accepted,
+HEAD has no body, other methods405/Allow GET,HEAD. Errors are the existing
+structured JSON/no-store form; success is UTF8 application/rss+xml/no-store.
+
+D1 is the sole item source, one SELECT of the latest20 published rows ordered
+publication_date DESC,id DESC. Only id/date/title/author/book description is
+projected; body/editor note/quotes/private rows are not selected. Titles and
+XML-safe descriptions remain plain text. XML1.0-invalid control characters
+are replaced with U+FFFD, never emitted as invalid numeric entities. Empty
+feeds remain RSS2.0. All GUIDs are canonical issue permalinks, independent of
+rank/title, unchanged across withdrawal/restoration and shared Book edits.
+
+Canonical origin is the explicit `site` in fixed8b astro.config.mjs:
+https://daily-book.jiahongw.com. It is recorded in src/site.ts, never derived
+from request Host/Forwarded/X-Forwarded-* headers. Dates are calendar dates
+serialized as00:00:00 +0800 with the corresponding weekday (Beijing), not
+claimed exact publishing times; the channel description states this precision.
+
+`npm run verify:rss` builds first to generate SDK binding types on a fresh
+checkout, then runs34dev/34built native checks and1default fixture-isolation
+check, finally restoring the normal49 build. It uses fixed fictitious64 and
+.cloudflare/rss-state,49964/49965; no
+remote configuration or production key. It seeds/restores only its owned
+fixtures and terminates only its owned process group. Actual RSS-specific and
+strict XML parsers validate live Worker output; cases include delimiters,
+invalid XML controls, Unicode, latest20 ordering/precision, forged Host and
+state headers, HEAD/405/400, read-only fingerprints, GUID restoration and empty
+feeds. Actual JS-disabled Chrome checks alternate/footer accessibility.
+The full verify command preserves all existing1000 checks plus69 RSS checks.
+Root tests add9 pure formatter/date cases; rss-parser3.13.0 is dev-only.
+
+## Final local read-only integration (task67)
+
+Merge parents are exactly reviewed0ad49ec search and8c61867 RSS. Common parent
+is1b12b79. Seven conflicts were resolved explicitly: README keeps both historical
+contracts under the current overview; globals keeps search wrapping plus RSS
+footer hit targets; CF/Vite keeps every fixed49/53/57/58/61/63/64 local mode and
+state; package keeps both scripts and RSS parser dev dependency/lock; Worker
+keeps raw search/archive validation and no-store wrapping plus RSS fixed-resource
+dispatch before framework negotiation; theme validation allows only actual
+Home/Archive/Search/RSS/Issue links. Search navigation and RSS head/footer both
+survive; no endpoint, matching, cursor, XML/date/canonical or schema contract is
+changed. No feature, write, deploy, push, historical source or importer pin change.
+
+The full verify runs original1000 +search206 +RSS69 =1275 retained checks, plus
+2 final normal-build inspections (1277 total). Repeated default-build recovery
+assertions are counted once. Root unit tests are139 (98+32+9); the existing local
+historical rehearsal verifier separately exercises29 native D1 recovery cases.
+Final normal production-build mode remains explicitly local fake49, not a
+production binding/deployment. It is scanned across Worker/client/config output
+for all six test modes and fixture markers, and the configured key must remain
+only a valueless secret declaration; original actual-value key artifact/log scans
+in admin/archive/search modes are retained unmodified.
+
+Current integrated desktop/mobile Home and Issue screenshots come from the
+theme suite, Archive from its suite, and ordinary43-match Search screenshots
+are added to the search suite (besides existing stress images). This is evidence
+capture only; screenshot helpers do not add product behavior. All tests remain
+owned, local-only and restore their fixtures/key files/process groups/default
+build. Independent historical reports retain their fixed Artifact versions.
