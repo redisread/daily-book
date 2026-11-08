@@ -58,6 +58,12 @@ jobs:
           npm test
           npm run build
 
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Root end-to-end verification
+        run: npm run test:e2e
+
       - name: Install Reader dependencies
         run: npm ci --ignore-scripts
         working-directory: apps/reader
