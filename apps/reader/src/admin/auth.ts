@@ -1,6 +1,7 @@
 import { env } from 'cloudflare:workers';
 import { timingSafeEqual } from 'node:crypto';
 import { apiError } from '../http';
+import { consumeAdminRateLimit } from './rate-limit';
 
 // Only the Worker secret is authoritative. No query, cookie or state header is
 // consulted, and no token/request headers are logged or reflected in errors.
@@ -15,5 +16,5 @@ export async function requireAdmin(request: Request): Promise<Response | null> {
     crypto.subtle.digest('SHA-256', encoder.encode(expected)),
   ]);
   if (!timingSafeEqual(new Uint8Array(actualHash), new Uint8Array(expectedHash))) return apiError(401, 'UNAUTHORIZED', '未授权。');
-  return null;
+  return consumeAdminRateLimit(request);
 }

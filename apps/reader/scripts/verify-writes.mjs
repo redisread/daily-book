@@ -30,7 +30,15 @@ async function request(path,options={}) {
   if (path.startsWith('/api/v1/admin/')) {assert(/no-store/.test(response.headers.get('cache-control')??''));assert((response.headers.get('vary')??'').toLowerCase().includes('authorization'));}
   return {status:response.status,headers:response.headers,text,json:text&&(response.headers.get('content-type')??'').includes('application/json')?JSON.parse(text):null};
 }
-const auth=(path,options={})=>request(path,{...options,headers:{Authorization:`Bearer ${key}`,...options.headers}});
+let authenticatedRequestsSinceBudgetReset=0;let authenticatedRequestsInFlight=0;
+const auth=async(path,options={})=>{
+  // This suite covers write correctness; the dedicated limits suite covers enforcement.
+  // Refill only between request groups so long regression runs do not stop at 30 calls.
+  if(authenticatedRequestsInFlight===0&&authenticatedRequestsSinceBudgetReset>=20){writeSQL('DELETE FROM admin_rate_limit_buckets');authenticatedRequestsSinceBudgetReset=0;}
+  authenticatedRequestsInFlight++;authenticatedRequestsSinceBudgetReset++;
+  try{return await request(path,{...options,headers:{Authorization:`Bearer ${key}`,...options.headers}});}
+  finally{authenticatedRequestsInFlight--;}
+};
 const send=(path,method,body,idem,tag,options={})=>auth(path,{method,body:JSON.stringify(body),...options,headers:{'Content-Type':'application/json','Idempotency-Key':idem,...(tag===undefined?{}:{'If-Match':tag}),...options.headers}});
 const create=async(label,fields={})=>{const id=prefix+'-'+label;const idem=newKey();const body={id,...fields};return {id,idem,body,response:await send('/api/v1/admin/books','POST',body,idem)};};
 const err=(r,status,code)=>{assert.equal(r.status,status,r.text);assert(r.json);assert.deepEqual(Object.keys(r.json).sort(),['error','requestId']);assert.equal(r.json.error.code,code);assert.equal(r.headers.get('x-request-id'),r.json.requestId);};

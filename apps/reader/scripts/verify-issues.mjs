@@ -27,7 +27,15 @@ async function request(path,options={}){
   let json=null;if((response.headers.get('content-type')??'').includes('application/json')&&text)json=JSON.parse(text);
   return{status:response.status,headers:response.headers,text,json};
 }
-const auth=(path,options={})=>request(path,{...options,headers:{Authorization:`Bearer ${key}`,...options.headers}});
+let authenticatedRequestsSinceBudgetReset=0;let authenticatedRequestsInFlight=0;
+const auth=async(path,options={})=>{
+  // This suite verifies Issue lifecycle behavior; the dedicated limits suite owns the cap assertions.
+  // Refill only between request groups so a full lifecycle run can exceed 30 calls safely.
+  if(authenticatedRequestsInFlight===0&&authenticatedRequestsSinceBudgetReset>=20){issueSQL('DELETE FROM admin_rate_limit_buckets');authenticatedRequestsSinceBudgetReset=0;}
+  authenticatedRequestsInFlight++;authenticatedRequestsSinceBudgetReset++;
+  try{return await request(path,{...options,headers:{Authorization:`Bearer ${key}`,...options.headers}});}
+  finally{authenticatedRequestsInFlight--;}
+};
 const send=(path,method,body,idem,tag,options={})=>auth(path,{method,body:JSON.stringify(body),...options,headers:{'Content-Type':'application/json','Idempotency-Key':idem,...(tag===undefined?{}:{'If-Match':tag}),...options.headers}});
 function error(response,status,code){assert.equal(response.status,status,response.text);assert(response.json);assert.deepEqual(Object.keys(response.json).sort(),['error','requestId']);assert.equal(response.json.error.code,code);assert.equal(response.headers.get('x-request-id'),response.json.requestId);}
 function newBookId(label){return`${bookPrefix}-${label}`;}

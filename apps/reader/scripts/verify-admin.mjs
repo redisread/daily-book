@@ -15,6 +15,7 @@ const root=fileURLToPath(new URL('../',import.meta.url));const output=new URL('.
 const keyFile=new URL('../.env.reader-admin-test.local',import.meta.url);
 assert(!existsSync(keyFile),'Refuse to overwrite an existing local secret file');
 const key=randomBytes(32).toString('hex');let ownedKey=false;let server;let logs='';
+let requestsInCurrentRateBucket=0;
 const port=mode==='dev'?49557:49558;const origin=`http://127.0.0.1:${port}`;
 const result={mode,startedAt:new Date().toISOString(),checks:[]};
 const check=(label,value)=>{assert(value,label);result.checks.push(label);};
@@ -32,7 +33,14 @@ async function request(path,options={}) {
   }
   return {status:response.status,headers:response.headers,text,json:text && (response.headers.get('content-type')??'').includes('application/json')?JSON.parse(text):null};
 }
-const authorized=(path,options={})=>request(path,{...options,headers:{Authorization:`Bearer ${key}`,...options.headers}});
+const authorized=async(path,options={})=>{
+  // This suite covers management read behavior, not quota accounting. Keep its
+  // long pagination matrix below the production bucket cap; verify:limits tests
+  // threshold behavior independently on the same native D1 implementation.
+  if(requestsInCurrentRateBucket>=80){adminSQL('DELETE FROM admin_rate_limit_buckets');requestsInCurrentRateBucket=0;}
+  requestsInCurrentRateBucket++;
+  return request(path,{...options,headers:{Authorization:`Bearer ${key}`,...options.headers}});
+};
 async function start() {
   const env={...process.env};delete env.CONTENT_API_KEY;delete env.VITE_CONTENT_API_KEY;
   server=spawn(process.execPath,['node_modules/vite/bin/vite.js',mode==='dev'?'dev':'preview','--mode','reader-admin-test','--host','127.0.0.1','--port',String(port)],{cwd:root,env,detached:true,stdio:['ignore','pipe','pipe']});
@@ -45,7 +53,7 @@ async function stop() {
 const assertError=(r,status,code)=>{assert.equal(r.status,status);assert(r.json,'Expected structured JSON error');assert.deepEqual(Object.keys(r.json).sort(),['error','requestId']);assert.equal(r.json.error.code,code);assert.equal(r.headers.get('x-request-id'),r.json.requestId);assert(!privateMarkers.some(marker=>r.text.includes(marker)));};
 async function walk(status,limit=2){const actual=[];let next=null;let count=0;do{const query=new URLSearchParams({limit:String(limit)});if(status!==null)query.set('status',status);if(next)query.set('cursor',next);const r=await authorized('/api/v1/admin/issues?'+query);assert.equal(r.status,200);assert(r.json.items.length<=limit);actual.push(...r.json.items.map(row=>row.id));next=r.json.nextCursor;assert(++count<50);}while(next!==null);return actual;}
 try {
-  migrateAdminDB();adminSQL('DELETE FROM quotes;DELETE FROM issues;DELETE FROM books;'+readFileSync(new URL('../fixtures/seed.sql',import.meta.url),'utf8')+readFileSync(new URL('../fixtures/admin.sql',import.meta.url),'utf8'));
+  migrateAdminDB();adminSQL('DELETE FROM admin_rate_limit_buckets;DELETE FROM quotes;DELETE FROM issues;DELETE FROM books;'+readFileSync(new URL('../fixtures/seed.sql',import.meta.url),'utf8')+readFileSync(new URL('../fixtures/admin.sql',import.meta.url),'utf8'));
   await start();
   for(const path of paths){const r=await authorized(path);assertError(r,503,'ADMIN_UNAVAILABLE');check(`Missing Worker secret fails closed at ${path}`,true);}
   check('Public reads remain available without a management secret',(await request('/api/v1/issues/published-latest')).status===200);
