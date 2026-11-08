@@ -69,16 +69,19 @@ export function buildPreflight({
   if (target?.databaseId !== null && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(target.databaseId ?? "")) {
     add("DATABASE_ID_INVALID", "databaseId must be a UUID");
   }
-  if (target?.releaseCommit !== null && !/^[0-9a-f]{40}$/.test(target.releaseCommit ?? "")) {
-    add("RELEASE_COMMIT_INVALID", "releaseCommit must be a full 40-character lowercase commit SHA");
-  }
   if (!/^[0-9a-f]{64}$/.test(target?.inventorySha256 ?? "")) add("INVENTORY_PIN_INVALID", "inventory SHA256 pin is invalid");
   if (!/^[0-9a-f]{64}$/.test(target?.overlaySha256 ?? "")) add("OVERLAY_PIN_INVALID", "overlay SHA256 pin is invalid");
-  if (target?.releaseCommit && commitSha && target.releaseCommit !== commitSha) {
-    add("RELEASE_COMMIT_MISMATCH", "requested commit differs from the committed release pin");
-  }
   if (commitSha && !/^[0-9a-f]{40}$/.test(commitSha)) {
     add("REQUESTED_COMMIT_INVALID", "requested commit must be a full 40-character lowercase commit SHA");
+  }
+  if (environment.releaseCommit && !/^[0-9a-f]{40}$/.test(environment.releaseCommit)) {
+    add("APPROVED_COMMIT_INVALID", "protected approved candidate must be a full 40-character lowercase commit SHA");
+  }
+  if (requireEnabled && !commitSha) {
+    add("REQUESTED_COMMIT_REQUIRED", "an exact candidate commit SHA is required for an enabled release plan");
+  }
+  if (commitSha && environment.releaseCommit !== commitSha) {
+    add("APPROVED_COMMIT_MISMATCH", "candidate commit differs from the protected external approval record");
   }
   if (target?.accountId && environment.accountId !== target.accountId) {
     add("ACCOUNT_ID_MISMATCH", "protected account value differs from the committed target");
@@ -86,14 +89,11 @@ export function buildPreflight({
   if (target?.databaseId && environment.databaseId !== target.databaseId) {
     add("DATABASE_ID_MISMATCH", "protected D1 value differs from the committed target");
   }
-  if (target?.releaseCommit && environment.releaseCommit !== target.releaseCommit) {
-    add("ENV_COMMIT_MISMATCH", "protected release commit differs from the committed target");
-  }
   if (requireEnabled && target?.deploymentEnabled !== true) {
     add("DEPLOYMENT_DISABLED", "production deployment is disabled in the committed release target");
   }
-  if (target?.deploymentEnabled === true && (!target.accountId || !target.databaseId || !target.releaseCommit)) {
-    add("TARGET_UNPINNED", "enabled target requires account, D1, and commit pins");
+  if (target?.deploymentEnabled === true && (!target.accountId || !target.databaseId)) {
+    add("TARGET_UNPINNED", "enabled target requires account and D1 pins");
   }
   if (requireEnabled && !/^[0-9a-f]{64}$/.test(target?.schemaReceiptSha256 ?? "")) {
     add("SCHEMA_RECEIPT_MISSING", "a verified production migration receipt SHA256 is required before deploy");
@@ -132,7 +132,11 @@ export function buildPreflight({
   }
 
   return {
-    status: errors.length === 0 ? "READY_FOR_SEPARATE_AUTHORIZATION" : "BLOCKED",
+    status: errors.length > 0
+      ? "BLOCKED"
+      : target?.deploymentEnabled === true
+        ? "READY_FOR_SEPARATE_AUTHORIZATION"
+        : "DISABLED_AS_DESIGNED",
     errors,
     selectedTarget: target && {
       workerName: target.workerName,
@@ -140,7 +144,7 @@ export function buildPreflight({
       databaseName: target.databaseName,
       accountId: target.accountId,
       databaseId: target.databaseId,
-      releaseCommit: target.releaseCommit,
+      releaseCommit: environment.releaseCommit ?? null,
       schemaReceiptSha256: target.schemaReceiptSha256,
       historyImportReceiptSha256: target.historyImportReceiptSha256,
     },
@@ -152,6 +156,7 @@ export function buildPreflight({
     overlayChecked,
     databaseOpened: false,
     networkUsed: false,
+    targetDeploymentEnabled: target?.deploymentEnabled === true,
     deploymentEnabled: false,
     migrationApplyEnabled: false,
     historyImportEnabled: false,
@@ -167,10 +172,10 @@ function parseArgs(argv) {
     else if (flag === "--require-enabled") result.requireEnabled = true;
     else if (flag === "--require-inventory") result.requireInventory = true;
     else if (flag === "--require-overlay") result.requireOverlay = true;
-    else if (flag === "--commit-sha" || flag === "--inventory" || flag === "--overlay") {
+    else if (flag === "--commit-sha" || flag === "--inventory" || flag === "--overlay" || flag === "--migrations-dir") {
       const value = argv[++i];
       if (!value) throw new Error(`${flag} requires a value`);
-      result[flag === "--commit-sha" ? "commitSha" : flag === "--inventory" ? "inventoryPath" : "overlayPath"] = value;
+      result[flag === "--commit-sha" ? "commitSha" : flag === "--inventory" ? "inventoryPath" : flag === "--overlay" ? "overlayPath" : "migrationsDirectory"] = value;
     } else if (flag === "--help") result.help = true;
     else throw new Error(`unsupported flag ${flag}; this tool has no apply, remote, reset, or force operation`);
   }
@@ -183,7 +188,7 @@ function parseArgs(argv) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
-    process.stdout.write("Read-only release preflight. Options: --verify-disabled, --commit-sha SHA, --inventory PATH, --overlay PATH, --require-enabled, --require-inventory, --require-overlay. No remote/apply operation exists.\n");
+    process.stdout.write("Read-only release preflight. Options: --verify-disabled, --commit-sha SHA, --inventory PATH, --overlay PATH, --migrations-dir PATH, --require-enabled, --require-inventory, --require-overlay. The approved candidate SHA must come from the protected external approval record. No remote/apply operation exists.\n");
     return;
   }
   const target = readReleaseTarget();
@@ -195,6 +200,7 @@ function main() {
     requireEnabled: args.requireEnabled,
     requireInventory: args.requireInventory,
     requireOverlay: args.requireOverlay,
+    migrationsDirectory: args.migrationsDirectory ?? migrationRoot,
     environment: {
       accountId: process.env.READER_RELEASE_ACCOUNT_ID,
       databaseId: process.env.READER_RELEASE_DATABASE_ID,
@@ -202,12 +208,16 @@ function main() {
     },
   });
   if (args.verifyDisabled) {
+    if (plan.errors.length > 0) {
+      process.stdout.write(`${JSON.stringify({ ...plan, status: "BLOCKED" }, null, 2)}\n`);
+      process.exitCode = 1;
+      return;
+    }
     const isExpectedDisabledState = target.deploymentEnabled === false
       && target.migrationApplyEnabled === false
       && target.historyImportEnabled === false
       && target.accountId === null
       && target.databaseId === null
-      && target.releaseCommit === null
       && target.schemaReceiptSha256 === null
       && target.historyImportReceiptSha256 === null;
     if (!isExpectedDisabledState) {

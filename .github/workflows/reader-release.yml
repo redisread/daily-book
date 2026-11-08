@@ -24,6 +24,7 @@ jobs:
   preflight:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout exact dispatch commit
         uses: actions/checkout@v6
@@ -50,6 +51,10 @@ jobs:
       - name: Install root dependencies
         run: npm ci
 
+      - name: Install Reader dependencies
+        run: npm ci --ignore-scripts
+        working-directory: apps/reader
+
       - name: Root checks
         run: |
           npm run books:check
@@ -64,15 +69,19 @@ jobs:
       - name: Root end-to-end verification
         run: npm run test:e2e
 
-      - name: Install Reader dependencies
-        run: npm ci --ignore-scripts
+      - name: Install Reader Chrome and system dependencies
+        run: npx playwright install --with-deps chrome
         working-directory: apps/reader
 
       - name: Reader checks
         run: |
           npm run typecheck
           npm run verify
-          npm run release:preflight
+        working-directory: apps/reader
+
+      - name: Require the checked-in target to stay disabled unless deployment was explicitly requested
+        if: inputs.deploy_canary == false
+        run: npm run release:preflight
         working-directory: apps/reader
 
       - name: Audit root dependencies
@@ -86,6 +95,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && inputs.deploy_canary
     needs: preflight
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment:
       name: reader-production
     permissions:
@@ -113,9 +123,8 @@ jobs:
           if (target.deploymentEnabled !== true
             || target.accountId !== process.env.READER_RELEASE_ACCOUNT_ID
             || target.databaseId !== process.env.READER_RELEASE_DATABASE_ID
-            || target.releaseCommit !== requested
             || process.env.READER_RELEASE_COMMIT_SHA !== requested) {
-            throw new Error('deployment disabled or protected target/commit differs from the committed manifest');
+            throw new Error('deployment disabled or protected target/approved candidate differs from this dispatch');
           }
           NODE
 
@@ -158,3 +167,4 @@ jobs:
           READER_RELEASE_ACCOUNT_ID: ${{ vars.READER_RELEASE_ACCOUNT_ID }}
           READER_RELEASE_DATABASE_ID: ${{ vars.READER_RELEASE_DATABASE_ID }}
           READER_RELEASE_COMMIT_SHA: ${{ vars.READER_RELEASE_COMMIT_SHA }}
+          READER_RELEASE_CANDIDATE_SHA: ${{ inputs.release_commit }}

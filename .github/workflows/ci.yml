@@ -15,6 +15,7 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -52,6 +53,7 @@ jobs:
 
   security:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -78,6 +80,7 @@ jobs:
 
   reader:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -93,6 +96,10 @@ jobs:
         run: npm ci --ignore-scripts
         working-directory: apps/reader
 
+      - name: Install Reader Chrome and system dependencies
+        run: npx playwright install --with-deps chrome
+        working-directory: apps/reader
+
       - name: Reader type check
         run: npm run typecheck
         working-directory: apps/reader
@@ -101,13 +108,10 @@ jobs:
         run: npm run verify
         working-directory: apps/reader
 
-      - name: Reader release target stays disabled by default
-        run: npm run release:preflight
-        working-directory: apps/reader
-
   e2e:
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v6

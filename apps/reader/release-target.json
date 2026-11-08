@@ -8,7 +8,6 @@
   "canaryDomain": "reader.daily-book.jiahongw.com",
   "databaseName": "daily-book-reader-prod",
   "databaseId": null,
-  "releaseCommit": null,
   "schemaReceiptSha256": null,
   "historyImportReceiptSha256": null,
   "historicalSourceCommit": "8b991098f984a5f8870bd01741e3cb937b63d50d",

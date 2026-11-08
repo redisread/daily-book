@@ -9,7 +9,6 @@ type ReleaseTarget = {
   databaseId: string | null;
   databaseName: string;
   deploymentEnabled: boolean;
-  releaseCommit: string | null;
   schemaReceiptSha256: string | null;
   historyImportReceiptSha256: string | null;
   workerName: string;
@@ -28,13 +27,14 @@ function productionTarget(mode: string | undefined): ReleaseTarget | undefined {
   const expected = {
     accountId: process.env.READER_RELEASE_ACCOUNT_ID,
     databaseId: process.env.READER_RELEASE_DATABASE_ID,
-    releaseCommit: process.env.READER_RELEASE_COMMIT_SHA,
   };
+  const approvedCandidate = process.env.READER_RELEASE_COMMIT_SHA;
+  const requestedCandidate = process.env.READER_RELEASE_CANDIDATE_SHA;
   if (!target.deploymentEnabled) {
     throw new Error("READER_RELEASE_DISABLED: production deploy is disabled in release-target.json");
   }
-  if (!target.accountId || !target.databaseId || !target.releaseCommit) {
-    throw new Error("READER_RELEASE_TARGET_UNPINNED: account, database, and commit pins are required");
+  if (!target.accountId || !target.databaseId) {
+    throw new Error("READER_RELEASE_TARGET_UNPINNED: account and database pins are required");
   }
   if (!/^[0-9a-f]{64}$/.test(target.schemaReceiptSha256 ?? "") || !/^[0-9a-f]{64}$/.test(target.historyImportReceiptSha256 ?? "")) {
     throw new Error("READER_RELEASE_RECEIPTS_MISSING: verified schema and import receipts are required before deploy");
@@ -45,8 +45,8 @@ function productionTarget(mode: string | undefined): ReleaseTarget | undefined {
   if (!/^[0-9a-f]{32}$/.test(target.accountId) || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(target.databaseId)) {
     throw new Error("READER_RELEASE_TARGET_INVALID: account or D1 ID has an invalid format");
   }
-  if (!/^[0-9a-f]{40}$/.test(target.releaseCommit)) {
-    throw new Error("READER_RELEASE_COMMIT_INVALID: expected a full 40-character commit SHA");
+  if (!/^[0-9a-f]{40}$/.test(requestedCandidate ?? "") || approvedCandidate !== requestedCandidate) {
+    throw new Error("READER_RELEASE_COMMIT_MISMATCH: candidate does not match the protected external approval record");
   }
   return target;
 }
