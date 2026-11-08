@@ -56,7 +56,11 @@ try {
   if(mode==='built')await build();await start();
   const missing=await send('/api/v1/admin/books','POST',{id:prefix+'-absent'},newKey());err(missing,503,'ADMIN_UNAVAILABLE');check('Missing Worker key fails closed before reading JSON or D1 writes',true);
   await stop();writeFileSync(keyFile,`CONTENT_API_KEY=${key}\n`,{flag:'wx',mode:0o600});ownedKey=true;if(mode==='built')await build();await start();
+  const nativeProbeKey=newKey();const nativeProbeId=prefix+'-native-workerd-probe';arm(nativeProbeKey);
+  const nativeProbe=send('/api/v1/admin/books','POST',{id:nativeProbeId,title:'native workerd probe'},nativeProbeKey);nativeProbe.catch(()=>{});
+  await arrived();
   const native=execFileSync('ps',['-axo','pid=,ppid=,pgid=,command='],{encoding:'utf8'}).split('\n').map(line=>/^\s*(\d+)\s+(\d+)\s+(\d+)\s+(.+)$/.exec(line)).filter(m=>m&&Number(m[3])===server.pid&&m[4].includes('/workerd')&&/\bserve\b/.test(m[4])).map(m=>({pid:Number(m[1]),group:Number(m[3]),command:m[4]}));check('Owned native workerd executes write requests',native.length>0);result.runtimeProcesses=native;
+  release();const nativeProbeResponse=await nativeProbe;assert.equal(nativeProbeResponse.status,201,nativeProbeResponse.text);
   for(const path of ['/api/v1/admin/books','/api/v1/admin/books/invalid','/api/v1/admin/books/invalid/history'])for(const method of ['GET','POST','PATCH','DELETE']){const r=await request(path,{method,headers:{Authorization:'Bearer wrong'}});err(r,401,'UNAUTHORIZED');check(`Authentication precedes routing/body at ${method} ${path}`,true);}
   for(const headers of [{},{Authorization:'Basic wrong'},{Authorization:'Bearer wrong, Bearer other'},{'X-Admin-Status':'admin'},{Cookie:`CONTENT_API_KEY=${key}`}]){err(await request('/api/v1/admin/books',{method:'POST',body:'not JSON',headers}),401,'UNAUTHORIZED');check('No alternate credential source or malformed-token fallback',true);}
   const minimal=await create('minimal');assert.equal(minimal.response.status,201,minimal.response.text);const path='/api/v1/admin/books/'+minimal.id;
