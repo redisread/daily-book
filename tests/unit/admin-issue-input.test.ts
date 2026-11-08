@@ -50,6 +50,10 @@ describe('admin issue input', () => {
     ), 422, 'INVALID_VALUE');
   });
 
+  it('rejects an empty PATCH body with EMPTY_PATCH', () => {
+    expectIssueError(() => parseIssuePatchInput({}, new Set()), 422, 'EMPTY_PATCH');
+  });
+
   it('rejects duplicate quote IDs, caller positions and unknown fields', () => {
     expectIssueError(() => parseIssueCreateInput({ id: 'issue-1', bookId: 'book-1', quotes: [
       { id: 'same', text: 'a', sourceLabel: 'p1' }, { id: 'same', text: 'b', sourceLabel: 'p2' },

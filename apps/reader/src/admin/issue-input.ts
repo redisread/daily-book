@@ -77,6 +77,7 @@ export function parseIssueCreateInput(value: unknown): IssueCreateInput {
 export function parseIssuePatchInput(value: unknown, currentQuoteIds: ReadonlySet<string>, otherExistingQuoteIds: ReadonlySet<string> = new Set()): IssuePatchInput {
   const input = objectValue(value);
   allowKeys(input, ['editorNote', 'body', 'quotes']);
+  if (Object.keys(input).length === 0) throw new WriteError(422, 'EMPTY_PATCH', 'PATCH至少需要一个可更新字段。');
   const result: IssuePatchInput = {};
   if (Object.hasOwn(input, 'editorNote')) result.editorNote = text(input.editorNote, 10_000, true);
   if (Object.hasOwn(input, 'body')) result.body = text(input.body, 100_000)!;

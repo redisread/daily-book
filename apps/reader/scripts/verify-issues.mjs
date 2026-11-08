@@ -80,6 +80,8 @@ try{
   error(await send(pathA,'PATCH',{body:'needs tag'},keygen()),428,'PRECONDITION_REQUIRED');
   for(const bad of ['*','W/'+initial.headers.get('etag'),`${initial.headers.get('etag')}, ${initial.headers.get('etag')}`])error(await send(pathA,'PATCH',{body:'x'},keygen(),bad),400,'INVALID_IF_MATCH');
   error(await send(pathA,'PATCH',{bookId:bookB.id},keygen(),initial.headers.get('etag')),400,'UNKNOWN_FIELD');
+  const emptyPatchCounts=counts(issueA.id);error(await send(pathA,'PATCH',{},keygen(),initial.headers.get('etag')),422,'EMPTY_PATCH');
+  const afterEmptyPatch=await auth(pathA);check('Empty Issue PATCH returns422 without changing resource, quotes, version, audit or receipt',afterEmptyPatch.text===initial.text&&JSON.stringify(counts(issueA.id))===JSON.stringify(emptyPatchCounts));
   const patchKey=keygen();const patchBody={body:'updated body',quotes:[qA,{id:newIssueId('quote-new'),text:'新的摘录',sourceLabel:'第3章'}]};
   const patched=await send(pathA,'PATCH',patchBody,patchKey,initial.headers.get('etag'));assert.equal(patched.status,200,patched.text);
   check('Issue PATCH replaces quote set, assigns contiguous positions and increments version once',patched.json.data.version===2&&patched.json.data.body==='updated body'&&patched.json.data.editorNote===note&&patched.json.data.quotes.map(q=>q.position).join(',')==='0,1');
@@ -87,6 +89,12 @@ try{
   const changedBook=await send(`/api/v1/admin/books/${bookA.id}`,'PATCH',{title:'共享Book版本变化'},keygen(),(await auth(`/api/v1/admin/books/${bookA.id}`)).headers.get('etag'));
   assert.equal(changedBook.status,200,changedBook.text);error(await send(pathA,'PATCH',{body:'stale Book tag'},keygen(),patched.headers.get('etag')),412,'PRECONDITION_FAILED');
   const afterStale=await auth(pathA);check('Concurrent Book version change invalidates Issue If-Match without changing Issue',afterStale.json.data.version===2&&afterStale.json.data.body==='updated body');
+
+  const sameBook=await createBook('same-value');const sameIssue=await createIssue('same-value',sameBook.id);assert.equal(sameIssue.response.status,201,sameIssue.response.text);
+  const samePath=`/api/v1/admin/issues/${sameIssue.id}`;const sameBefore=await auth(samePath);const sameBeforeCounts=counts(sameIssue.id);const sameKey=keygen();
+  const samePatch=await send(samePath,'PATCH',{body:''},sameKey,sameBefore.headers.get('etag'));assert.equal(samePatch.status,200,samePatch.text);
+  const sameAfterCounts=counts(sameIssue.id);check('Same-value Issue PATCH increments version, audit and receipt exactly once',samePatch.json.data.version===2&&samePatch.json.data.body===''&&sameAfterCounts.issue===sameBeforeCounts.issue&&sameAfterCounts.quotes===sameBeforeCounts.quotes&&sameAfterCounts.audit===sameBeforeCounts.audit+1&&sameAfterCounts.receipts===sameBeforeCounts.receipts+1);
+  const sameValueReplay=await send(samePath,'PATCH',{body:''},sameKey,sameBefore.headers.get('etag'));check('Same-value Issue PATCH replay preserves its captured response without another version or audit',sameValueReplay.status===200&&sameValueReplay.text===samePatch.text&&JSON.stringify(counts(sameIssue.id))===JSON.stringify(sameAfterCounts));
 
   const missingInfoBook=await createBook('incomplete');const incomplete=await createIssue('incomplete',missingInfoBook.id,{editorNote:'short',quotes:[]});assert.equal(incomplete.response.status,201,incomplete.response.text);
   const prePublishCounts=counts(incomplete.id);error(await send(`/api/v1/admin/issues/${incomplete.id}/publish`,'POST',{},keygen(),incomplete.response.headers.get('etag')),422,'INVALID_VALUE');
