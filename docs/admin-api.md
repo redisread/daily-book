@@ -24,3 +24,26 @@ npm --prefix apps/reader run verify:limits
 验证器只使用本地隔离 D1 `00000000-0000-4000-8000-000000000072`，覆盖读写阈值、独立桶、并发竞争、UTC 分钟切换、密钥轮换、存储故障关闭和公开读取可用性。测试数据库在 `apps/reader/.cloudflare/management-state`；不连接远程 D1，不部署，不运行导入。
 
 生产上线前需在 Cloudflare 边缘设置中单独审查并验证未认证猜密钥防护。限流实现本身不代表已应用该边缘规则，也不授予部署或生产数据导入权限。
+
+## 管理历史导入验证
+
+所有命令从仓库根目录执行，并显式提供经过审核的不可变 inventory；路径不依赖个人工作区布局。报告路径必须是仓库外的新路径。
+
+```sh
+INVENTORY=/absolute/path/to/approved-inventory.json
+
+# 默认 dry-run：databaseOpened=false，不打开 D1。
+npm --prefix apps/reader run history-import:management -- \
+  --input "$INVENTORY" \
+  --report /absolute/path/outside-repository/new-plan.json
+
+# 在新建的外部目录运行仅本地原生 D1 的完整导入防护演练。
+npm --prefix apps/reader run verify:history-management -- \
+  --input "$INVENTORY" \
+  --out /absolute/path/outside-repository/new-evidence-directory
+
+# 一次性首次新刊 130 集成验证；建议在干净 checkout 执行，使用固定假 D1 ID72。
+npm --prefix apps/reader run verify:issue130 -- --input "$INVENTORY"
+```
+
+两个验证入口都会校验 inventory 的批准 SHA 与 source/schema pins。`verify:issue130` 会先确认或执行 ID72 上的精确本地导入，再创建并发布 Issue130；不要在已经含有其他新刊测试写入的复用状态上重跑。它不会连接远程 D1、部署或写生产数据。

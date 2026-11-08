@@ -45,10 +45,10 @@
     "verify:rss": "npm run build && npm run typecheck && node scripts/verify-rss.mjs dev && node scripts/verify-rss.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-rss-default.mjs",
     "verify:writes": "node scripts/verify-writes.mjs dev && node scripts/verify-writes.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs",
     "verify:issues": "node scripts/verify-issues.mjs dev && node scripts/verify-issues.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs",
-    "verify:history-management": "tsx ../scripts/history-import/verify-management-local.ts",
+    "verify:history-management": "tsx ../../scripts/history-import/verify-management-local.ts",
     "verify:issue130": "node scripts/verify-imported-issue-130.mjs",
     "management:request": "node scripts/management-request.mjs",
-    "history-import:management": "tsx ../scripts/import-history-management.ts",
+    "history-import:management": "tsx ../../scripts/import-history-management.ts",
     "verify:limits": "node scripts/verify-rate-limits.mjs dev && node scripts/verify-rate-limits.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs"
   },
   "description": "Daily Book original-theme reader and Bearer-protected management APIs.",

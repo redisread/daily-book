@@ -5,12 +5,15 @@ import {spawn,spawnSync} from 'node:child_process';
 import {once} from 'node:events';
 import {randomBytes,createHash} from 'node:crypto';
 import {existsSync,mkdirSync,writeFileSync,unlinkSync,readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
 import {fileURLToPath,URL} from 'node:url';
 import {setTimeout as wait} from 'node:timers/promises';
 import {managementRows} from './management-db.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
-const input=fileURLToPath(new URL('../../../../../artifacts/daily-book-content-inventory-2026-11-07/delivery/inventory.json',import.meta.url));
+const args=process.argv.slice(2);assert(args.length===2&&args[0]==='--input'&&!args[1].startsWith('--'),'Usage: verify-imported-issue-130.mjs --input <approved-inventory.json>');
+const input=resolve(args[1]);
+assert.equal(createHash('sha256').update(readFileSync(input)).digest('hex'),'4918f76db3da19ba122ed01073b942551ed8e64d926a5c5ee8fb2d370879b5ad','Inventory bytes differ from the approved immutable package');
 const stateDir=new URL('../.cloudflare/management-state',import.meta.url);
 const evidenceDir=new URL('../.cloudflare/evidence/management/',import.meta.url);
 const evidenceFile=new URL(`issue-130-${Date.now()}.json`,evidenceDir);
