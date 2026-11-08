@@ -16,10 +16,10 @@ export async function adminRead(request: Request, read: () => Promise<Response>)
     return privateResponse(error instanceof InvalidRequest ? apiError(400,error.code,error.message) : apiError(503,'READ_UNAVAILABLE','管理读取暂不可用。'));
   }
 }
-export async function rejectAdminMethod(request: Request): Promise<Response> {
+export async function rejectAdminMethod(request: Request, allow = 'GET, HEAD'): Promise<Response> {
   return adminRead(request,async()=>{
-    const response = apiError(405,'METHOD_NOT_ALLOWED','仅支持只读请求。');
-    response.headers.set('Allow','GET, HEAD');
+    const response = apiError(405,'METHOD_NOT_ALLOWED','该路径不支持此方法。');
+    response.headers.set('Allow',allow);
     return response;
   });
 }

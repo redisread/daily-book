@@ -100,7 +100,7 @@ try {
   const quoteChanged=await authorized('/api/v1/admin/issues/published-latest');check('Quote-set mutation with its owning Issue version changes Issue tag',quoteChanged.headers.get('etag')!==changedA.headers.get('etag')&&quoteChanged.json.data.quotes[0].text==='QUOTE_VERSION_CHANGED');
   const dataFingerprint=()=>createHash('sha256').update(JSON.stringify(['books','issues','quotes'].map(table=>adminRows(`SELECT * FROM ${table} ORDER BY id`)))).digest('hex');
   const beforeMethods=dataFingerprint();
-  for(const path of paths)for(const method of ['POST','PUT','PATCH','DELETE','OPTIONS']){const r=await authorized(path,{method});assertError(r,405,'METHOD_NOT_ALLOWED');check(`${method} is not a management write API at ${path}`,true);}
+  for(const path of paths)for(const method of ['POST','PUT','PATCH','DELETE','OPTIONS']){const r=await authorized(path,{method});const guardedBookPatch=method==='PATCH'&&path.startsWith('/api/v1/admin/books/');assertError(r,guardedBookPatch?400:405,guardedBookPatch?'INVALID_IDEMPOTENCY_KEY':'METHOD_NOT_ALLOWED');check(`${method} is rejected without write prerequisites at ${path}`,true);}
   check('Rejected HTTP methods leave every D1 business row unchanged',dataFingerprint()===beforeMethods);result.rejectedMethodsD1SHA256=beforeMethods;
   const head=await authorized(paths[1],{method:'HEAD'});check('Authorized HEAD is bodyless and retains strong ETag',head.status===200&&head.text===''&&Boolean(head.headers.get('etag')));
   const badPost=await request(paths[0],{method:'POST'});assertError(badPost,401,'UNAUTHORIZED');check('Unsupported method still authenticates before405',true);

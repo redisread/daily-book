@@ -1,6 +1,9 @@
 import vinext from 'vinext/server/fetch-handler';
 import type appRouter from 'vinext/server/app-router-entry';
 import { privateResponse,rejectAdminMethod } from './src/admin/http';
+import { bookWriteRoute } from './src/admin/book-routes';
+import { bookReadRoute } from './src/admin/book-reads';
+import type { WriteObserver } from './src/admin/atomic-write';
 import {parseArchiveInput} from './src/archive-input';
 import {InvalidRequest} from './src/domain/pagination';
 import {unavailablePage,failedRead,apiError} from './src/http';
@@ -11,7 +14,7 @@ import { withRequestReads, type DecisionObserver } from './src/request-reads';
 // Keep the public entry selector. Its generated virtual-module declaration is
 // opaque to standalone tsc; the pinned App Router export supplies its public type.
 const framework: typeof appRouter = vinext;
-export function createReaderWorker(observer?: DecisionObserver) {
+export function createReaderWorker(observer?: DecisionObserver, writeObserver?: WriteObserver) {
   return {
     ...framework,
     fetch(...args: Parameters<typeof framework.fetch>): Promise<Response> {
@@ -33,10 +36,15 @@ export function createReaderWorker(observer?: DecisionObserver) {
           try{const response=await publicRssResponse();return args[0].method==='HEAD'?new Response(null,{status:response.status,headers:response.headers}):response;}
           catch(error){return failedRead(error);}
         }
-        const management = pathname.startsWith('/api/v1/admin/');
-        // This phase has no management write surface. Reject every other method
-        // at the Worker boundary, with the same auth/error policy as GET routes.
-        if (management && !['GET','HEAD'].includes(args[0].method)) return rejectAdminMethod(args[0]);
+        const management = decodedPath.startsWith('/api/v1/admin/');
+        const bookCollection=/^\/api\/v1\/admin\/books\/?$/.test(decodedPath);
+        const bookDetail=/^\/api\/v1\/admin\/books\/([^/]+)\/?$/.exec(decodedPath);
+        const bookHistory=/^\/api\/v1\/admin\/books\/([^/]+)\/history\/?$/.exec(decodedPath);
+        // Stream and authenticate writes before framework buffering/normalization.
+        if (bookCollection && args[0].method==='POST') return bookWriteRoute(args[0],null,writeObserver);
+        if (bookDetail && args[0].method==='PATCH') return bookWriteRoute(args[0],bookDetail[1],writeObserver);
+        if ((bookCollection||bookHistory) && ['GET','HEAD'].includes(args[0].method)) return bookReadRoute(args[0],bookHistory?.[1]??null);
+        if (management && !['GET','HEAD'].includes(args[0].method)) return rejectAdminMethod(args[0],bookCollection?'GET, HEAD, POST':bookDetail?'GET, HEAD, PATCH':'GET, HEAD');
         const response = await framework.fetch(...args);
         // Also keep framework-generated management 404/405/HEAD responses
         // private/no-store. Authentication stays inside each registered route.
