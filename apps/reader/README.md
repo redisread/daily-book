@@ -104,11 +104,11 @@ fixture包含28个published（可测默认20与分页）、仅草稿/仅撤回�
 
 直接依赖沿用已验证的精确版本：vinext1.4.4、React/DOM/RSC19.3.1、Vite8.3.6、Cloudflare Vite plugin2.0.0-beta.v.12、cf1.0.0-beta.28。官方工具链仍是beta；上游fflate依赖链的5个moderate告警、sourcemap/dynamic-import构建警告仍需上线前复核，本应用未接入不受信任ZIP/OG处理。未验证完整主题、父Astro CI或任何线上环境。
 
-## Protected read-only management (task57)
+## Protected management read baseline (task57; extended by tasks70–71)
 
-The management surface is **read-only**. It does not implement writes, publication,
-conditional writes, a management UI, cloud provisioning or deployment. The frozen
-schema and historical mapping/import tool are unchanged.
+The original task57 read endpoints and access rules remain the baseline. Tasks70–71
+add local authenticated Book and Issue writes; there is still no management UI,
+cloud provisioning, production migration, deployment, or production import.
 
 - `GET /api/v1/admin/issues`: `{items,nextCursor}`, default20 / max100.
   Optional single `status=draft|published|withdrawn`; omission includes all states.
@@ -131,26 +131,22 @@ query parameters, cookies or visibility/state headers. No fallback/default key i
 provided; provided Bearer tokens are bounded to4096 characters. Missing configuration returns503; absent, malformed and wrong credentials
 return the same generic401 error before any database read. Comparisons hash both
 values to fixed-size SHA256 then use the existing `nodejs_compat` timing-safe
-comparison API. No key value or request headers are logged/reflected. The Worker
-rejects non-GET/HEAD management requests after authentication, without executing
-framework handlers or a database write. The old probe remains absent.
+comparison API. No key value or request headers are logged/reflected. Non-GET/HEAD
+requests are handled only by the explicit Book/Issue write routes below; other
+unsupported methods remain rejected after authentication. The old probe remains absent.
 
 Book detail emits a quoted strong `"b:<safe-id>:<version>"` ETag. Issue detail emits
-`"i:<base64url(JSON([issueId,issueVersion,bookId,bookVersion]))>"`, so changing a shared
-Book version changes every referencing Issue tag even when its own version is
-unchanged. IDs/tuple encoding cannot inject header syntax. Unsafe version integers
-fail closed rather than produce colliding tags. Quote-set edits belong to the
-owning Issue version; future authorized mutation code must increment that version,
-and Book edits must increment the Book version. This phase emits tags only and
-neither validates write preconditions nor strips/pretends to strengthen `W/` tags.
-Tests use identity transport to inspect the server's actual strong validator.
+an opaque strong tag carrying a base64url Issue/Book identity plus two fixed-width
+versions. A shared Book edit invalidates each related Issue tag. Unsafe version
+integers fail closed; write preconditions compare the caller's original strong tag
+inside the D1 batch and never strip or upgrade `W/` tags.
 
 Management SQL never populates the public request-read cache. Public CASE/WHERE
 visibility remains in SQL; sharing the SQL JSON projection does not share a
 private row or change a public response. Even a valid management Bearer leaves
 public draft404/withdrawn410 and published-only lists unchanged, including RSC.
 
-### Native verification
+### Native read verification (task57 baseline)
 
 `npm run verify` keeps the original480 checks and adds `verify:admin` in both dev
 and built native workerd. `reader-admin-test` uses only fictitious dummy57 and
@@ -170,6 +166,15 @@ scans every generated server/client/config file for the value. Reports contain n
 key; any unexpected diagnostic occurrence is redacted and makes verification fail.
 Default build is restored after the suite. Native process evidence and JSON results
 are under `.cloudflare/evidence/admin-*-result.json`.
+
+## Management Issue write endpoints (task71)
+
+- `POST /api/v1/admin/issues` creates a draft with `{id,bookId,editorNote?,body?,quotes?}`.
+- `PATCH /api/v1/admin/issues/:id` edits content and replaces the complete quote array when `quotes` is present. Quote positions follow array order; an existing quote ID can remain on its Issue, and an ID owned by another Issue is rejected.
+- `POST /api/v1/admin/issues/:id/publish|withdraw|restore` accepts only `{}`. Updates and status changes require `Idempotency-Key` plus the current single strong `If-Match`; failed writes create no success audit or receipt.
+- First publish requires nonempty Book title/author/category/description, 1–10 nonempty quotes and a 40–100 Unicode-code-point editor note after trim. The Worker assigns Beijing's current date and `MAX(issue_number)+1` in the atomic D1 transaction. Restore retains the original date/number and allows historical missing fields.
+- `GET /api/v1/admin/issues/:id/history` returns a resource-scoped bounded `{items,nextCursor}` history ordered by event timestamp DESC and event ID DESC.
+- `npm run verify:issues` runs dev and built native Worker checks against a dedicated local-only D1 ID 71. It verifies same-day publish contention, Beijing date allocation, Book-version invalidation, quote rollback and cross-Issue identity, restore of incomplete history, idempotent replay, Issue history pagination, public withdrawal behavior and default-output isolation. It does not address production resources.
 
 ## Original-theme migration (task58, independent branch)
 

@@ -33,6 +33,14 @@ export function bookIfMatch(headers: Headers): string {
   if (!match || !Number.isSafeInteger(Number(match[2]))) throw new WriteError(400,'INVALID_IF_MATCH','If-Match必须为单个有效强标签。');
   return tag; // Syntax validation only; raw equality is checked in the D1 batch.
 }
+export function issueIfMatch(headers: Headers): string {
+  const tag=headers.get('If-Match');
+  if (tag===null) throw new WriteError(428,'PRECONDITION_REQUIRED','需要单个强If-Match。');
+  const match=/^"i:([A-Za-z0-9_-]+)-([0-9]{16})-([0-9]{16})"$/.exec(tag);
+  if (tag.length>512 || !match || !Number.isSafeInteger(Number(match[2])) || Number(match[2])<1
+    || !Number.isSafeInteger(Number(match[3])) || Number(match[3])<1) throw new WriteError(400,'INVALID_IF_MATCH','If-Match必须为单个有效强标签。');
+  return tag; // The opaque token is compared byte-for-byte inside the D1 batch.
+}
 export async function readJSON(request: Request): Promise<Record<string,unknown>> {
   if (request.headers.get('Content-Type')?.split(';',1)[0].trim().toLowerCase()!=='application/json')
     throw new WriteError(415,'UNSUPPORTED_MEDIA_TYPE','仅接受application/json。');

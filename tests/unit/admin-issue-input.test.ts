@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   assertFirstPublicationComplete,
   assertIssueTransition,
-  IssueInputError,
   parseIssueCreateInput,
   parseIssuePatchInput,
   type FirstPublicationBook,
   type IssueQuoteInput,
 } from '../../apps/reader/src/admin/issue-input';
+import { issueIfMatch, WriteError } from '../../apps/reader/src/admin/write-input';
 
 const validBook: FirstPublicationBook = {
   title: 'Book title',
@@ -23,7 +23,7 @@ function expectIssueError(run: () => unknown, status: number, code: string) {
     run();
     throw new Error('expected issue input error');
   } catch (error) {
-    expect(error).toBeInstanceOf(IssueInputError);
+    expect(error).toBeInstanceOf(WriteError);
     expect(error).toMatchObject({ status, code });
   }
 }
@@ -95,5 +95,15 @@ describe('admin issue lifecycle transitions', () => {
     ['withdrawn', 'withdraw'],
   ] as const)('rejects %s → %s', (from, action) => {
     expectIssueError(() => assertIssueTransition(from, action), 409, 'INVALID_STATE');
+  });
+
+  it('accepts only one strong composite Issue tag with safe positive versions', () => {
+    const valid='"i:WyJpc3N1ZSIsImJvb2siXQ-0000000000000001-0000000000000002"';
+    expect(issueIfMatch(new Headers({ 'If-Match': valid }))).toBe(valid);
+    for(const value of [undefined,'*','W/'+valid,`${valid}, ${valid}`,'"i:bad-0000000000000000-0000000000000002"','"i:bad-9007199254740992-0000000000000002"']){
+      const headers=new Headers();if(value!==undefined)headers.set('If-Match',value);
+      const status=value===undefined?428:400;
+      expectIssueError(()=>issueIfMatch(headers),status,value===undefined?'PRECONDITION_REQUIRED':'INVALID_IF_MATCH');
+    }
   });
 });

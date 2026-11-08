@@ -1,8 +1,4 @@
-export class IssueInputError extends Error {
-  constructor(public readonly status: number, public readonly code: string) {
-    super(code);
-  }
-}
+import { WriteError, invalidValue } from './write-input';
 
 export interface IssueQuoteInput {
   id: string;
@@ -24,9 +20,8 @@ export interface IssuePatchInput {
   quotes?: IssueQuoteInput[];
 }
 
-const invalidValue = () => new IssueInputError(422, 'INVALID_VALUE');
-const unknownField = () => new IssueInputError(400, 'UNKNOWN_FIELD');
-const invalidState = () => new IssueInputError(409, 'INVALID_STATE');
+const unknownField = () => new WriteError(400, 'UNKNOWN_FIELD', '请求包含不允许的字段。');
+const invalidState = () => new WriteError(409, 'INVALID_STATE', '刊期当前状态不允许此操作。');
 
 function objectValue(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw invalidValue();

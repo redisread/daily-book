@@ -2,7 +2,9 @@ import { env } from 'cloudflare:workers';
 import { BOOK_JSON, ISSUE_JSON } from '../domain/issue-projection';
 import { validId } from '../domain/pagination';
 import type { Book, PublicIssue } from '../domain/types';
+import { apiError } from '../http';
 import { encodeAdminCursor, type AdminPageInput, type IssueStatus } from './pagination';
+import { encodeIssueHistoryCursor, parseIssueHistoryPage } from './issue-history-input';
 
 export type AdminIssue = Omit<PublicIssue, 'status' | 'publicationDate' | 'issueNumber'> & {
   status: IssueStatus; publicationDate: string | null; issueNumber: number | null;
@@ -35,4 +37,24 @@ export async function listAdminIssues({ limit,status,cursor }: AdminPageInput): 
   const rows = result.results.map(row => JSON.parse(row.issue_json) as AdminIssue);
   const items = rows.slice(0,limit);
   return { items,nextCursor:rows.length > limit ? encodeAdminCursor(items.at(-1)!,status) : null };
+}
+
+interface IssueEventRow {
+  event_id:string;resource_type:'issue';resource_id:string;operation:string;before_version:number|null;after_version:number;
+  before_json:string|null;after_json:string;created_at:string;request_id:string;actor:string;
+}
+export async function issueHistory(id:string,params:URLSearchParams):Promise<Response> {
+  if(!validId(id))return apiError(404,'ISSUE_NOT_FOUND','刊期不存在。');
+  const {limit,cursor}=parseIssueHistoryPage(params,id);
+  const exists=await env.DB.prepare('SELECT id FROM issues WHERE id=?').bind(id).first();
+  if(!exists)return apiError(404,'ISSUE_NOT_FOUND','刊期不存在。');
+  const rows=(await env.DB.prepare(`SELECT event_id,resource_type,resource_id,operation,before_version,after_version,before_json,after_json,created_at,request_id,actor
+    FROM admin_audit_events WHERE resource_type='issue' AND resource_id=?
+    ${cursor?'AND (created_at<? OR (created_at=? AND event_id<?))':''} ORDER BY created_at DESC,event_id DESC LIMIT ?`)
+    .bind(id,...(cursor?[cursor.createdAt,cursor.createdAt,cursor.eventId]:[]),limit+1).all<IssueEventRow>()).results;
+  const selected=rows.slice(0,limit);const items=selected.map(row=>({id:row.event_id,resourceType:row.resource_type,resourceId:row.resource_id,operation:row.operation,
+    beforeVersion:row.before_version,afterVersion:row.after_version,before:row.before_json===null?null:JSON.parse(row.before_json),after:JSON.parse(row.after_json),
+    createdAt:row.created_at,requestId:row.request_id,actor:row.actor}));
+  const last=selected.at(-1);
+  return Response.json({items,nextCursor:rows.length>limit?encodeIssueHistoryCursor(last!.created_at,last!.event_id,id):null});
 }

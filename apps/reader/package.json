@@ -35,7 +35,7 @@
     "typecheck": "tsc --noEmit",
     "db:local": "cf d1 migrations apply 00000000-0000-4000-8000-000000000049 --local --persist-to .cloudflare/state --dir migrations",
     "seed:local": "node scripts/seed-local.mjs",
-    "verify": "npm run verify:baseline && npm run verify:races && npm run verify:admin && npm run verify:theme && npm run verify:archive && npm run verify:search && npm run verify:rss && npm run verify:writes",
+    "verify": "npm run verify:baseline && npm run verify:races && npm run verify:admin && npm run verify:theme && npm run verify:archive && npm run verify:search && npm run verify:rss && npm run verify:writes && npm run verify:issues",
     "verify:baseline": "npm run db:local && npm run seed:local && node scripts/verify-schema.mjs && npm run types && npm run typecheck && npm run build && node scripts/verify-runtime.mjs dev && node scripts/verify-runtime.mjs built",
     "verify:races": "node scripts/verify-races.mjs dev && npm run build -- --mode reader-race-test && node scripts/verify-build-isolation.mjs race && node scripts/verify-races.mjs built && npm run build && node scripts/verify-build-isolation.mjs default",
     "verify:admin": "npm run types && npm run typecheck && npm run build -- --mode reader-admin-test && node scripts/verify-admin.mjs dev && node scripts/verify-admin.mjs built && npm run build && node scripts/verify-build-isolation.mjs default",
@@ -43,7 +43,8 @@
     "verify:archive": "npm run typecheck && node scripts/verify-archive.mjs dev && node scripts/verify-archive.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-archive-default.mjs",
     "verify:search": "npm run build && npm run typecheck && node scripts/verify-search.mjs dev && node scripts/verify-search.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-search-default.mjs",
     "verify:rss": "npm run build && npm run typecheck && node scripts/verify-rss.mjs dev && node scripts/verify-rss.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-rss-default.mjs",
-    "verify:writes": "node scripts/verify-writes.mjs dev && node scripts/verify-writes.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs"
+    "verify:writes": "node scripts/verify-writes.mjs dev && node scripts/verify-writes.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs",
+    "verify:issues": "node scripts/verify-issues.mjs dev && node scripts/verify-issues.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs"
   },
   "description": "Daily Book original-theme reader and Bearer-protected management APIs.",
   "engines": {

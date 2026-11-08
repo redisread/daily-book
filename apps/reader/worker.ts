@@ -3,6 +3,7 @@ import type appRouter from 'vinext/server/app-router-entry';
 import { privateResponse,rejectAdminMethod } from './src/admin/http';
 import { bookWriteRoute } from './src/admin/book-routes';
 import { bookReadRoute } from './src/admin/book-reads';
+import { issueHistoryRoute, issueWriteRoute, rejectIssueMethod } from './src/admin/issue-routes';
 import type { WriteObserver } from './src/admin/atomic-write';
 import {parseArchiveInput} from './src/archive-input';
 import {InvalidRequest} from './src/domain/pagination';
@@ -40,11 +41,25 @@ export function createReaderWorker(observer?: DecisionObserver, writeObserver?: 
         const bookCollection=/^\/api\/v1\/admin\/books\/?$/.test(decodedPath);
         const bookDetail=/^\/api\/v1\/admin\/books\/([^/]+)\/?$/.exec(decodedPath);
         const bookHistory=/^\/api\/v1\/admin\/books\/([^/]+)\/history\/?$/.exec(decodedPath);
+        const issueCollection=/^\/api\/v1\/admin\/issues\/?$/.test(decodedPath);
+        const issueAction=/^\/api\/v1\/admin\/issues\/([^/]+)\/(publish|withdraw|restore)\/?$/.exec(decodedPath);
+        const issueHistory=/^\/api\/v1\/admin\/issues\/([^/]+)\/history\/?$/.exec(decodedPath);
+        const issueDetail=/^\/api\/v1\/admin\/issues\/([^/]+)\/?$/.exec(decodedPath);
         // Stream and authenticate writes before framework buffering/normalization.
         if (bookCollection && args[0].method==='POST') return bookWriteRoute(args[0],null,writeObserver);
         if (bookDetail && args[0].method==='PATCH') return bookWriteRoute(args[0],bookDetail[1],writeObserver);
         if ((bookCollection||bookHistory) && ['GET','HEAD'].includes(args[0].method)) return bookReadRoute(args[0],bookHistory?.[1]??null);
-        if (management && !['GET','HEAD'].includes(args[0].method)) return rejectAdminMethod(args[0],bookCollection?'GET, HEAD, POST':bookDetail?'GET, HEAD, PATCH':'GET, HEAD');
+        if (issueCollection && args[0].method==='POST') return issueWriteRoute(args[0],null,null,writeObserver);
+        if (issueDetail && args[0].method==='PATCH') return issueWriteRoute(args[0],issueDetail[1],null,writeObserver);
+        if (issueAction) {
+          if(args[0].method==='POST')return issueWriteRoute(args[0],issueAction[1],issueAction[2] as 'publish'|'withdraw'|'restore',writeObserver);
+          return rejectIssueMethod(args[0],'POST');
+        }
+        if(issueHistory){
+          if(['GET','HEAD'].includes(args[0].method))return issueHistoryRoute(args[0],issueHistory[1]);
+          return rejectIssueMethod(args[0],'GET, HEAD');
+        }
+        if (management && !['GET','HEAD'].includes(args[0].method)) return rejectAdminMethod(args[0],bookCollection?'GET, HEAD, POST':bookDetail?'GET, HEAD, PATCH':issueCollection?'GET, HEAD, POST':issueDetail?'GET, HEAD, PATCH':'GET, HEAD');
         const response = await framework.fetch(...args);
         // Also keep framework-generated management 404/405/HEAD responses
         // private/no-store. Authentication stays inside each registered route.

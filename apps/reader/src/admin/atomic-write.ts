@@ -37,12 +37,12 @@ export function receiptResponse(receipt: WriteReceipt): Response {
   if (receipt.response_location!==null) headers.set('Location',receipt.response_location);
   return new Response(receipt.response_body,{status:receipt.response_status!,headers});
 }
-export async function atomicWrite(intent: WriteIntent, planFor: (operationId:string)=>AtomicPlan, observer?: WriteObserver): Promise<Response> {
+export async function atomicWrite(intent: WriteIntent, planFor: (operationId:string)=>AtomicPlan|Promise<AtomicPlan>, observer?: WriteObserver): Promise<Response> {
   // This is a replay optimization, NOT the concurrency guard. A miss never grants
   // permission to mutate: the unique INSERT and every precondition are in batch.
   const previous=await storedReceipt(intent.key);
   if (previous) return receiptResponse(replay(previous,intent.digest));
-  const operationId=crypto.randomUUID();const requestId=crypto.randomUUID();const plan=planFor(operationId);
+  const operationId=crypto.randomUUID();const requestId=crypto.randomUUID();const plan=await planFor(operationId);
   const statements=[
     env.DB.prepare(`INSERT INTO admin_write_receipts
       (idempotency_key,request_hash,operation_id,resource_type,resource_id,operation,method,canonical_path,actor,request_id,before_json,condition_ok)

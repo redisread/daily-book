@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     vinext(),
     cloudflare({
       viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
-      persistState: { path: mode === "reader-write-test" ? ".cloudflare/write-state" : mode === "reader-race-test" ? ".cloudflare/race-state" : mode === "reader-admin-test" ? ".cloudflare/admin-state" : mode === "reader-theme-test" ? ".cloudflare/theme-state" : mode === "reader-archive-test" ? ".cloudflare/archive-state" : mode === "reader-search-test" ? ".cloudflare/search-state" : mode === "reader-rss-test" ? ".cloudflare/rss-state" : ".cloudflare/state" },
+      persistState: { path: mode === "reader-write-test" ? ".cloudflare/write-state" : mode === "reader-issue-test" ? ".cloudflare/issue-state" : mode === "reader-race-test" ? ".cloudflare/race-state" : mode === "reader-admin-test" ? ".cloudflare/admin-state" : mode === "reader-theme-test" ? ".cloudflare/theme-state" : mode === "reader-archive-test" ? ".cloudflare/archive-state" : mode === "reader-search-test" ? ".cloudflare/search-state" : mode === "reader-rss-test" ? ".cloudflare/rss-state" : ".cloudflare/state" },
       remoteBindings: false,
       tunnel: false,
     }),
