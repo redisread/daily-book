@@ -1,0 +1,154 @@
+name: Daily Book Reader gated release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_commit:
+        description: Full 40-character SHA of the reviewed main commit to validate
+        required: true
+        type: string
+      deploy_canary:
+        description: Request the canary deploy job (requires the protected reader-production environment)
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reader-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact dispatch commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Require exact main commit pin
+        env:
+          INPUT_RELEASE_COMMIT: ${{ inputs.release_commit }}
+        run: |
+          node <<'NODE'
+          const requested = process.env.INPUT_RELEASE_COMMIT;
+          if (!/^[0-9a-f]{40}$/.test(requested ?? '') || requested !== process.env.GITHUB_SHA) {
+            throw new Error('release_commit must equal the full SHA selected from protected main');
+          }
+          NODE
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Root checks
+        run: |
+          npm run books:check
+          npm run typecheck
+          npm run lint
+          npm test
+          npm run build
+
+      - name: Install Reader dependencies
+        run: npm ci --ignore-scripts
+        working-directory: apps/reader
+
+      - name: Reader checks
+        run: |
+          npm run typecheck
+          npm run verify
+          npm run release:preflight
+        working-directory: apps/reader
+
+      - name: Audit root dependencies
+        run: npm audit --audit-level=high
+
+      - name: Audit Reader dependencies
+        run: npm audit --audit-level=moderate
+        working-directory: apps/reader
+
+  deploy-canary:
+    if: github.ref == 'refs/heads/main' && inputs.deploy_canary
+    needs: preflight
+    runs-on: ubuntu-latest
+    environment:
+      name: reader-production
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout exact dispatch commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Require pinned target and release commit
+        env:
+          INPUT_RELEASE_COMMIT: ${{ inputs.release_commit }}
+          READER_RELEASE_ACCOUNT_ID: ${{ vars.READER_RELEASE_ACCOUNT_ID }}
+          READER_RELEASE_DATABASE_ID: ${{ vars.READER_RELEASE_DATABASE_ID }}
+          READER_RELEASE_COMMIT_SHA: ${{ vars.READER_RELEASE_COMMIT_SHA }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const target = JSON.parse(fs.readFileSync('apps/reader/release-target.json', 'utf8'));
+          const requested = process.env.INPUT_RELEASE_COMMIT;
+          if (!/^[0-9a-f]{40}$/.test(requested ?? '') || requested !== process.env.GITHUB_SHA) {
+            throw new Error('dispatch commit does not match the checked out main commit');
+          }
+          if (target.deploymentEnabled !== true
+            || target.accountId !== process.env.READER_RELEASE_ACCOUNT_ID
+            || target.databaseId !== process.env.READER_RELEASE_DATABASE_ID
+            || target.releaseCommit !== requested
+            || process.env.READER_RELEASE_COMMIT_SHA !== requested) {
+            throw new Error('deployment disabled or protected target/commit differs from the committed manifest');
+          }
+          NODE
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/reader/package-lock.json
+
+      - name: Install Reader dependencies
+        run: npm ci --ignore-scripts
+        working-directory: apps/reader
+
+      - name: Validate release manifest pins
+        run: npm run release:plan -- --require-enabled --commit-sha "$GITHUB_SHA"
+        working-directory: apps/reader
+        env:
+          READER_RELEASE_ACCOUNT_ID: ${{ vars.READER_RELEASE_ACCOUNT_ID }}
+          READER_RELEASE_DATABASE_ID: ${{ vars.READER_RELEASE_DATABASE_ID }}
+          READER_RELEASE_COMMIT_SHA: ${{ vars.READER_RELEASE_COMMIT_SHA }}
+
+      - name: Prepare protected Worker secret file
+        env:
+          CONTENT_API_KEY: ${{ secrets.READER_CONTENT_API_KEY }}
+        run: |
+          test -n "$CONTENT_API_KEY"
+          umask 077
+          node --input-type=module <<'NODE'
+          import { writeFileSync } from 'node:fs';
+          if (!process.env.CONTENT_API_KEY) throw new Error('Reader API key is not configured');
+          writeFileSync(`${process.env.RUNNER_TEMP}/reader-secrets.json`, JSON.stringify({ CONTENT_API_KEY: process.env.CONTENT_API_KEY }), { mode: 0o600 });
+          NODE
+
+      - name: Deploy Reader canary Worker
+        run: ./node_modules/.bin/cf deploy --mode reader-production --secrets-file "$RUNNER_TEMP/reader-secrets.json" --message "Reader canary $GITHUB_SHA"
+        working-directory: apps/reader
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          READER_RELEASE_ACCOUNT_ID: ${{ vars.READER_RELEASE_ACCOUNT_ID }}
+          READER_RELEASE_DATABASE_ID: ${{ vars.READER_RELEASE_DATABASE_ID }}
+          READER_RELEASE_COMMIT_SHA: ${{ vars.READER_RELEASE_COMMIT_SHA }}

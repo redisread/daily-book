@@ -100,9 +100,9 @@ fixture包含28个published（可测默认20与分页）、仅草稿/仅撤回�
 
 默认生产模式产物另检查：只引用虚构49库、服务端没有barrier SQL/超时控制代码，客户端产物在两种模式中都没有测试控制代码。此处“生产模式”仅指本地构建，不代表已部署或可正式切换。
 
-本切片仍无公开写接口，**未来幂等/审计、管理写入与读写整合尚未验收**。受控读取竞态通过不等于全部业务并发或生产就绪；正式切换仍需后续完整交付和明确授权。
+公开页面外，Reader 现在还提供Bearer保护的Book/Issue管理写API，包含版本条件、幂等回执、审计、发布/撤回/恢复和共享限流。上述内容只在本地假D1上验收；仍无后台UI、生产Worker/D1或线上写入。
 
-直接依赖沿用已验证的精确版本：vinext1.4.4、React/DOM/RSC19.3.1、Vite8.3.6、Cloudflare Vite plugin2.0.0-beta.v.12、cf1.0.0-beta.28。官方工具链仍是beta；上游fflate依赖链的5个moderate告警、sourcemap/dynamic-import构建警告仍需上线前复核，本应用未接入不受信任ZIP/OG处理。未验证完整主题、父Astro CI或任何线上环境。
+直接依赖固定为vinext1.4.4、React/DOM/RSC19.3.1、Vite8.3.6、Cloudflare Vite plugin2.0.0-beta.v.12、cf1.0.0-beta.28。Cloudflare/Vinext工具链仍是beta。Task76将fflate锁定到补丁版0.7.5，消除Reader lockfile中由该依赖链产生的5个moderate npm audit findings；应用源码未直接调用ZIP解析或OG生成，但框架依赖闭包仍需在上线前复核。父Astro站的依赖审查见`docs/dependency-advisory-review.md`，生产入口保持关闭见`release-target.json`。本地配置预检：`npm run release:preflight`；目标/提交/pin拒绝测试：`npm run verify:release`。
 
 ## Protected management read baseline (task57; extended by tasks70–71)
 
