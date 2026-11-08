@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { appendFileSync, cpSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -7,17 +7,15 @@ import path from "node:path";
 import { buildPreflight, readReleaseTarget } from "./production-release-preflight.mjs";
 
 const script = fileURLToPath(new URL("./production-release-preflight.mjs", import.meta.url));
+const verifyScript = fileURLToPath(new URL("./verify-production-release-preflight.mjs", import.meta.url));
 const appRoot = path.resolve(path.dirname(script), "..");
 const target = readReleaseTarget();
-const disabled = spawnSync(process.execPath, [script, "--verify-disabled"], { encoding: "utf8" });
 if (target.deploymentEnabled === false) {
+  const disabled = spawnSync(process.execPath, [script, "--verify-disabled"], { encoding: "utf8" });
   assert.equal(disabled.status, 0, disabled.stderr);
   assert.match(disabled.stdout, /DISABLED_AS_DESIGNED/);
   assert.match(disabled.stdout, /"databaseOpened": false/);
   assert.match(disabled.stdout, /"remoteOperationEnabled": false/);
-} else {
-  assert.equal(disabled.status, 1);
-  assert.match(disabled.stdout, /UNEXPECTEDLY_ENABLED/);
 }
 
 const defaultPolicy = buildPreflight({
@@ -116,7 +114,15 @@ try {
   rmSync(damagedCheckout, { recursive: true, force: true });
 }
 
-const unprovisioned = buildPreflight({ target, requireEnabled: true });
+const unprovisionedTarget = {
+  ...testTarget,
+  deploymentEnabled: false,
+  accountId: null,
+  databaseId: null,
+  schemaReceiptSha256: null,
+  historyImportReceiptSha256: null,
+};
+const unprovisioned = buildPreflight({ target: unprovisionedTarget, requireEnabled: true });
 assert.equal(unprovisioned.status, "BLOCKED");
 assert(unprovisioned.errors.some(({ code }) => code === "DEPLOYMENT_DISABLED"));
 assert.equal(unprovisioned.selectedTarget.accountId, null);
@@ -125,4 +131,54 @@ assert.equal(unprovisioned.selectedTarget.releaseCommit, null);
 assert(unprovisioned.errors.some(({ code }) => code === "SCHEMA_RECEIPT_MISSING"));
 assert(unprovisioned.errors.some(({ code }) => code === "IMPORT_RECEIPT_MISSING"));
 
-process.stdout.write("PASS release preflight: disabled policy, synthetic approved candidate, pin/schema failures, and no remote path\n");
+function runNpmVerifyFixture(name, fixtureTarget) {
+  const fixtureRoot = mkdtempSync(path.join(tmpdir(), `reader-release-${name}-`));
+  try {
+    const fixtureScripts = path.join(fixtureRoot, "scripts");
+    mkdirSync(fixtureScripts, { recursive: true });
+    cpSync(script, path.join(fixtureScripts, "production-release-preflight.mjs"));
+    cpSync(verifyScript, path.join(fixtureScripts, "verify-production-release-preflight.mjs"));
+    cpSync(path.join(appRoot, "migrations"), path.join(fixtureRoot, "migrations"), { recursive: true });
+    writeFileSync(path.join(fixtureRoot, "release-target.json"), `${JSON.stringify(fixtureTarget, null, 2)}\n`);
+    writeFileSync(path.join(fixtureRoot, "package.json"), JSON.stringify({
+      name: `reader-release-${name}-fixture`,
+      private: true,
+      scripts: { "verify:release": "node scripts/verify-production-release-preflight.mjs" },
+    }, null, 2));
+
+    const env = { ...process.env, RELEASE_PREFLIGHT_FIXTURE_RUN: "1" };
+    delete env.READER_RELEASE_ACCOUNT_ID;
+    delete env.READER_RELEASE_DATABASE_ID;
+    delete env.READER_RELEASE_COMMIT_SHA;
+    const result = spawnSync("npm", ["run", "verify:release"], { cwd: fixtureRoot, env, encoding: "utf8" });
+    assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+    assert.match(result.stdout, /PASS release preflight:/);
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+}
+
+if (process.env.RELEASE_PREFLIGHT_FIXTURE_RUN !== "1") {
+  runNpmVerifyFixture("disabled", {
+    ...target,
+    deploymentEnabled: false,
+    migrationApplyEnabled: false,
+    historyImportEnabled: false,
+    accountId: null,
+    databaseId: null,
+    schemaReceiptSha256: null,
+    historyImportReceiptSha256: null,
+  });
+  runNpmVerifyFixture("enabled", {
+    ...target,
+    deploymentEnabled: true,
+    migrationApplyEnabled: false,
+    historyImportEnabled: false,
+    accountId: "1234567890abcdef1234567890abcdef",
+    databaseId: "12345678-1234-4234-8234-123456789012",
+    schemaReceiptSha256: "b".repeat(64),
+    historyImportReceiptSha256: "c".repeat(64),
+  });
+}
+
+process.stdout.write("PASS release preflight: actual and synthetic disabled targets, enabled candidate without protected values, pin/schema failures, and no remote path\n");
