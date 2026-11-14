@@ -16,7 +16,11 @@ const checks = [];
 const result = { mode, startedAt: new Date().toISOString(), checks };
 const runtimeSecret = randomBytes(32).toString('hex');
 let server; let logs = ''; let readinessLogs = '';
+const stripAnsi = (text) => text.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, '');
 const check = (name, condition) => { assert(condition, name); checks.push(name); };
+let splitEscapeLogs = '';
+for (const chunk of [`${origin.slice(0, -5)}\u001b[3`, `2m${origin.slice(-5)}\u001b[0m`]) splitEscapeLogs += chunk;
+check('ANSI readiness normalization handles an escape sequence split across chunks', stripAnsi(splitEscapeLogs) === origin);
 const privateMarkers = [
   'DRAFT_ONLY_BOOK_', 'WITHDRAWN_ONLY_BOOK_', 'DRAFT_EDITOR_NOTE_SENTINEL', 'DRAFT_SHARED_EDITOR_NOTE_SENTINEL',
   'DRAFT_BODY_SENTINEL', 'DRAFT_SHARED_BODY_SENTINEL', 'WITHDRAWN_BODY_SENTINEL', 'WITHDRAWN_EDITOR_NOTE_SENTINEL',
@@ -60,7 +64,7 @@ try {
   for (const stream of [server.stdout,server.stderr]) stream.on('data', (chunk) => {
     const output = chunk.toString();
     logs += output;
-    readinessLogs += output.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, '');
+    readinessLogs = stripAnsi(logs);
   });
   const deadline = Date.now() + 60000;
   while (!readinessLogs.includes(origin)) {
