@@ -8,6 +8,7 @@ import { readFileSync,writeFileSync,mkdirSync,existsSync,unlinkSync,readdirSync 
 import { fileURLToPath,URL,URLSearchParams } from 'node:url';
 import { randomBytes,createHash } from 'node:crypto';
 import { setTimeout as wait } from 'node:timers/promises';
+import { stripAnsi } from './readiness.mjs';
 import { migrateAdminDB,adminSQL,adminRows } from './admin-db.mjs';
 
 const mode=process.argv[2];assert(['dev','built'].includes(mode));
@@ -45,7 +46,7 @@ async function start() {
   const env={...process.env};delete env.CONTENT_API_KEY;delete env.VITE_CONTENT_API_KEY;
   server=spawn(process.execPath,['node_modules/vite/bin/vite.js',mode==='dev'?'dev':'preview','--mode','reader-admin-test','--host','127.0.0.1','--port',String(port)],{cwd:root,env,detached:true,stdio:['ignore','pipe','pipe']});
   let phaseLogs='';for(const stream of [server.stdout,server.stderr])stream.on('data',chunk=>{logs+=chunk;phaseLogs+=chunk;});
-  const deadline=Date.now()+60000;while(!phaseLogs.includes(origin)){if(server.exitCode!==null)throw new Error('Owned admin test server exited');if(Date.now()>deadline)throw new Error('Owned admin test startup timed out');await wait(100);}
+  const deadline=Date.now()+60000;while(!stripAnsi(phaseLogs).includes(origin)){if(server.exitCode!==null)throw new Error('Owned admin test server exited');if(Date.now()>deadline)throw new Error('Owned admin test startup timed out');await wait(100);}
 }
 async function stop() {
   if(server && server.exitCode===null){const exited=once(server,'exit');process.kill(-server.pid,'SIGTERM');if(!(await Promise.race([exited.then(()=>true),wait(5000,undefined,{ref:false}).then(()=>false)]))){try{process.kill(-server.pid,'SIGKILL');}catch{/* already exited */}}}server=undefined;

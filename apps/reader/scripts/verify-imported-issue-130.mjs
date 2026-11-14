@@ -8,6 +8,7 @@ import {existsSync,mkdirSync,writeFileSync,unlinkSync,readFileSync} from 'node:f
 import {resolve} from 'node:path';
 import {fileURLToPath,URL} from 'node:url';
 import {setTimeout as wait} from 'node:timers/promises';
+import {stripAnsi} from './readiness.mjs';
 import {managementRows} from './management-db.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
@@ -45,7 +46,7 @@ function start(){
   const mode=server?.mode??'dev';const command=mode==='built'?'preview':'dev';
   const child=spawn(process.execPath,['node_modules/vite/bin/vite.js',command,'--mode','reader-admin-write-test','--host','127.0.0.1','--port',String(port)],{cwd:root,env,detached:true,stdio:['ignore','pipe','pipe']});
   let phase='';for(const stream of [child.stdout,child.stderr])stream.on('data',chunk=>{const text=String(chunk);logs+=text;phase+=text;});
-  const ready=(async()=>{const deadline=Date.now()+60000;while(!phase.includes(origin)){if(child.exitCode!==null)throw Error('Owned issue130 Worker exited');if(Date.now()>deadline)throw Error('Issue130 Worker startup timed out');await wait(100);}})();
+  const ready=(async()=>{const deadline=Date.now()+60000;while(!stripAnsi(phase).includes(origin)){if(child.exitCode!==null)throw Error('Owned issue130 Worker exited');if(Date.now()>deadline)throw Error('Issue130 Worker startup timed out');await wait(100);}})();
   server={child,mode};return ready;
 }
 async function stop(){if(!server?.child||server.child.exitCode!==null){server=undefined;return;}const child=server.child;const exited=once(child,'exit');process.kill(-child.pid,'SIGTERM');if(!(await Promise.race([exited.then(()=>true),wait(5000,undefined,{ref:false}).then(()=>false)]))){try{process.kill(-child.pid,'SIGKILL');}catch{/* already stopped */}}server=undefined;}

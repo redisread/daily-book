@@ -7,6 +7,7 @@ import {existsSync,writeFileSync,unlinkSync,mkdirSync} from 'node:fs';
 import {randomBytes} from 'node:crypto';
 import {fileURLToPath,URL} from 'node:url';
 import {setTimeout as wait} from 'node:timers/promises';
+import {stripAnsi} from './readiness.mjs';
 import {issueRows,issueSQL,migrateIssueDB} from './issue-db.mjs';
 
 const mode=process.argv[2];assert(['dev','built'].includes(mode));
@@ -55,7 +56,7 @@ async function start(){
   const env=Object.fromEntries(Object.entries(process.env).filter(([name])=>name!=='CONTENT_API_KEY'&&name!=='VITE_CONTENT_API_KEY'&&!name.startsWith('CLOUDFLARE_')));
   server=spawn(process.execPath,['node_modules/vite/bin/vite.js',mode==='dev'?'dev':'preview','--mode','reader-issue-test','--host','127.0.0.1','--port',String(port)],{cwd:root,env,detached:true,stdio:['ignore','pipe','pipe']});
   let phase='';for(const stream of [server.stdout,server.stderr])stream.on('data',chunk=>{logs+=chunk;phase+=chunk;});
-  const deadline=Date.now()+60000;while(!phase.includes(origin)){if(server.exitCode!==null)throw Error('Owned Issue-test server exited');if(Date.now()>deadline)throw Error('Issue-test startup timed out');await wait(100);}
+  const deadline=Date.now()+60000;while(!stripAnsi(phase).includes(origin)){if(server.exitCode!==null)throw Error('Owned Issue-test server exited');if(Date.now()>deadline)throw Error('Issue-test startup timed out');await wait(100);}
   const readyDeadline=Date.now()+15000;while(Date.now()<readyDeadline){try{const response=await request('/api/v1/admin/issues?limit=1',{headers:{Authorization:'Bearer invalid'}});if(response.status===401)return;}catch{/* Native runtime may still be starting its local D1 binding. */}await wait(100);}
   throw Error('Issue-test HTTP readiness check timed out');
 }

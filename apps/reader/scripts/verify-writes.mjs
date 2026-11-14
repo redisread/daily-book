@@ -8,6 +8,7 @@ import {readFileSync,writeFileSync,mkdirSync,existsSync,unlinkSync,readdirSync} 
 import {fileURLToPath,URL} from 'node:url';
 import {randomBytes,createHash} from 'node:crypto';
 import {setTimeout as wait} from 'node:timers/promises';
+import {stripAnsi} from './readiness.mjs';
 import {migrateWriteDB,writeSQL,writeRows} from './write-db.mjs';
 
 const mode=process.argv[2];assert(['dev','built'].includes(mode));
@@ -51,7 +52,7 @@ async function start() {
   const env=Object.fromEntries(Object.entries(process.env).filter(([name])=>name!=='CONTENT_API_KEY'&&name!=='VITE_CONTENT_API_KEY'&&!name.startsWith('CLOUDFLARE_')));
   server=spawn(process.execPath,['node_modules/vite/bin/vite.js',mode==='dev'?'dev':'preview','--mode','reader-write-test','--host','127.0.0.1','--port',String(port)],{cwd:root,env,detached:true,stdio:['ignore','pipe','pipe']});
   let phase='';for(const stream of [server.stdout,server.stderr])stream.on('data',chunk=>{logs+=chunk;phase+=chunk;});
-  const deadline=Date.now()+60000;while(!phase.includes(origin)){if(server.exitCode!==null)throw Error('Owned write-test server exited');if(Date.now()>deadline)throw Error('Write-test startup timed out');await wait(100);}
+  const deadline=Date.now()+60000;while(!stripAnsi(phase).includes(origin)){if(server.exitCode!==null)throw Error('Owned write-test server exited');if(Date.now()>deadline)throw Error('Write-test startup timed out');await wait(100);}
 }
 async function stop() {
   if(server&&server.exitCode===null){const exited=once(server,'exit');process.kill(-server.pid,'SIGTERM');if(!(await Promise.race([exited.then(()=>true),wait(5000,undefined,{ref:false}).then(()=>false)]))){try{process.kill(-server.pid,'SIGKILL');}catch{/* already stopped */}}}server=undefined;

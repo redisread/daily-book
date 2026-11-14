@@ -3,9 +3,10 @@ import { spawn, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { setTimeout as wait } from 'node:timers/promises';
 import { migrateRaceDB, raceSQL, raceRows } from './race-db.mjs';
+import { stripAnsi } from './readiness.mjs';
 
 const mode = process.argv[2]; assert(['dev', 'built'].includes(mode));
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -15,7 +16,8 @@ const origin = `http://127.0.0.1:${port}`;
 const result = { mode, startedAt: new Date().toISOString(), checks: [], cases: [] };
 const check = (name, condition) => { assert(condition, name); result.checks.push(name); };
 const headers = { RSC: '1', Accept: 'text/x-component', 'X-Reader-Visibility': 'published', 'X-Request-Id': 'forged-shared-context' };
-let server; let logs = ''; let pending;
+let server; let logs = ''; let readinessLogs = ''; let pending;
+const runtimeSecret = randomBytes(32).toString('hex');
 const ids = new Set();
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 async function request(path, requestHeaders = {}) {
@@ -60,10 +62,13 @@ try {
   await migrateRaceDB();
   await raceSQL(readFileSync(new URL('../fixtures/races.sql', import.meta.url), 'utf8'));
   await raceSQL("UPDATE reader_test_barrier SET armed=0,released=1 WHERE id='current';" + stateSQL('PUBLIC_INITIAL', 'published'));
-  server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', mode === 'dev' ? 'dev' : 'preview', '--mode', 'reader-race-test', '--host', '127.0.0.1', '--port', String(port)], { cwd: root, detached: true, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env } });
-  for (const stream of [server.stdout, server.stderr]) stream.on('data', (chunk) => { logs += chunk.toString(); });
+  server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', mode === 'dev' ? 'dev' : 'preview', '--mode', 'reader-race-test', '--host', '127.0.0.1', '--port', String(port)], { cwd: root, detached: true, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, CONTENT_API_KEY: runtimeSecret } });
+  for (const stream of [server.stdout, server.stderr]) stream.on('data', (chunk) => {
+    logs += chunk.toString();
+    readinessLogs = stripAnsi(logs);
+  });
   const deadline = Date.now() + 60000;
-  while (!logs.includes(origin)) {
+  while (!readinessLogs.includes(origin)) {
     if (server.exitCode !== null) throw new Error(`Owned test server exited: ${server.exitCode}`);
     if (Date.now() > deadline) throw new Error('Owned test server startup timed out');
     await wait(100);
@@ -123,6 +128,7 @@ try {
       result.cases.push({ transport, transition, gate, apiStatus: api.status, original: { status: outcome.value.status, mime: outcome.value.headers.get('content-type'), sha256: hash(outcome.value.text) }, concurrent: { status: concurrent.status, mime: concurrent.headers.get('content-type'), sha256: hash(concurrent.text) }, fresh: { status: fresh.status, mime: fresh.headers.get('content-type'), sha256: hash(fresh.text) } });
     }
   }
+  check('Synthetic local secret is not written to server logs', !logs.includes(runtimeSecret));
   check('All four controlled withdraw/restore HTML/RSC cases completed', result.cases.length === 4);
   result.status = 'passed';
 } catch (error) {
@@ -137,8 +143,9 @@ try {
     }
   }
   result.finishedAt = new Date().toISOString();
+  const safeLogs = logs.replaceAll(runtimeSecret, '[redacted synthetic local secret]');
   writeFileSync(new URL(`race-${mode}-result.json`, output), JSON.stringify(result, null, 2));
-  writeFileSync(new URL(`race-${mode}-server.log`, output), logs);
+  writeFileSync(new URL(`race-${mode}-server.log`, output), safeLogs);
   process.stdout.write(JSON.stringify(result, null, 2) + '\n');
-  if (result.status !== 'passed') process.stderr.write(logs);
+  if (result.status !== 'passed') process.stderr.write(safeLogs);
 }

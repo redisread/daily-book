@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash, randomBytes } from 'node:crypto';
 import { setTimeout as wait } from 'node:timers/promises';
 import { localSQL, rows } from './local-db.mjs';
+import { stripAnsi } from './readiness.mjs';
 
 const mode = process.argv[2]; assert(['dev','built'].includes(mode));
 const root = new URL('../', import.meta.url); process.chdir(fileURLToPath(root));
@@ -16,7 +17,6 @@ const checks = [];
 const result = { mode, startedAt: new Date().toISOString(), checks };
 const runtimeSecret = randomBytes(32).toString('hex');
 let server; let logs = ''; let readinessLogs = '';
-const stripAnsi = (text) => text.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, '');
 const check = (name, condition) => { assert(condition, name); checks.push(name); };
 let splitEscapeLogs = '';
 for (const chunk of [`${origin.slice(0, -5)}\u001b[3`, `2m${origin.slice(-5)}\u001b[0m`]) splitEscapeLogs += chunk;

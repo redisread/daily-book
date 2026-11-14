@@ -8,6 +8,7 @@ import {fileURLToPath,URL} from 'node:url';
 import {readFileSync,writeFileSync,mkdirSync,existsSync,unlinkSync,readdirSync} from 'node:fs';
 import {randomBytes,createHash} from 'node:crypto';
 import {setTimeout as wait} from 'node:timers/promises';
+import {stripAnsi} from './readiness.mjs';
 import {chromium,expect} from '@playwright/test';
 import {migrateArchiveDB,archiveSQL,archiveRows} from './archive-db.mjs';
 const mode=process.argv[2];assert(['dev','built'].includes(mode));
@@ -42,7 +43,7 @@ try{
   writeFileSync(keyFile,`CONTENT_API_KEY=${key}\n`,{flag:'wx',mode:0o600});ownedKey=true;
   const env=Object.fromEntries(Object.entries(process.env).filter(([name])=>name!=='CONTENT_API_KEY'&&!name.startsWith('CLOUDFLARE_')));
   if(mode==='built'){const built=spawnSync('npm',['run','build','--','--mode','reader-archive-test'],{cwd:root,env,encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:16*1024*1024});const text=(built.stdout??'')+(built.stderr??'');assert(!text.includes(key));logs+=text;assert.equal(built.status,0);}
-  server=spawn(process.execPath,['node_modules/vite/bin/vite.js',mode==='dev'?'dev':'preview','--mode','reader-archive-test','--host','127.0.0.1','--port',String(port),'--strictPort'],{cwd:root,env,detached:true,stdio:['ignore','pipe','pipe']});let phase='';for(const stream of [server.stdout,server.stderr])stream.on('data',chunk=>{logs+=chunk;phase+=chunk;});const deadline=Date.now()+90000;while(!phase.includes(origin)){if(server.exitCode!==null)throw new Error('Owned archive server exited');if(Date.now()>deadline)throw new Error('Owned archive startup timed out');await wait(100);}
+  server=spawn(process.execPath,['node_modules/vite/bin/vite.js',mode==='dev'?'dev':'preview','--mode','reader-archive-test','--host','127.0.0.1','--port',String(port),'--strictPort'],{cwd:root,env,detached:true,stdio:['ignore','pipe','pipe']});let phase='';for(const stream of [server.stdout,server.stderr])stream.on('data',chunk=>{logs+=chunk;phase+=chunk;});const deadline=Date.now()+90000;while(!stripAnsi(phase).includes(origin)){if(server.exitCode!==null)throw new Error('Owned archive server exited');if(Date.now()>deadline)throw new Error('Owned archive startup timed out');await wait(100);}
   if(mode==='built'){const outputs=files(new URL('../.cloudflare/output/v0/',import.meta.url));check('Configured archive Worker/client/build outputs contain no actual secret',outputs.length>100&&outputs.every(path=>!readFileSync(path).includes(Buffer.from(key))));result.configuredBuildFilesScanned=outputs.length;}
   for(const [path,status] of [['/archive',200],['/archive?cursor=bad',400]]){const response=await fetch(origin+path,{method:'HEAD',headers:{Connection:'close'},signal:AbortSignal.timeout(20000)});check(`HEAD ${path} preserves ${status}/no-store without a body`,response.status===status&&/no-store/.test(response.headers.get('cache-control')??'')&&(await response.text())==='');}
   const first=await request('/archive');check('Archive is real200/no-store SSR',first.status===200);check('First page has fixed20 published entries',cards(first.text).length===20);check('Visible first20 exactly match independent D1 ordering',JSON.stringify(cards(first.text))===JSON.stringify(expected.slice(0,20).map(row=>row.id)));

@@ -7,6 +7,7 @@ import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {fileURLToPath,URL} from 'node:url';
 import {createHash} from 'node:crypto';
 import {setTimeout as wait} from 'node:timers/promises';
+import {stripAnsi} from './readiness.mjs';
 import {chromium,expect} from '@playwright/test';
 import {migrateThemeDB,themeSQL} from './theme-db.mjs';
 
@@ -18,7 +19,7 @@ const check=(label,value)=>{assert(value,label);result.checks.push(label);};
 const reference=JSON.parse(readFileSync(new URL('../fixtures/theme-reference-provenance.json',import.meta.url),'utf8'));
 const seed=readFileSync(new URL('../fixtures/theme-reference.sql',import.meta.url),'utf8');
 const styleHash=createHash('sha256').update(readFileSync(new URL('../app/original-theme.css',import.meta.url))).digest('hex');result.originalCSSSHA256=styleHash;
-async function start(cwd,args,url){const env=Object.fromEntries(Object.entries(process.env).filter(([name])=>!name.startsWith('CLOUDFLARE_')));const child=spawn(process.execPath,args,{cwd,env,detached:true,stdio:['ignore','pipe','pipe']});children.push(child);let text='';for(const stream of [child.stdout,child.stderr])stream.on('data',chunk=>{text+=chunk;logs.push(chunk.toString());});const deadline=Date.now()+90000;while(!text.includes(url)){if(child.exitCode!==null)throw new Error('Owned theme server exited');if(Date.now()>deadline)throw new Error('Owned theme server startup timed out');await wait(100);}return child;}
+async function start(cwd,args,url){const env=Object.fromEntries(Object.entries(process.env).filter(([name])=>!name.startsWith('CLOUDFLARE_')));const child=spawn(process.execPath,args,{cwd,env,detached:true,stdio:['ignore','pipe','pipe']});children.push(child);let text='';for(const stream of [child.stdout,child.stderr])stream.on('data',chunk=>{text+=chunk;logs.push(chunk.toString());});const deadline=Date.now()+90000;while(!stripAnsi(text).includes(url)){if(child.exitCode!==null)throw new Error('Owned theme server exited');if(Date.now()>deadline)throw new Error('Owned theme server startup timed out');await wait(100);}return child;}
 async function fonts(page){const loaded=await page.evaluate(async()=>{await document.fonts.ready;const groups=await Promise.all(['700 16px "Space Grotesk"','400 16px "Inter"','500 16px "Inter"','500 16px "JetBrains Mono"','700 16px "JetBrains Mono"'].map(value=>document.fonts.load(value,'Reader 129')));return groups.map(faces=>faces.length>0&&faces.every(face=>face.status==='loaded'));});assert(loaded.every(Boolean),'All five original self-hosted font faces must really load');}
 async function shot(page,name,fullPage=true){await page.screenshot({path:fileURLToPath(new URL(name,output)),fullPage,animations:'disabled'});result.screenshots.push(name);}
 async function noOverflow(page,label){const dimensions=await page.evaluate(()=>({viewport:innerWidth,document:document.documentElement.scrollWidth}));check(`${label}: no document horizontal overflow`,dimensions.document<=dimensions.viewport+1);}

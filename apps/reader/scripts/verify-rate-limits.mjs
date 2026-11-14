@@ -7,6 +7,7 @@ import {randomBytes} from 'node:crypto';
 import {existsSync,unlinkSync,writeFileSync,readFileSync} from 'node:fs';
 import {fileURLToPath,URL} from 'node:url';
 import {setTimeout as wait} from 'node:timers/promises';
+import {stripAnsi} from './readiness.mjs';
 import {managementRows,managementSQL,migrateManagementDB} from './management-db.mjs';
 
 const mode=process.argv[2];assert(['dev','built'].includes(mode));
@@ -24,7 +25,7 @@ function startOne(port) {
   const args=['node_modules/vite/bin/vite.js',mode==='dev'?'dev':'preview','--mode','reader-admin-write-test','--host','127.0.0.1','--port',String(port)];
   const child=spawn(process.execPath,args,{cwd:root,env,detached:true,stdio:['ignore','pipe','pipe']});let phase='';
   for(const stream of [child.stdout,child.stderr])stream.on('data',chunk=>{const text=String(chunk);logs+=text;phase+=text;});
-  return {child,ready:(async()=>{const origin=`http://127.0.0.1:${port}`;const deadline=Date.now()+60000;while(!phase.includes(origin)){if(child.exitCode!==null)throw Error('Rate-limit test server exited');if(Date.now()>deadline)throw Error('Rate-limit test server startup timed out');await wait(100);}return origin;})()};
+  return {child,ready:(async()=>{const origin=`http://127.0.0.1:${port}`;const deadline=Date.now()+60000;while(!stripAnsi(phase).includes(origin)){if(child.exitCode!==null)throw Error('Rate-limit test server exited');if(Date.now()>deadline)throw Error('Rate-limit test server startup timed out');await wait(100);}return origin;})()};
 }
 async function stopOne(server){if(!server||server.exitCode!==null)return;const exited=once(server,'exit');process.kill(-server.pid,'SIGTERM');if(!(await Promise.race([exited.then(()=>true),wait(5000,undefined,{ref:false}).then(()=>false)]))){try{process.kill(-server.pid,'SIGKILL');}catch{/* already stopped */}}}
 async function stop(){await Promise.all([stopOne(serverA),stopOne(serverB)]);serverA=undefined;serverB=undefined;}
