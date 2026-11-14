@@ -3,7 +3,7 @@ import { spawn, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { setTimeout as wait } from 'node:timers/promises';
 import { localSQL, rows } from './local-db.mjs';
 
@@ -14,6 +14,7 @@ const origin = `http://127.0.0.1:${mode === 'dev' ? 49049 : 49050}`;
 const seed = readFileSync(new URL('../fixtures/seed.sql', import.meta.url), 'utf8');
 const checks = [];
 const result = { mode, startedAt: new Date().toISOString(), checks };
+const runtimeSecret = randomBytes(32).toString('hex');
 let server; let logs = '';
 const check = (name, condition) => { assert(condition, name); checks.push(name); };
 const privateMarkers = [
@@ -54,7 +55,7 @@ try {
   const expected = rows("SELECT id,publication_date FROM issues WHERE status='published' ORDER BY publication_date DESC,id DESC");
   assert.equal(expected.length, 28);
   server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', mode === 'dev' ? 'dev' : 'preview', '--host','127.0.0.1','--port',String(mode === 'dev' ? 49049 : 49050)], {
-    cwd: root, env: { ...process.env }, detached: true, stdio: ['ignore','pipe','pipe'],
+    cwd: root, env: { ...process.env, CONTENT_API_KEY: runtimeSecret }, detached: true, stdio: ['ignore','pipe','pipe'],
   });
   for (const stream of [server.stdout,server.stderr]) stream.on('data', (chunk) => { logs += chunk.toString(); });
   const deadline = Date.now() + 60000;
@@ -170,6 +171,7 @@ try {
   // Restore only our synthetic fixtures; this helper cannot target a real/remote database.
   try { localSQL(seed); } catch (error) { result.restoreError = String(error.message); result.status = 'failed'; process.exitCode = 1; }
   result.finishedAt = new Date().toISOString();
+  check('Synthetic local secret is not written to server logs', !logs.includes(runtimeSecret));
   writeFileSync(new URL(`${mode}-result.json`,dir),JSON.stringify(result,null,2));
   writeFileSync(new URL(`${mode}-server.log`,dir),logs);
   process.stdout.write(JSON.stringify(result,null,2) + '\n');
