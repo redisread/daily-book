@@ -15,7 +15,7 @@ const seed = readFileSync(new URL('../fixtures/seed.sql', import.meta.url), 'utf
 const checks = [];
 const result = { mode, startedAt: new Date().toISOString(), checks };
 const runtimeSecret = randomBytes(32).toString('hex');
-let server; let logs = '';
+let server; let logs = ''; let readinessLogs = '';
 const check = (name, condition) => { assert(condition, name); checks.push(name); };
 const privateMarkers = [
   'DRAFT_ONLY_BOOK_', 'WITHDRAWN_ONLY_BOOK_', 'DRAFT_EDITOR_NOTE_SENTINEL', 'DRAFT_SHARED_EDITOR_NOTE_SENTINEL',
@@ -57,9 +57,13 @@ try {
   server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', mode === 'dev' ? 'dev' : 'preview', '--host','127.0.0.1','--port',String(mode === 'dev' ? 49049 : 49050)], {
     cwd: root, env: { ...process.env, CONTENT_API_KEY: runtimeSecret }, detached: true, stdio: ['ignore','pipe','pipe'],
   });
-  for (const stream of [server.stdout,server.stderr]) stream.on('data', (chunk) => { logs += chunk.toString(); });
+  for (const stream of [server.stdout,server.stderr]) stream.on('data', (chunk) => {
+    const output = chunk.toString();
+    logs += output;
+    readinessLogs += output.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, '');
+  });
   const deadline = Date.now() + 60000;
-  while (!logs.includes(origin)) {
+  while (!readinessLogs.includes(origin)) {
     if (server.exitCode !== null) throw new Error(`Owned server exited: ${server.exitCode}`);
     if (Date.now() > deadline) throw new Error('Owned server startup timed out');
     await wait(100);
