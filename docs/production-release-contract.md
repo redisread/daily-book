@@ -33,7 +33,7 @@ The environment's required reviewer is configured in GitHub repository settings,
 
 The workflow contains no migration-apply or import job. Until those one-shot operations have their own reviewed implementation and explicit approvals, deployment cannot initialize production data and the Reader must not serve that database. `apps/reader/tools/history-import/cloudflare.config.ts` and its fixed local importer remain unchanged and local-only.
 
-The existing `.github/workflows/deploy.yml` and root `wrangler.jsonc` are unchanged. A merge to `main` still triggers the legacy root Astro deployment to Worker `daily-book`; it does not deploy Reader. This feature branch is not pushed or merged as part of the task.
+The existing `.github/workflows/deploy.yml` still triggers on pushes to `main` and deploys the legacy root Astro Worker `daily-book`; it does not deploy Reader. Its quality job installs both root and Reader dependencies before running the root cross-project type check. The root `wrangler.jsonc` and deployment trigger/steps remain unchanged. A merge to `main` can therefore still trigger the legacy site deployment; review that release side effect separately from the gated Reader release.
 
 ## CI quality and security gates
 
