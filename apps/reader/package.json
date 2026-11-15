@@ -1,0 +1,64 @@
+{
+  "name": "daily-book-reader",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@11.17.0",
+  "dependencies": {
+    "@vinext/cloudflare": "1.3.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-server-dom-webpack": "19.3.1",
+    "vinext": "1.4.4",
+    "@fontsource/inter": "5.2.8",
+    "@fontsource/jetbrains-mono": "5.2.8",
+    "@fontsource/space-grotesk": "5.2.10"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "2.0.0-beta.v.12",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.2.1",
+    "@vitejs/plugin-rsc": "0.5.39",
+    "cf": "1.0.0-beta.28",
+    "typescript": "7.0.2",
+    "vite": "8.3.6",
+    "@playwright/test": "1.61.1",
+    "rss-parser": "3.13.0"
+  },
+  "overrides": {
+    "fflate": "0.7.5"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "vite preview",
+    "types": "cf workers types",
+    "typecheck": "tsc --noEmit",
+    "db:local": "cf d1 migrations apply 00000000-0000-4000-8000-000000000049 --local --persist-to .cloudflare/state --dir migrations",
+    "seed:local": "node scripts/seed-local.mjs",
+    "verify": "npm run verify:baseline && npm run verify:races && npm run verify:admin && npm run verify:theme && npm run verify:archive && npm run verify:search && npm run verify:rss && npm run verify:writes && npm run verify:issues && npm run verify:limits && npm run verify:release",
+    "verify:baseline": "npm run db:local && npm run seed:local && node scripts/verify-schema.mjs && npm run types && npm run typecheck && npm run build && node scripts/verify-runtime.mjs dev && node scripts/verify-runtime.mjs built",
+    "verify:races": "node scripts/verify-races.mjs dev && npm run build -- --mode reader-race-test && node scripts/verify-build-isolation.mjs race && node scripts/verify-races.mjs built && npm run build && node scripts/verify-build-isolation.mjs default",
+    "verify:admin": "npm run types && npm run typecheck && npm run build -- --mode reader-admin-test && node scripts/verify-admin.mjs dev && node scripts/verify-admin.mjs built && npm run build && node scripts/verify-build-isolation.mjs default",
+    "verify:theme": "npm run types && npm run typecheck && npm run build -- --mode reader-theme-test && node scripts/verify-theme.mjs dev && node scripts/verify-theme.mjs built && npm run build && node scripts/verify-build-isolation.mjs default",
+    "verify:archive": "npm run typecheck && node scripts/verify-archive.mjs dev && node scripts/verify-archive.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-archive-default.mjs",
+    "verify:search": "npm run build && npm run typecheck && node scripts/verify-search.mjs dev && node scripts/verify-search.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-search-default.mjs",
+    "verify:rss": "npm run build && npm run typecheck && node scripts/verify-rss.mjs dev && node scripts/verify-rss.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-rss-default.mjs",
+    "verify:writes": "node scripts/verify-writes.mjs dev && node scripts/verify-writes.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs",
+    "verify:issues": "node scripts/verify-issues.mjs dev && node scripts/verify-issues.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs",
+    "verify:history-management": "tsx ../../scripts/history-import/verify-management-local.ts",
+    "verify:issue130": "node scripts/verify-imported-issue-130.mjs",
+    "release:preflight": "node scripts/production-release-preflight.mjs --verify-disabled",
+    "release:plan": "node scripts/production-release-preflight.mjs",
+    "verify:release": "node scripts/verify-production-release-preflight.mjs",
+    "management:request": "node scripts/management-request.mjs",
+    "history-import:management": "tsx ../../scripts/import-history-management.ts",
+    "verify:limits": "node scripts/verify-rate-limits.mjs dev && node scripts/verify-rate-limits.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs"
+  },
+  "description": "Daily Book original-theme reader and Bearer-protected management APIs.",
+  "engines": {
+    "node": "^22.23.0 || ^24.22.0 || ^26.12.0"
+  }
+}
