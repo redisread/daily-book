@@ -54,6 +54,8 @@
     "release:plan": "node scripts/production-release-preflight.mjs",
     "verify:release": "node scripts/verify-production-release-preflight.mjs",
     "management:request": "node scripts/management-request.mjs",
+    "verify:history-bootstrap-local": "tsx ../../scripts/history-import/verify-bootstrap-local.ts",
+    "history:bootstrap-local": "tsx ../../scripts/bootstrap-reader-local.ts",
     "history-import:management": "tsx ../../scripts/import-history-management.ts",
     "verify:limits": "node scripts/verify-rate-limits.mjs dev && node scripts/verify-rate-limits.mjs built && npm run build && node scripts/verify-build-isolation.mjs default && node scripts/verify-integrated-default.mjs"
   },

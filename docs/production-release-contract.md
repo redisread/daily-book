@@ -1,6 +1,6 @@
 # Reader release and data-operation contract
 
-This is the local contract for release preparation in task #76. The target manifest is intentionally unprovisioned and disabled. The checks in this repository do not call Cloudflare, open D1, apply migrations, import history, deploy a Worker, or change a route.
+This is the local contract for release preparation in task #76. The target manifest is intentionally unprovisioned and disabled. The release preflight does not call Cloudflare, open D1, apply migrations, import history, deploy a Worker, or change a route.
 
 ## Pinned target
 
@@ -44,3 +44,42 @@ The manual release preflight reruns root checks and all Reader verification agai
 ## Rollback boundary
 
 Reader application rollback uses the dedicated Worker deployment version or removes the canary route. This does not roll back D1 schema/data. Do not place migration or import in the Worker rollback job. Before a later authorized migration/import task, require a verified export/checkpoint, target identity receipt, exact migration/import pins, complete readback and an explicit uncertain-ack stop procedure. A database restore is a separate destructive operation and is not implied by a code rollback.
+
+## One-time local migration and history rehearsal
+
+From the repository root, use the approved inventory and a new UUID for each isolated database. The dry-run validates the committed release target, migration order and hashes, source inventory, and identity overlay. It emits the fake D1 binding, namespace, plan hash, expected table counts and expected next issue number without opening SQLite or D1.
+
+```sh
+inventory=/absolute/path/to/approved/inventory.json
+target=$(node -p 'crypto.randomUUID()')
+evidence=$(mktemp -d)
+npm --silent --prefix apps/reader run history:bootstrap-local -- \
+  --input "$inventory" --target "$target" > "$evidence/plan.json"
+npm --silent --prefix apps/reader run history:bootstrap-local -- \
+  --input "$inventory" --target "$target" --apply-local "$evidence/plan.json" > "$evidence/first.json"
+npm --silent --prefix apps/reader run history:bootstrap-local -- \
+  --input "$inventory" --target "$target" --apply-local "$evidence/plan.json" > "$evidence/repeat.json"
+```
+
+An explicit apply requires the original dry-run and a matching target and input. State is confined to `apps/reader/.cloudflare/management-rehearsal/test-bootstrap-<uuid>`. The tool checks the ownership record, migration ledger and exact schema before continuing. An offline SQLite lock serializes tool executions for that target. Keep other local Readers stopped when using the rehearsal state.
+
+The schema receipt records each committed D1 migration and its applied time. If migration execution is interrupted, the tool reads the ledger and schema to distinguish a complete apply from an exact empty prefix or unexplained state. A proven prefix returns a nonzero exit with the committed migrations and no import receipt. Review it before explicitly rerunning the same plan. The history receipt comes from byte-for-byte data verification of the original atomic import. The reported history result includes 6,345 field comparisons and a zero difference count when that verification succeeds. State with unknown schema, another plan, or unrelated data stops; no reset or override is provided.
+
+Run the isolated fixture suite with an unused external evidence directory.
+
+```sh
+npm --prefix apps/reader run verify:history-bootstrap-local -- \
+  --input "$inventory" --out "$evidence/verified"
+```
+
+The verifier archives an offline copy of the isolated state, retains the previous state under a sibling path, restores into the same identity, and compares the complete readback and data hash. It also injects migration interruption and lost responses after native commits. The backup contains local database state. Share the JSON proof separately from the database copy.
+
+For Issue 130, in this clean worktree check that `apps/reader/.cloudflare/management-state` does not exist, copy the successfully imported isolated state's D1 subdirectory there while the local processes are stopped, then run the existing verifier. It first verifies the copied import as a no-op, publishes Issue 130 to that copy, and checks replay and public visibility.
+
+```sh
+test ! -e apps/reader/.cloudflare/management-state &&
+  mkdir -p apps/reader/.cloudflare/management-state/v3 &&
+  cp -R "apps/reader/.cloudflare/management-rehearsal/test-bootstrap-$target/v3/d1" \
+    apps/reader/.cloudflare/management-state/v3/d1 &&
+  npm --prefix apps/reader run verify:issue130 -- --input "$inventory"
+```
