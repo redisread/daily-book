@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { cpSync, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
@@ -34,6 +34,38 @@ check('Dry-run is deterministic, checks 3,060 source fields, and creates no loca
   plan.databaseOpened === false && plan.plan.sourceFieldChecks === 3060 && !existsSync(target.persistPath)
   && JSON.stringify(planLocalBootstrap(input, id)) === JSON.stringify(plan));
 
+const cliArgs = ['--input', input, '--target', id];
+const planFile = resolve(out, 'plan.json');
+const cli = (args: string[], timeout: number) => spawnSync(process.execPath, [
+  '--import', 'tsx', resolve(ROOT, 'scripts/bootstrap-reader-local.ts'), ...args,
+], { cwd: ROOT, encoding: 'utf8', timeout });
+const dryRun = cli(cliArgs, 15_000);
+assert.ifError(dryRun.error);
+check('Four CLI arguments produce the reviewed dry-run without creating a target',
+  dryRun.status === 0
+  && JSON.stringify(JSON.parse(dryRun.stdout)) === JSON.stringify(plan) && !existsSync(target.persistPath));
+
+const invalidApplyArguments = [
+  ['--apply-local'],
+  ['--apply-local', ''],
+  ['--apply-local', '  '],
+  ['--apply-local', '--remote'],
+  ['', planFile],
+  ['', ''],
+  ['--remote', planFile],
+  ['--apply-local', planFile, '--remote'],
+];
+for (const suffix of invalidApplyArguments) {
+  const rejected = cli([...cliArgs, ...suffix], 15_000);
+  assert.ifError(rejected.error);
+  assert.equal(rejected.status, 1, JSON.stringify(suffix));
+  assert.equal(rejected.stdout, '', JSON.stringify(suffix));
+  const errorLine = rejected.stderr.trim().split('\n').at(-1) ?? '';
+  assert.equal(JSON.parse(errorLine).code, 'INVALID_ARGUMENT', JSON.stringify(suffix));
+  assert(!existsSync(target.persistPath), JSON.stringify(suffix));
+}
+check('Malformed CLI apply arguments all exit nonzero without creating a target', true);
+
 const wrongId = randomUUID();
 await assert.rejects(executeLocalBootstrap(input, wrongId, plan), matches('PLAN_MISMATCH'));
 await assert.rejects(executeLocalBootstrap(input, id, plan, localTarget(wrongId)), matches('TARGET_INVALID'));
@@ -52,7 +84,10 @@ await preexisting.batch([{ sql: 'CREATE TABLE keep_me(value TEXT)' }]);
 await assert.rejects(executeLocalBootstrap(input, preexistingId, planLocalBootstrap(input, preexistingId)), matches('TARGET_UNOWNED'));
 check('Preexisting state without ownership is preserved', (await preexisting.rows('SELECT count(*) AS count FROM keep_me'))[0].count === 0);
 
-const first = await executeLocalBootstrap(input, id, plan);
+const apply = cli([...cliArgs, '--apply-local', planFile], 120_000);
+assert.ifError(apply.error);
+assert.equal(apply.status, 0, apply.stderr || apply.stdout);
+const first: Awaited<ReturnType<typeof executeLocalBootstrap>> = JSON.parse(apply.stdout);
 output('first.json', first);
 check('Native D1 commits all three migrations and imports 128 books, 129 issues and 627 quotes',
   first.status === 'applied-local' && first.migrationReceipt.committed.length === 3

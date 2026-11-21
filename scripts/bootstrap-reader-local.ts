@@ -8,9 +8,13 @@ try {
   ensure(args.length === 4 || args.length === 6, 'INVALID_ARGUMENT',
     'Usage: --input <approved inventory> --target <local UUID v4> [--apply-local <dry-run JSON>]');
   const [inputFlag, input, targetFlag, id, applyFlag, planPath] = args;
-  ensure(inputFlag === '--input' && targetFlag === '--target' && (!applyFlag || applyFlag === '--apply-local'),
-    'INVALID_ARGUMENT', 'Expected --input, --target and optional --apply-local with approved dry-run JSON');
-  const result = planPath
+  ensure(inputFlag === '--input' && targetFlag === '--target' && input.trim() && !input.startsWith('--') && id.trim() && !id.startsWith('--'),
+    'INVALID_ARGUMENT', 'Expected --input with an inventory path and --target with a local UUID');
+  if (args.length === 6) {
+    ensure(applyFlag === '--apply-local' && planPath.trim() && !planPath.startsWith('--'),
+      'INVALID_ARGUMENT', '--apply-local requires a nonempty approved dry-run JSON path');
+  }
+  const result = applyFlag === '--apply-local'
     ? await executeLocalBootstrap(resolve(input), id, JSON.parse(readFileSync(planPath, 'utf8')))
     : planLocalBootstrap(resolve(input), id);
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
