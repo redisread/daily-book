@@ -9,6 +9,7 @@ import {parseArchiveInput} from './src/archive-input';
 import {InvalidRequest} from './src/domain/pagination';
 import {unavailablePage,failedRead,apiError} from './src/http';
 import {publicRssResponse} from './src/rss';
+import {legacyBookDateResponse} from './src/legacy-book';
 import {parseSearchInput} from './src/domain/search-input';
 import { withRequestReads, type DecisionObserver } from './src/request-reads';
 
@@ -21,6 +22,8 @@ export function createReaderWorker(observer?: DecisionObserver, writeObserver?: 
     fetch(...args: Parameters<typeof framework.fetch>): Promise<Response> {
       return withRequestReads(async () => {
         const url=new URL(args[0].url);const pathname=url.pathname;
+        const legacyBook = /^\/book\/([^/]+)\/?$/.exec(pathname);
+        if (legacyBook) return legacyBookDateResponse(args[0], legacyBook[1]);
         const archive=/^\/archive\/?$/.test(pathname);
         let decodedPath=pathname;try{decodedPath=decodeURIComponent(pathname);}catch{/* framework owns invalid path syntax */}
         const searchPage=/^\/search\/?$/.test(decodedPath);const searchApi=/^\/api\/v1\/search\/?$/.test(decodedPath);

@@ -26,6 +26,11 @@ async function loadIssue(id: string): Promise<IssueLookup> {
 export async function readIssueVisibility(id: string): Promise<IssueLookup['kind']> {
   return (await readIssue(id)).kind;
 }
+export async function readPublishedIssueIdByDate(date: string): Promise<string | null> {
+  const row = await env.DB.prepare("SELECT id FROM issues WHERE publication_date=? AND status='published'")
+    .bind(date).first<{ id: string }>();
+  return row && validId(row.id) ? row.id : null;
+}
 export async function listPublishedIssues({ limit, cursor }: PageInput): Promise<IssuePage> {
   // Boundaries originate from the validated cursor; SQL ordering matches its two keys exactly.
   const boundary = cursor ? 'AND (i.publication_date < ? OR (i.publication_date = ? AND i.id < ?))' : '';

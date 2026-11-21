@@ -83,3 +83,11 @@ test ! -e apps/reader/.cloudflare/management-state &&
     apps/reader/.cloudflare/management-state/v3/d1 &&
   npm --prefix apps/reader run verify:issue130 -- --input "$inventory"
 ```
+
+## Imported-content integration and rollback
+
+The Reader accepts the legacy `GET /book/YYYY-MM-DD` link (including an optional trailing slash) and resolves its date against the published Issue in D1. A match returns a relative 307 redirect and `Cache-Control: no-store`. Missing and withdrawn dates return the same 404, and the canonical Issue route still enforces its own visibility check. Query parameters on old links are discarded. Archive, search and RSS continue linking directly to `/issues/:id`. Older RSS links therefore remain usable, and feed readers that identify items by URL may show a repeated item after cutover.
+
+Before a production cutover, confirm the approved candidate SHA, protected GitHub environment, Worker and D1 identity, and the reviewed production schema/import procedures. Freeze or reconcile legacy editorial updates against the final inventory. After the separately authorized migration and import, require verified readback and both receipt hashes. Keep the current site's route and deployment record while smoke-testing the isolated canary. Compare the home page, historical links, archive, search, RSS and the authorized publishing/readback path against the verified inventory before changing the primary route.
+
+For a routing or Reader application rollback, first stop new Reader editorial writes. Restore the saved primary route to the previous Worker if it was switched, or revert the canary to a verified Worker version or remove its route. Confirm the old home page, dated book page and RSS from a fresh request. Preserve and export the Reader D1, including any editorial writes after cutover. Any later data restore needs separate authorization, an independently verified backup and a reconciliation plan for those writes.

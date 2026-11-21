@@ -146,9 +146,23 @@ try {
     const r = await request(path, { method, headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({body:'MUST_NOT_WRITE'}) });
     check(`${method} ${path} is not a public write API`, r.response.status === 405);
   }
-  for (const path of ['/api/v1/admin/probe','/api/hello','/books.json','/book/2026-11-01']) {
+  for (const path of ['/api/v1/admin/probe','/api/hello','/books.json','/book/2026-02-30']) {
     const r = await request(path,{},false); check(`${path} is absent, without legacy/probe fallback`,r.response.status === 404);
   }
+  const legacy = await request('/book/2026-11-01?utm_source=archive');
+  check('Old book date redirects to the precise current issue and drops legacy query parameters',
+    legacy.response.status === 307 && legacy.response.headers.get('location') === '/issues/published-latest' && !legacy.text);
+  const legacyHead = await request('/book/2026-11-01/', { method: 'HEAD' });
+  check('Legacy date HEAD redirects without a body',
+    legacyHead.response.status === 307 && legacyHead.response.headers.get('location') === '/issues/published-latest' && !legacyHead.text);
+  const nonexistentLegacy = await request('/book/2026-11-06');
+  const withdrawnLegacy = await request('/book/2026-11-05');
+  check('Unknown and withdrawn dates are indistinguishable 404s without redirect',
+    nonexistentLegacy.response.status === 404 && withdrawnLegacy.response.status === 404
+    && !withdrawnLegacy.response.headers.has('location') && nonexistentLegacy.text === withdrawnLegacy.text);
+  const methodLegacy = await request('/book/2026-11-01', { method: 'POST' });
+  check('Old book date rejects writes',
+    methodLegacy.response.status === 405 && methodLegacy.response.headers.get('allow') === 'GET, HEAD');
   const beforeWithdraw = await list('?limit=1');
   localSQL("UPDATE books SET title='READ_THROUGH_UPDATE <proof>',version=version+1 WHERE id='shared-book'");
   const changed = await request('/api/v1/issues/published-latest'); const changedHTML = await request('/issues/published-latest');
@@ -158,6 +172,10 @@ try {
     const r = await request(path,{headers});
     check(`Withdrawal immediately returns 410 at ${path}${headers.RSC ? ' RSC':''}`, r.response.status === 410 && !r.text.includes('READ_THROUGH_UPDATE') && !r.text.includes('PUBLISHED_BODY_STORED_NOT_RENDERED_LATEST'));
   }
+  const withdrawnAlias = await request('/book/2026-11-01');
+  check('The old date stops redirecting immediately after withdrawal',
+    withdrawnAlias.response.status === 404 && !withdrawnAlias.response.headers.has('location')
+    && withdrawnAlias.text === nonexistentLegacy.text);
   const advanced = await request('/'); const nextPage = await list('?limit=1&cursor=' + encodeURIComponent(beforeWithdraw.nextCursor));
   check('Home advances and existing cursor still works after boundary-row withdrawal', advanced.text.includes('data-issue-id="published-middle"') && nextPage.items[0].id === 'published-middle');
   localSQL("UPDATE issues SET status='withdrawn' WHERE status='published'");
