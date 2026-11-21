@@ -1,0 +1,22 @@
+-- Synthetic fixed dummy63 fixtures only, not historical data.
+INSERT INTO books(id,title,author,category,description)VALUES('search-title-book','needleTitle书名','普通作者','普通类别','普通简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-title','search-title-book','published','2027-02-01',900064,'普通编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO books(id,title,author,category,description)VALUES('search-author-book','作者匹配书','needleAuthor作者','普通类别','普通简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-author','search-author-book','published','2027-02-02',900065,'普通编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO books(id,title,author,category,description)VALUES('search-category-book','类别匹配书','普通作者','needleCategory类别','普通简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-category','search-category-book','published','2027-02-03',900066,'普通编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO books(id,title,author,category,description)VALUES('search-description-book','简介匹配书','普通作者','普通类别','needleDescription简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-description','search-description-book','published','2027-02-04',900067,'普通编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO books(id,title,author,category,description)VALUES('search-note-book','编辑话匹配书','普通作者','普通类别','普通简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-note','search-note-book','published','2027-02-05',900068,'needleNote编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO books(id,title,author,category,description)VALUES('search-literal-book','Literal % _ <script>window.__searchXSS=1</script> & "quoted"','LiteralAuthor','普通类别','普通简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-literal','search-literal-book','published','2027-02-06',900069,'普通编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO books(id,title,author,category,description)VALUES('search-unicode-book','Café ÉΩ','普通作者','普通类别','普通简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-unicode','search-unicode-book','published','2027-02-07',900070,'普通编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO books(id,title,author,category,description)VALUES('search-decomposed-book','Café','普通作者','普通类别','普通简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-decomposed','search-decomposed-book','published','2027-02-08',900071,'普通编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO books(id,title,author,category,description)VALUES('search-emoji-book','😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀','普通作者','普通类别','普通简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-emoji','search-emoji-book','published','2027-02-09',900072,'普通编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO books(id,title,author,category,description)VALUES('search-body-book','未搜索正文的普通书','普通作者','普通类别','普通简介');
+INSERT INTO issues(id,book_id,status,publication_date,issue_number,editor_note,body)VALUES('search-body','search-body-book','published','2027-02-10',900073,'普通编辑话','SEARCH_BODY_MUST_NOT_RENDER');
+INSERT INTO quotes(id,issue_id,position,text)VALUES('search-body-q1','search-body',0,'SEARCH_QUOTE_MUST_NOT_SEARCH');
