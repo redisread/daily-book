@@ -11,7 +11,7 @@
     "deploy": "npm run build && wrangler deploy",
     "deploy:dry-run": "npm run build && wrangler deploy --dry-run",
     "astro": "astro",
-    "typecheck": "astro check",
+    "typecheck": "astro check && npm --prefix apps/reader run types && npm --prefix apps/reader run typecheck",
     "lint": "eslint src",
     "books:check": "tsx scripts/check-books.ts",
     "test:e2e": "playwright test",
@@ -20,13 +20,14 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^14.2.5",
+    "@astrojs/cloudflare": "^14.4.6",
     "@astrojs/rss": "^4.0.17",
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/space-grotesk": "^5.2.10",
-    "astro": "^7.2.9",
+    "astro": "^7.4.7",
+    "js-yaml": "^4.3.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
