@@ -48,6 +48,8 @@ export async function promoteCandidate(candidate, operations) {
       return;
     }
 
+    // Only promote from a verified rollback baseline.
+    await verify(previous);
     receipt({ ...candidate, previous, outcome: "promoting" });
     if (await currentMain() !== candidate.sha) {
       receipt({ ...candidate, previous, finalVersion: await currentVersion(), outcome: "superseded" });

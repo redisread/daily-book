@@ -124,6 +124,15 @@ try {
   check('Home uses latest published date rather than highest assigned number', home.response.status === 200 && home.text.includes('data-issue-id="published-latest"') && !home.text.includes('data-issue-id="withdrawn-hidden"'));
   check('Published SSR is real HTML with the same issue/book/quotes as API', html.response.status === 200 && html.text.includes('data-issue-id="published-latest"') && html.text.includes('公开书籍 &lt;proof&gt;') && html.text.includes('公开第一条书摘 &lt;proof&gt;') && html.text.includes('第一章'));
   check('Stored issue body is not added as a new SSR feature', !html.text.includes('PUBLISHED_BODY_STORED_NOT_RENDERED_LATEST'));
+  const releaseProbe = { headers: { 'X-Reader-Release-Check': '1' } };
+  const probedHome = await request('/', releaseProbe);
+  const probedIssue = await request('/api/v1/issues/published-latest', releaseProbe);
+  const servingVersion = probedHome.response.headers.get('x-reader-worker-version');
+  check('Release probes identify the same serving Worker on SSR and API responses',
+    !home.response.headers.has('x-reader-worker-version')
+    && typeof servingVersion === 'string' && servingVersion.length > 0
+    && servingVersion === probedIssue.response.headers.get('x-reader-worker-version')
+    && probedHome.response.headers.get('cache-control') === 'no-store');
   const flight = await request('/issues/published-latest', { headers:{ RSC:'1' } });
   check('Published RSC request succeeds without private fixture content', flight.response.status === 200 && /text\/x-component/.test(flight.response.headers.get('content-type') ?? '') && flight.text.includes('公开第一条书摘'));
   let draftHTML; let missingHTML;

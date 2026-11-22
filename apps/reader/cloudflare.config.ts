@@ -20,6 +20,27 @@ function readReleaseTarget(): ReleaseTarget {
   ) as ReleaseTarget;
 }
 
+const rehearsalTarget = JSON.parse(
+  readFileSync(fileURLToPath(new URL("./release-rehearsal-target.json", import.meta.url)), "utf8"),
+) as Pick<ReleaseTarget, "workerName" | "databaseName"> & { mode: string; origin: string };
+
+function rehearsalBindings(): ReleaseTarget {
+  const production = readReleaseTarget();
+  const databaseId = process.env.READER_REHEARSAL_DATABASE_ID;
+  if (!production.accountId || process.env.READER_REHEARSAL_ACCOUNT_ID !== production.accountId
+    || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(databaseId ?? "")
+    || databaseId === production.databaseId) {
+    throw new Error("READER_REHEARSAL_TARGET_MISMATCH: expected a separate rehearsal D1");
+  }
+  return {
+    ...production,
+    workerName: rehearsalTarget.workerName,
+    canaryDomain: new URL(rehearsalTarget.origin).hostname,
+    databaseId: databaseId!,
+    databaseName: rehearsalTarget.databaseName,
+  };
+}
+
 function productionTarget(mode: string | undefined): ReleaseTarget | undefined {
   if (mode !== "reader-production") return undefined;
 
@@ -88,7 +109,7 @@ const localDatabaseNames: Record<string, string> = {
 };
 
 export default defineConfig(({ mode }) => {
-  const release = productionTarget(mode);
+  const release = mode === rehearsalTarget.mode ? rehearsalBindings() : productionTarget(mode);
   const workerMode = mode ?? "";
   return {
     ...(release ? { accountId: release.accountId! } : {}),
@@ -106,6 +127,7 @@ export default defineConfig(({ mode }) => {
       env: {
         ASSETS: bindings.assets(),
         CONTENT_API_KEY: bindings.secret(),
+        READER_VERSION_METADATA: bindings.versionMetadata(),
         DB: bindings.d1(release
           ? { id: release.databaseId!, name: release.databaseName }
           : {
