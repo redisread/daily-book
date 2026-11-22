@@ -69,3 +69,41 @@ test("reports that a later deployment took over during verification", async () =
   assert.equal(receipts.at(-1).outcome, "superseded-after-deploy");
   assert.equal(receipts.at(-1).liveVersion, "C");
 });
+
+test("recovers a committed deployment after a lost response without repeating the write", async () => {
+  let live = prior;
+  let writes = 0;
+  let lookups = 0;
+  const { operations, receipts } = fixture({
+    currentDeployment: async () => live,
+    deploy: async () => {
+      writes++;
+      live = published;
+      throw new Error("connection lost after commit");
+    },
+    findDeployment: async (version) => {
+      assert.equal(version, published.version);
+      return ++lookups === 2 ? published : undefined;
+    },
+  });
+  await publishCandidate(candidate, operations);
+  assert.equal(writes, 1);
+  assert.equal(lookups, 2);
+  assert.equal(receipts[1].recovered, true);
+  assert.equal(receipts.at(-1).outcome, "live");
+  assert.equal(receipts.at(-1).previousVersion, "A");
+});
+
+test("keeps an unconfirmed deployment traceable without repeating the write", async () => {
+  let writes = 0;
+  const { operations, receipts } = fixture({
+    deploy: async () => {
+      writes++;
+      throw new Error("outcome unclear");
+    },
+    findDeployment: async () => undefined,
+  });
+  await assert.rejects(publishCandidate(candidate, operations), /outcome is unknown/);
+  assert.equal(writes, 1);
+  assert.deepEqual(receipts.at(-1), { ...candidate, previousVersion: "A", outcome: "deployment-unknown" });
+});

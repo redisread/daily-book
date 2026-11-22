@@ -82,7 +82,7 @@ export async function smoke(expectedVersion, fetchResponse = request) {
 }
 
 export async function publishCandidate(candidate, {
-  mainSha, currentDeployment, deploy, verify, record, pause = delay, attempts = 12,
+  mainSha, currentDeployment, deploy, findDeployment, verify, record, pause = delay, attempts = 12,
 }) {
   const previous = await currentDeployment();
   if (await mainSha() !== candidate.sha) {
@@ -92,10 +92,30 @@ export async function publishCandidate(candidate, {
 
   const previousVersion = previous.version;
   record({ ...candidate, previousVersion, outcome: "deploying" });
-  const published = await deploy(candidate.version);
-  assert.equal(published.version, candidate.version, "Cloudflare acknowledged a different Reader version");
+  let published;
+  let recovered = false;
+  try {
+    published = await deploy(candidate.version);
+    assert.equal(published.version, candidate.version, "Cloudflare acknowledged a different Reader version");
+  } catch (failure) {
+    published = undefined;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      const observed = await findDeployment(candidate.version).catch(() => undefined);
+      if (observed?.version === candidate.version) {
+        published = observed;
+        recovered = true;
+        break;
+      }
+      if (attempt < attempts - 1) await pause(3000);
+    }
+    if (!published) {
+      record({ ...candidate, previousVersion, outcome: "deployment-unknown" });
+      throw new Error("Reader deployment outcome is unknown. Check Cloudflare before taking further action.", { cause: failure });
+    }
+  }
+
   const receipt = { ...candidate, previousVersion, deploymentId: published.id };
-  record({ ...receipt, outcome: "deployed" });
+  record({ ...receipt, outcome: "deployed", recovered });
   let error;
   for (let attempt = 0; attempt < attempts; attempt++) {
     let live;
@@ -183,7 +203,7 @@ async function run() {
   const versions = await cf(`${worker}/versions?per_page=100`);
   const matches = versions.items.filter((item) => item.annotations?.["workers/message"] === annotation);
   assert(matches.length === 1 && uuidPattern.test(matches[0].id), "Could not identify uploaded Reader version");
-  await publishCandidate({ sha, buildId, version: matches[0].id }, {
+  await publishCandidate({ sha, buildId, annotation, version: matches[0].id }, {
     mainSha: currentMain,
     async currentDeployment() {
       const result = await cf(`${worker}/deployments`);
@@ -196,6 +216,14 @@ async function run() {
         annotations: { "workers/message": annotation },
       });
       return deploymentRecord(result);
+    },
+    async findDeployment(version) {
+      const result = await cf(`${worker}/deployments`);
+      const matches = result.deployments.filter((item) =>
+        item.annotations?.["workers/message"] === annotation
+        && item.versions?.some((entry) => entry.version_id === version));
+      assert(matches.length <= 1, "Multiple deployments matched the current build");
+      return matches[0] ? deploymentRecord(matches[0]) : undefined;
     },
     verify: smoke,
     record,
