@@ -1,4 +1,5 @@
 import vinext from 'vinext/server/fetch-handler';
+import { env } from 'cloudflare:workers';
 import type appRouter from 'vinext/server/app-router-entry';
 import { privateResponse,rejectAdminMethod } from './src/admin/http';
 import { bookWriteRoute } from './src/admin/book-routes';
@@ -19,8 +20,8 @@ const framework: typeof appRouter = vinext;
 export function createReaderWorker(observer?: DecisionObserver, writeObserver?: WriteObserver) {
   return {
     ...framework,
-    fetch(...args: Parameters<typeof framework.fetch>): Promise<Response> {
-      return withRequestReads(async () => {
+    async fetch(...args: Parameters<typeof framework.fetch>): Promise<Response> {
+      const response = await withRequestReads(async () => {
         const url=new URL(args[0].url);const pathname=url.pathname;
         const legacyBook = /^\/book\/([^/]+)\/?$/.exec(pathname);
         if (legacyBook) return legacyBookDateResponse(args[0], legacyBook[1]);
@@ -73,6 +74,11 @@ export function createReaderWorker(observer?: DecisionObserver, writeObserver?: 
         }
         return response;
       }, observer);
+      if (args[0].headers.get('X-Reader-Release-Check') !== '1') return response;
+      const headers = new Headers(response.headers);
+      headers.set('Cache-Control', 'no-store');
+      headers.set('X-Reader-Worker-Version', env.READER_VERSION_METADATA.id);
+      return new Response(response.body, {status:response.status,statusText:response.statusText,headers});
     },
   };
 }

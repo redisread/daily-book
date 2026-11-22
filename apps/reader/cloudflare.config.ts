@@ -106,6 +106,7 @@ export default defineConfig(({ mode }) => {
       env: {
         ASSETS: bindings.assets(),
         CONTENT_API_KEY: bindings.secret(),
+        READER_VERSION_METADATA: bindings.versionMetadata(),
         DB: bindings.d1(release
           ? { id: release.databaseId!, name: release.databaseName }
           : {
