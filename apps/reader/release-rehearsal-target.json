@@ -1,8 +1,0 @@
-{
-  "branch": "reader-release-rehearsal",
-  "mode": "reader-release-rehearsal",
-  "workerName": "daily-book-reader-release-rehearsal",
-  "databaseName": "daily-book-reader-release-rehearsal",
-  "lockBucket": "daily-book-reader-release-rehearsal-lock",
-  "origin": "https://reader-release-rehearsal.jiahongw.com"
-}
