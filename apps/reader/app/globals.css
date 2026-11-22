@@ -1,0 +1,88 @@
+/* Fonts and the unmodified design system are pinned to historical source 8b99109. */
+@import '@fontsource/space-grotesk/latin-700.css';
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/jetbrains-mono/latin-500.css';
+@import '@fontsource/jetbrains-mono/latin-700.css';
+@import './original-theme.css';
+
+/* Migration-only reflow/accessibility: no new palette, type family or theme. */
+body { overflow-x: visible; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body:has(dialog[open]) { overflow: hidden; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+.header { height:auto; min-height:72px; gap:16px; flex-wrap:wrap; }
+.header-nav { flex-wrap:wrap; }
+main { padding-bottom:48px; }
+main:focus { outline-offset:4px; }
+.date-bar { gap:12px; }
+.date-info,.book-info-section { min-width:0; }
+.date-main,.book-category,.book-title,.book-author,.book-desc,.editor-note-text,.cover-title,.cover-author,.quote-text,.quote-source { overflow-wrap:anywhere; }
+.date-issue,.date-main,.book-meta-inline,.quote-reader-count { font-variant-numeric:tabular-nums; }
+.issue-link { text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:4px; }
+.date-arrow { width:auto; min-width:2.75rem; height:auto; min-height:2.75rem; padding:8px; flex-shrink:0; font-size:.875rem; }
+.date-arrow:disabled { color:var(--muted); box-shadow:none; cursor:not-allowed; }
+.date-arrow:disabled:hover { transform:none; background:var(--paper); }
+.book-category { max-width:100%; }
+.book-title[data-long-title] { line-height:1.4; }
+.book-desc,.editor-note-text,.quote-text,.quote-source { white-space:pre-line; }
+.book-meta-inline { flex-wrap:wrap; margin-bottom:0; }
+.book-cover { max-width:100%; height:auto; min-height:16.875rem; padding:0; background:var(--fg); color:var(--paper); }
+.book-cover:disabled { cursor:default; }
+.book-cover-placeholder { aspect-ratio:auto; height:auto; min-height:16.625rem; }
+.cover-title { font-size:1.625rem; }
+.cover-author { font-size:.75rem; letter-spacing:.25em; }
+.book-cover.enlarged { width:min(280px,calc(100vw - 112px)); height:auto; min-height:25rem; }
+.book-cover.enlarged .book-cover-placeholder { min-height:24.5rem; }
+.book-cover.enlarged .cover-title { font-size:2.25rem; }
+.book-cover.enlarged .cover-author { font-size:.875rem; }
+.cover-dialog { margin:auto; padding:0; border:0; background:transparent; color:var(--fg); max-width:calc(100vw - 16px); max-height:calc(100dvh - 16px); overflow:auto; }
+.cover-dialog::backdrop { background:rgba(10,10,10,.92); }
+.cover-dialog .lightbox-content { transform:none; width:fit-content; max-width:100%; }
+.lightbox-close { font-size:1.125rem; line-height:1.2; width:auto; height:auto; min-width:2.75rem; min-height:2.75rem; padding:.375rem; }
+.quote-reader { display:grid; grid-template-columns:minmax(0,1fr); gap:24px; padding:0 8px 8px 0; }
+.quote-card { min-width:0; }
+.quote-mark { font-size:4.5rem; }
+.quote-source { font-style:normal; }
+.quote-source::before { flex:0 0 28px; }
+.quote-reader-tools,.quote-reader-hint { display:none; }
+.quote-empty { padding:44px 0; color:var(--muted); }
+.empty-state { padding-block:80px; min-height:60vh; }
+.footer { flex-wrap:wrap; gap:12px; }
+@media (min-width:769px) { .hero-content { grid-template-columns:300px minmax(0,1fr); } }
+@media (max-width:768px) {
+  .hero-content { grid-template-columns:minmax(0,1fr); }
+  .book-cover { min-height:14.375rem; }
+  .book-cover-placeholder { min-height:14.125rem; }
+  .cover-title { font-size:1.375rem; }
+  .book-cover.enlarged { width:min(240px,calc(100vw - 112px)); min-height:21.25rem; }
+  .book-cover.enlarged .book-cover-placeholder { min-height:20.75rem; }
+  .book-cover.enlarged .cover-title { font-size:1.875rem; }
+  .quote-reader { display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth; touch-action:auto; padding:0 8px 10px 0; }
+  .quote-reader .quote-card { flex:0 0 100%; min-width:0; scroll-snap-align:start; }
+  .quote-reader-tools { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:16px; margin-top:14px; }
+  .quote-reader-count,.quote-reader-hint { color:var(--muted); font-family:var(--font-mono); font-size:.75rem; }
+  .quote-reader-hint { display:block; text-align:center; margin-top:12px; }
+}
+@media (prefers-reduced-motion:reduce) { .quote-reader { scroll-behavior:auto; } }
+
+/* Archive reuses the fixed8b month/grid/history-card vocabulary. */
+.archive-heading { padding:32px 0 16px; }
+.archive-entry { min-width:0; }
+.archive-entry .history-title,.archive-entry .history-author { overflow-wrap:anywhere; }
+.archive-entry .history-title { line-height:1.4; white-space:normal; overflow:visible; text-overflow:clip; }
+.archive-entry .history-date { display:block; font-variant-numeric:tabular-nums; }
+.archive-period { display:inline-block; max-width:100%; overflow-wrap:anywhere; font-family:var(--font-mono); font-size:.75rem; font-weight:700; padding:2px 6px; margin-bottom:12px; background:var(--fg); color:var(--paper); border:1.5px solid var(--fg); box-shadow:2px 2px 0 var(--fg); }
+.archive-pagination { display:flex; align-items:center; flex-wrap:wrap; gap:20px; margin-top:28px; }
+.archive-pagination p { color:var(--muted); font-size:.875rem; }
+
+.search-heading { padding:32px 0; }
+.public-search-page .search-input { min-inline-size:0; inline-size:100%; }
+.public-search-page .search-btn { font:inherit; font-weight:700; min-block-size:44px; }
+.search-help { color:var(--muted); font-size:.875rem; overflow-wrap:anywhere; }
+.public-search-page .search-term { display:inline-block; max-inline-size:100%; margin:8px 0; overflow-wrap:anywhere; vertical-align:top; }
+.public-search-page .results-count { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; }
+.public-search-page .book-title,.public-search-page .book-author { overflow-wrap:anywhere; }
+.public-search-page .history-date { display:block; }
+
+.footer { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; }
+.footer a { display:inline-flex; align-items:center; min-block-size:44px; color:var(--fg); text-underline-offset:4px; padding:8px 4px; }
