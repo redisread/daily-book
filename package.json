@@ -27,7 +27,7 @@
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/space-grotesk": "^5.2.10",
     "astro": "^7.4.7",
-    "js-yaml": "^4.3.2",
+    "js-yaml": "^5.5.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
