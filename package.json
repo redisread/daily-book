@@ -34,7 +34,7 @@
     "@astrojs/check": "^0.9.10",
     "@cloudflare/workers-types": "^5.20261119.1",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.65.0",
+    "@playwright/test": "^1.65.1",
     "@types/js-yaml": "^4.0.9",
     "eslint": "^10.9.1",
     "eslint-plugin-astro": "^3.1.0",
