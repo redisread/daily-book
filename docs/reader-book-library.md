@@ -15,6 +15,8 @@ npm --prefix apps/reader run verify:library
 npx --no-install tsx scripts/history-import/verify-library-migration.ts /path/to/approved/inventory.json
 ```
 
+PR 的 Reader CI 在验证通过后上传四张合成测试截图，保留 7 天。需要回滚上传步骤时，从 `.github/workflows/ci.yml` 移除该步骤即可，Reader 验证仍会执行。
+
 浏览器用两个旧公开书目、草稿、撤回书及一次后台发布和下架来检验真实 Worker。历史对账工具先在新本地库导入批准的历史清单，再追加 0004，比较每本书的编者按、正文和按位置排序的摘录，并核对旧表哈希和迁移重跑。
 
 ## 生产切换
