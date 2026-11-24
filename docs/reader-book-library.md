@@ -8,7 +8,7 @@
 
 ## 本地验证
 
-从仓库根目录安装根和 Reader 的锁定依赖。浏览器回归用 Google Chrome 和独立的本地 D1，截图保存在执行回执列出的目录。
+从仓库根目录安装根和 Reader 的锁定依赖。浏览器回归用 Google Chrome 和独立的本地 D1，截图保存在执行回执列出的目录。交互预览使用独立的 `reader-library-preview` 模式和测试绑定，自动验证使用 `reader-library-test`。
 
 ```sh
 npm --prefix apps/reader run verify:library
@@ -17,7 +17,7 @@ npx --no-install tsx scripts/history-import/verify-library-migration.ts /path/to
 
 PR 的 Reader CI 在验证通过后上传四张合成测试截图，保留 7 天。需要回滚上传步骤时，从 `.github/workflows/ci.yml` 移除该步骤即可，Reader 验证仍会执行。
 
-浏览器用两个旧公开书目、草稿、撤回书及一次后台发布和下架来检验真实 Worker。历史对账工具先在新本地库导入批准的历史清单，再追加 0004，比较每本书的编者按、正文和按位置排序的摘录，并核对旧表哈希和迁移重跑。
+浏览器用含重复刊期、草稿和撤回书的迁移样例，以及后台发布和下架流程检验真实 Worker。历史对账工具先在新本地库导入批准的历史清单，再追加 0004，比较每本书的编者按、正文和按位置排序的摘录，并核对旧表哈希和迁移重跑。
 
 ## 生产切换
 

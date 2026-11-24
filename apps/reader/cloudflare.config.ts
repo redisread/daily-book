@@ -53,6 +53,7 @@ function productionTarget(mode: string | undefined): ReleaseTarget | undefined {
 
 const localWorkerNames: Record<string, string> = {
   "reader-library-test": "daily-book-reader-library-local",
+  "reader-library-preview": "daily-book-reader-library-preview",
   "reader-write-test": "daily-book-reader-write-local",
   "reader-admin-write-test": "daily-book-reader-admin-write-local",
   "reader-issue-test": "daily-book-reader-issue-local",
@@ -66,6 +67,7 @@ const localWorkerNames: Record<string, string> = {
 
 const localDatabaseIds: Record<string, string> = {
   "reader-library-test": "00000000-0000-4000-8000-000000000087",
+  "reader-library-preview": "00000000-0000-4000-8000-000000000088",
   "reader-admin-write-test": "00000000-0000-4000-8000-000000000072",
   "reader-write-test": "00000000-0000-4000-8000-000000000070",
   "reader-issue-test": "00000000-0000-4000-8000-000000000071",
@@ -79,6 +81,7 @@ const localDatabaseIds: Record<string, string> = {
 
 const localDatabaseNames: Record<string, string> = {
   "reader-library-test": "daily-book-reader-library-local-only",
+  "reader-library-preview": "daily-book-reader-library-preview-only",
   "reader-admin-write-test": "daily-book-reader-admin-write-local-only",
   "reader-write-test": "daily-book-reader-write-local-only",
   "reader-issue-test": "daily-book-reader-issue-local-only",

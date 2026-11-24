@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium, expect } from '@playwright/test';
 import Parser from 'rss-parser';
 import { stripAnsi } from './readiness.mjs';
+import { smoke as releaseSmoke } from './workers-builds-release.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const parent = join(root, '.cloudflare', 'library-rehearsal');
@@ -61,6 +62,15 @@ async function request(path, status = 200, options = {}) {
   assert.equal(response.status, status, path + ': ' + (await response.clone().text()).slice(0, 800));
   return response;
 }
+async function runtimeRows(sql, params = []) {
+  const response = await request('/cdn-cgi/local/explorer/api/d1/database/' + db + '/raw', 200, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sql, params }),
+  });
+  const payload = await response.json();
+  assert.equal(payload.success, true);
+  return payload.result.flatMap(item => item.results.rows.map(row =>
+    Object.fromEntries(item.results.columns.map((name, index) => [name, row[index]]))));
+}
 async function publicBookId() {
   return /data-book-id="([^"]+)"/.exec(await (await request('/')).text())?.[1];
 }
@@ -105,6 +115,15 @@ try {
   const original = (await rss()).items[0];
   assert.equal(original.guid, 'https://daily-book.jiahongw.com/#recommendation-' + today);
   checks.push('Concurrent native requests share a single recommendation across HTML and RSS.');
+
+  const releaseHeaders = { 'x-reader-release-check': '1' };
+  const releasedVersion = (await request('/api/v1/books', 200, { headers: releaseHeaders })).headers.get('x-reader-worker-version');
+  assert(releasedVersion);
+  await releaseSmoke(releasedVersion, (url, options) => {
+    const path = new URL(url);
+    return fetch(origin + path.pathname + path.search, { ...options, redirect: 'manual' });
+  });
+  checks.push('Native release smoke confirms the migrated book routes and checkout-wide Worker version.');
 
   const card = (await (await request('/api/v1/books?q=测试作者')).json()).items[0];
   assert.equal(card.id, 'shared-book');
@@ -162,7 +181,7 @@ try {
   await expect(editor.getByRole('link', { name: '查看公开书页' })).toBeVisible();
   await request('/api/v1/books/new-library-book');
   assert.equal(await publicBookId(), firstId);
-  const newRow = rows("SELECT eligible_on FROM book_content WHERE book_id='new-library-book'")[0];
+  const [newRow] = await runtimeRows("SELECT eligible_on FROM book_content WHERE book_id='new-library-book'");
   assert.equal(newRow.eligible_on, tomorrow);
   await editor.getByLabel('管理密钥').fill('');
   await capture(editor, 'editor-desktop');
@@ -180,27 +199,28 @@ try {
     });
     const payload = await result.json();
     assert.equal(payload.success, true);
+    assert.equal(payload.result.outcome.toLowerCase(), 'ok', JSON.stringify(payload.result));
   };
   const token = { Authorization: 'Bearer ' + key };
   const record = async id => (await request('/api/v1/admin/books/' + id, 200, { headers: token })).headers.get('ETag');
   const other = firstId === 'shared-book' ? 'replacement-book' : 'shared-book';
   const midnight = Date.parse(today + 'T00:00:00+08:00');
-  sql("UPDATE book_content SET eligible_on='" + tomorrow + "' WHERE book_id='" + other + "'");
+  await runtimeRows('UPDATE book_content SET eligible_on=? WHERE book_id=?', [tomorrow, other]);
   await dispatch(midnight - 1);
   await dispatch(midnight);
   await dispatch(midnight);
-  assert.deepEqual(rows('SELECT day,book_id FROM daily_recommendations ORDER BY day'),
+  assert.deepEqual(await runtimeRows('SELECT day,book_id FROM daily_recommendations ORDER BY day'),
     [{ day: previousDay, book_id: firstId }, { day: today, book_id: firstId }]);
   const repeat = (await rss()).items;
   assert.equal(repeat.length, 2);
   assert.equal(repeat[0].link, repeat[1].link);
   assert.notEqual(repeat[0].guid, repeat[1].guid);
   assert.equal(repeat[1].guid, 'https://daily-book.jiahongw.com/#recommendation-' + previousDay);
-  sql("UPDATE book_content SET eligible_on='" + today + "' WHERE book_id='" + other + "'");
+  await runtimeRows('UPDATE book_content SET eligible_on=? WHERE book_id=?', [today, other]);
   checks.push('Real scheduled invocations at Beijing midnight store separate days; repeated books keep separate RSS GUIDs.');
 
   await action(firstId, 'withdraw', await record(firstId));
-  assert.deepEqual(rows("SELECT book_id FROM daily_recommendations WHERE day='" + today + "'"), [{ book_id: other }]);
+  assert.deepEqual(await runtimeRows('SELECT book_id FROM daily_recommendations WHERE day=?', [today]), [{ book_id: other }]);
   assert.equal(await publicBookId(), other);
   const replacement = (await rss()).items[0];
   assert.equal(replacement.guid, original.guid);
@@ -209,17 +229,17 @@ try {
   await start();
   assert.equal(await publicBookId(), other);
   await action(other, 'withdraw', await record(other));
-  assert.deepEqual(rows("SELECT book_id FROM daily_recommendations WHERE day='" + today + "'"), [{ book_id: null }]);
+  assert.deepEqual(await runtimeRows('SELECT book_id FROM daily_recommendations WHERE day=?', [today]), [{ book_id: null }]);
   assert.equal(await publicBookId(), undefined);
   assert((await (await request('/')).text()).includes('暂无推荐'));
   assert(!(await rss()).items.some(item => item.guid === original.guid));
   checks.push('Withdrawal fills the same day, keeps the RSS GUID, and persists across restart. Empty eligible pool removes today.');
 
   await dispatch(midnight + 86400000 - 1);
-  const empty = rows("SELECT book_id FROM daily_recommendations WHERE day='" + today + "'");
+  const empty = await runtimeRows('SELECT book_id FROM daily_recommendations WHERE day=?', [today]);
   assert.deepEqual(empty, [{ book_id: null }]);
   await dispatch(midnight + 86400000);
-  const firstEligible = rows("SELECT book_id FROM daily_recommendations WHERE day='" + tomorrow + "'");
+  const firstEligible = await runtimeRows('SELECT book_id FROM daily_recommendations WHERE day=?', [tomorrow]);
   assert.deepEqual(firstEligible, [{ book_id: 'new-library-book' }]);
   assert(!(await rss()).items.some(item => item.guid.endsWith(tomorrow)));
   checks.push('The newly published book enters the draw exactly at the next Beijing midnight. RSS excludes future entries.');
