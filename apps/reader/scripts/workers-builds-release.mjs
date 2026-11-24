@@ -56,10 +56,31 @@ export async function smoke(expectedVersion, fetchResponse = request) {
     const response = await fetchResponse(canonicalOrigin + path, {
       headers: { "cache-control": "no-cache", "x-reader-release-check": "1" },
     });
-    assert.equal(response.status, status, `Reader response for ${path}`);
     assert.equal(response.headers.get("x-reader-worker-version"), expectedVersion,
       `Unexpected serving Worker version for ${path}`);
+    assert((Array.isArray(status) ? status : [status]).includes(response.status), `Reader response for ${path}: ${response.status}`);
     return response;
+  }
+
+  const library = await get("/api/v1/books", [200, 404]);
+  if (library.status === 200) {
+    const books = await library.json();
+    assert(Array.isArray(books.items), "Book library response does not contain a book list");
+    const home = await (await get("/")).text();
+    await get("/books");
+    const selected = /data-book-id="([A-Za-z0-9][A-Za-z0-9_-]*)"/.exec(home)?.[1];
+    const rss = await (await get("/rss.xml")).text();
+    if (selected) {
+      const page = "/books/" + selected;
+      const detail = await get("/api/v1" + page);
+      assert.equal((await detail.json()).data?.id, selected);
+      assert(rss.includes(`<link>${canonicalOrigin}${page}</link>`), "RSS lacks the selected book");
+      await get(page);
+      await get("/api/v1/admin" + page, 401);
+    } else {
+      assert(home.includes("暂无推荐"), "Expected empty recommendation state");
+    }
+    return;
   }
 
   const index = await get("/api/v1/issues?limit=1");

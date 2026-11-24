@@ -12,6 +12,11 @@ import {unavailablePage,failedRead,apiError} from './src/http';
 import {publicRssResponse} from './src/rss';
 import {legacyBookDateResponse} from './src/legacy-book';
 import {parseSearchInput} from './src/domain/search-input';
+import { libraryReady, readPublicBook } from './src/domain/book-library';
+import { beijingDay, ensureRecommendation } from './src/domain/daily-recommendation';
+import { libraryQuery } from './src/domain/library-query';
+import { emptyBody, publicLibrary } from './src/library-http';
+import { libraryAdminDetail, libraryAdminWrite } from './src/admin/library-routes';
 import { withRequestReads, type DecisionObserver } from './src/request-reads';
 
 // Keep the public entry selector. Its generated virtual-module declaration is
@@ -20,13 +25,58 @@ const framework: typeof appRouter = vinext;
 export function createReaderWorker(observer?: DecisionObserver, writeObserver?: WriteObserver) {
   return {
     ...framework,
+    async scheduled(event: ScheduledController) {
+      if (await libraryReady()) await ensureRecommendation(beijingDay(event.scheduledTime));
+    },
     async fetch(...args: Parameters<typeof framework.fetch>): Promise<Response> {
       const response = await withRequestReads(async () => {
         const url=new URL(args[0].url);const pathname=url.pathname;
         const legacyBook = /^\/book\/([^/]+)\/?$/.exec(pathname);
-        if (legacyBook) return legacyBookDateResponse(args[0], legacyBook[1]);
         const archive=/^\/archive\/?$/.test(pathname);
         let decodedPath=pathname;try{decodedPath=decodeURIComponent(pathname);}catch{/* framework owns invalid path syntax */}
+        const request = args[0];
+        const rsc = request.headers.get('RSC') === '1';
+        const bookPage = /^\/books(?:\/([^/]+))?\/?$/.exec(decodedPath);
+        const booksApi = /^\/api\/v1\/books(?:\/([^/]+))?\/?$/.exec(decodedPath);
+        const adminPage = /^\/admin\/books\/?$/.test(decodedPath);
+        const oldIssue = /^\/(?:issues|api\/v1\/(?:issues|admin\/issues))(?:\/|$)/.test(decodedPath);
+        const oldLibrary = /^\/(?:archive|search|api\/v1\/search)\/?$/.test(decodedPath);
+        const bookManagement = /^\/api\/v1\/admin\/books(?:\/|$)/.test(decodedPath);
+        if (bookPage || booksApi || adminPage || legacyBook || oldIssue || oldLibrary || bookManagement) {
+          const library = await libraryReady();
+          if (library && (legacyBook || oldIssue || oldLibrary)) {
+            const response = decodedPath.startsWith('/api/') ? apiError(404, 'NOT_FOUND', '地址不存在。') : unavailablePage(404, rsc, 'book');
+            return emptyBody(request, decodedPath.startsWith('/api/v1/admin/') ? privateResponse(response) : response);
+          }
+          if (legacyBook) return legacyBookDateResponse(request, legacyBook[1]);
+          if (booksApi) {
+            return library ? publicLibrary(request, booksApi[1]) : emptyBody(request, apiError(404, 'NOT_FOUND', '地址不存在。'));
+          }
+          if (bookPage || adminPage) {
+            if (!library) return emptyBody(request, unavailablePage(404, rsc, 'book'));
+            try {
+              if (bookPage?.[1] && !(await readPublicBook(bookPage[1]))) return emptyBody(request, unavailablePage(404, rsc, 'book'));
+              if (bookPage && !bookPage[1]) libraryQuery(url.searchParams, true);
+            } catch (error) {
+              return emptyBody(request, unavailablePage(error instanceof InvalidRequest ? 400 : 503, rsc, 'book'));
+            }
+          }
+          if (library && bookManagement) {
+            const action = /^\/api\/v1\/admin\/books\/([^/]+)\/(publish|withdraw|restore)\/?$/.exec(decodedPath);
+            const detail = /^\/api\/v1\/admin\/books\/([^/]+)\/?$/.exec(decodedPath);
+            const collection = /^\/api\/v1\/admin\/books\/?$/.test(decodedPath);
+            if (action) {
+              if (request.method === 'POST') return libraryAdminWrite(request, action[1], action[2] as 'publish'|'withdraw'|'restore', writeObserver);
+              return rejectAdminMethod(request, 'POST');
+            }
+            if (detail) {
+              if (['GET', 'HEAD'].includes(request.method)) return libraryAdminDetail(request, detail[1]);
+              if (request.method === 'PATCH') return libraryAdminWrite(request, detail[1], null, writeObserver);
+              return rejectAdminMethod(request, 'GET, HEAD, PATCH');
+            }
+            if (collection && request.method === 'POST') return libraryAdminWrite(request, null, null, writeObserver);
+          }
+        }
         const searchPage=/^\/search\/?$/.test(decodedPath);const searchApi=/^\/api\/v1\/search\/?$/.test(decodedPath);
         if(searchPage||searchApi){try{if(searchApi)parseSearchInput(url.searchParams,false);else parseSearchInput(url.searchParams,true);}
           catch(error){return searchApi?failedRead(error):unavailablePage(error instanceof InvalidRequest?400:503,args[0].headers.get('RSC')==='1','search');}}
@@ -68,7 +118,7 @@ export function createReaderWorker(observer?: DecisionObserver, writeObserver?: 
         // Also keep framework-generated management 404/405/HEAD responses
         // private/no-store. Authentication stays inside each registered route.
         if(management)return privateResponse(response);
-        if(archive||searchPage||searchApi){
+        if(archive||searchPage||searchApi||bookPage||adminPage||pathname==='/'){
           const headers=new Headers(response.headers);headers.set('Cache-Control','no-store');
           return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
         }
