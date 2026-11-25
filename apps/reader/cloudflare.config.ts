@@ -1,4 +1,4 @@
-import { bindings, defineConfig, defineWorker } from "cf/config";
+import { bindings, defineConfig, defineWorker, triggers } from "cf/config";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -52,6 +52,8 @@ function productionTarget(mode: string | undefined): ReleaseTarget | undefined {
 }
 
 const localWorkerNames: Record<string, string> = {
+  "reader-library-test": "daily-book-reader-library-local",
+  "reader-library-preview": "daily-book-reader-library-preview",
   "reader-write-test": "daily-book-reader-write-local",
   "reader-admin-write-test": "daily-book-reader-admin-write-local",
   "reader-issue-test": "daily-book-reader-issue-local",
@@ -64,6 +66,8 @@ const localWorkerNames: Record<string, string> = {
 };
 
 const localDatabaseIds: Record<string, string> = {
+  "reader-library-test": "00000000-0000-4000-8000-000000000087",
+  "reader-library-preview": "00000000-0000-4000-8000-000000000088",
   "reader-admin-write-test": "00000000-0000-4000-8000-000000000072",
   "reader-write-test": "00000000-0000-4000-8000-000000000070",
   "reader-issue-test": "00000000-0000-4000-8000-000000000071",
@@ -76,6 +80,8 @@ const localDatabaseIds: Record<string, string> = {
 };
 
 const localDatabaseNames: Record<string, string> = {
+  "reader-library-test": "daily-book-reader-library-local-only",
+  "reader-library-preview": "daily-book-reader-library-preview-only",
   "reader-admin-write-test": "daily-book-reader-admin-write-local-only",
   "reader-write-test": "daily-book-reader-write-local-only",
   "reader-issue-test": "daily-book-reader-issue-local-only",
@@ -97,7 +103,8 @@ export default defineConfig(({ mode }) => {
       entrypoint: mode === "reader-write-test" ? "./fixtures/write-worker.ts" : mode === "reader-race-test" ? "./fixtures/race-worker.ts" : "./worker.ts",
       compatibilityDate: "2026-11-07",
       compatibilityFlags: ["nodejs_compat"],
-      ...(release ? { domains: [release.canaryDomain], workersDev: false, previewUrls: false } : {}),
+      ...(release ? { domains: [release.canaryDomain], workersDev: false, previewUrls: false,
+        triggers: [triggers.scheduled({ schedule: "0 16 * * *" })] } : {}),
       assets: {
         htmlHandling: "none", notFoundHandling: "none",
         runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*"],

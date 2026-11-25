@@ -112,6 +112,19 @@ jobs:
         run: npm run verify
         working-directory: apps/reader
 
+      - name: Upload Book Library browser previews
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: reader-book-library-preview
+          path: |
+            apps/reader/.cloudflare/library-rehearsal/run-*/home-mobile.png
+            apps/reader/.cloudflare/library-rehearsal/run-*/library-mobile.png
+            apps/reader/.cloudflare/library-rehearsal/run-*/book-mobile.png
+            apps/reader/.cloudflare/library-rehearsal/run-*/editor-desktop.png
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
   e2e:
     needs: quality
     runs-on: ubuntu-latest

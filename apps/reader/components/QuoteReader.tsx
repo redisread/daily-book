@@ -2,7 +2,7 @@
 import { useEffect,useId,useRef,useState } from 'react';
 import type { Quote } from '../src/domain/types';
 
-export function QuoteReader({ quotes,author,title }: {quotes:Quote[];author:string;title:string}) {
+export function QuoteReader({ quotes,author,title }: {quotes:Pick<Quote,'id'|'text'|'sourceLabel'>[];author:string;title:string}) {
   const track=useRef<HTMLDivElement>(null);const id=useId();const [active,setActive]=useState(0);const [ready,setReady]=useState(false);
   function update() {
     if(!track.current)return;

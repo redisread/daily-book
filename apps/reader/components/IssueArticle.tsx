@@ -8,7 +8,7 @@ export function displayIssue(issue:PublicIssue):DisplayedIssue {
   return {id:issue.id,book:issue.book,quotes:issue.quotes,publicationDate:issue.publicationDate,issueNumber:issue.issueNumber,editorNote:issue.editorNote};
 }
 const weekdays=['日','一','二','三','四','五','六'];
-function dateLabel(value:string) {
+export function dateLabel(value:string) {
   const date=new Date(`${value}T00:00:00Z`);
   return `${date.getUTCFullYear()}年${date.getUTCMonth()+1}月${date.getUTCDate()}日 星期${weekdays[date.getUTCDay()]}`;
 }
